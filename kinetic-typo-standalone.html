@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kinetic Type with Three.js | Standalone Version</title>
+    <meta name="description" content="Single-file kinetic typography using Three.js" />
+    <style>
+        *,
+        *::after,
+        *::before {
+            box-sizing: border-box;
+        }
+
+        :root {
+            font-size: 16px;
+        }
+
+        body {
+            margin: 0;
+            --color-text: #fff;
+            --color-bg: #000;
+            --color-link: #aaa;
+            --color-link-hover: #aaa;
+            color: var(--color-text);
+            background-color: var(--color-bg);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: all 1.5s cubic-bezier(1, 0, 0, 1);
+        }
+
+        body.demo-2 {
+            --color-bg: #3e64ff;
+            --color-link: #13246d;
+            --color-link-hover: #13246d;
+        }
+
+        body.demo-3 {
+            --color-bg: #d8345f;
+            --color-text: #fff;
+            --color-link: #000;
+            --color-link-hover: #000;
+        }
+
+        body.demo-4 {
+            --color-bg: #f2f3f3;
+            --color-text: #888;
+            --color-link: #000;
+            --color-link-hover: #000;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--color-link);
+            outline: none;
+            cursor: pointer;
+            transition: color 1.5s cubic-bezier(1, 0, 0, 1);
+        }
+
+        a:hover,
+        a:focus {
+            color: var(--color-link-hover);
+            outline: none;
+            transition: none;
+        }
+
+        .frame {
+            padding: 3rem 5vw;
+            text-align: center;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .frame__title {
+            font-size: 1rem;
+            margin: 0 0 1rem;
+            font-weight: normal;
+        }
+
+        .frame__links {
+            display: inline;
+        }
+
+        .frame__links a:not(:last-child),
+        .frame__demos a:not(:last-child) {
+            margin-right: 1rem;
+        }
+
+        .frame__demos {
+            margin: 1rem 0;
+        }
+
+        .frame__demo--current,
+        .frame__demo--current:hover {
+            color: var(--color-text);
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: calc(100vh - 13rem);
+            position: relative;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        @media screen and (min-width: 53em) {
+            .frame {
+                position: fixed;
+                text-align: left;
+                z-index: 100;
+                top: 0;
+                left: 0;
+                display: grid;
+                align-content: space-between;
+                width: 100%;
+                max-width: none;
+                height: 100vh;
+                padding: 3rem;
+                pointer-events: none;
+                grid-template-columns: 75% 25%;
+                grid-template-rows: auto auto auto;
+                grid-template-areas: 'title links'
+                    '... ...'
+                    '... demos';
+            }
+
+            .frame__title-wrap {
+                grid-area: title;
+                display: flex;
+            }
+
+            .frame__title {
+                margin: 0;
+            }
+
+            .frame__demos {
+                margin: 0;
+                grid-area: demos;
+                justify-self: end;
+            }
+
+            .frame__links {
+                grid-area: links;
+                padding: 0;
+                justify-self: end;
+            }
+
+            .frame a {
+                pointer-events: auto;
+            }
+
+            .content {
+                height: 100vh;
+                justify-content: center;
+            }
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="frame">
+            <div class="frame__title-wrap">
+                <h1 class="frame__title">Kinetic Typography with Three.js</h1>
+            </div>
+            <div class="frame__links">
+                <a href="https://tympanus.net/codrops/?p=49770">Article</a>
+                <a href="https://github.com/marioecg/codrops-kinetic-typo">GitHub</a>
+            </div>
+            <div class="frame__demos">
+                <a class="frame__demo frame__demo--current" data-demo="0">Endless</a>
+                <a class="frame__demo" data-demo="1">Swirl</a>
+                <a class="frame__demo" data-demo="2">Twisted</a>
+                <a class="frame__demo" data-demo="3">Relax</a>
+            </div>
+        </div>
+        <div class="content">
+            <div id="webgl"></div>
+        </div>
+    </main>
+
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.150.0/build/three.module.js",
+            "gsap": "https://unpkg.com/gsap@3.12.0/index.js"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { gsap } from 'gsap';
+
+        // ==================== SHADERS ====================
+        const shaders = {
+            vertex: {
+                demo1: /* glsl */ `
+                    varying vec2 vUv;
+                    varying vec3 vPosition;
+                    uniform float uTime;
+
+                    void main() {
+                        vUv = uv;
+                        vPosition = position;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
+                    }
+                `,
+                demo2: /* glsl */ `
+                    varying vec2 vUv;
+                    varying vec3 vPosition;
+                    uniform float uTime;
+
+                    void main() {
+                        vUv = uv;
+                        vPosition = position;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
+                    }
+                `,
+                demo3: /* glsl */ `
+                    varying vec2 vUv;
+                    uniform float uTime;
+
+                    mat4 rotation3d(vec3 axis, float angle) {
+                        axis = normalize(axis);
+                        float s = sin(angle);
+                        float c = cos(angle);
+                        float oc = 1.0 - c;
+
+                        return mat4(
+                            oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
+                            oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
+                            oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
+                            0.0,                                0.0,                                0.0,                                1.0
+                        );
+                    }
+
+                    vec3 rotate(vec3 v, vec3 axis, float angle) {
+                        return (rotation3d(axis, angle) * vec4(v, 1.0)).xyz;
+                    }
+
+                    void main() {
+                        vUv = uv;
+                        vec3 pos = position;
+                        vec3 axis = vec3(1., 0., 0.);
+                        float twist = 0.1;
+                        float angle = pos.x * twist;
+                        vec3 transformed = rotate(pos, axis, angle);
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.);
+                    }
+                `,
+                demo4: /* glsl */ `
+                    varying vec2 vUv;
+                    varying float vWave;
+                    uniform float uTime;
+
+                    void main() {
+                        vUv = uv;
+                        vec3 pos = position;
+                        float freq = 0.5;
+                        float amp = 1.;
+                        float time = uTime * 3.5;
+                        pos.z += sin((pos.x - pos.y) * freq - time) * amp;
+                        vWave = pos.z;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.);
+                    }
+                `
+            },
+            fragment: {
+                demo1: /* glsl */ `
+                    varying vec2 vUv;
+                    varying vec3 vPosition;
+                    uniform float uTime;
+                    uniform sampler2D uTexture;
+
+                    void main() {
+                        float time = uTime * 0.4;
+                        vec2 repeat = -vec2(12., 3.);
+                        vec2 uv = fract(vUv * repeat - vec2(time, 0.));
+                        vec3 texture = texture2D(uTexture, uv).rgb;
+                        float fog = clamp(vPosition.z / 6., 0., 1.);
+                        vec3 fragColor = mix(vec3(0.), texture, fog);
+                        gl_FragColor = vec4(fragColor, 1.);
+                    }
+                `,
+                demo2: /* glsl */ `
+                    varying vec2 vUv;
+                    varying vec3 vPosition;
+                    uniform float uTime;
+                    uniform sampler2D uTexture;
+
+                    void main() {
+                        float time = uTime * 1.5;
+                        vec2 repeat = vec2(12., 12.);
+                        vec2 uv = fract(vUv * repeat + vec2(sin(vUv.y * 1.) * 5., time));
+                        vec3 texture = texture2D(uTexture, uv).rgb;
+                        float depth = vPosition.z / 10.;
+                        vec3 fragColor = mix(vec3(0., 0., .8), texture, depth);
+                        gl_FragColor = vec4(fragColor, 1.);
+                    }
+                `,
+                demo3: /* glsl */ `
+                    varying vec2 vUv;
+                    uniform float uTime;
+                    uniform sampler2D uTexture;
+
+                    void main() {
+                        float time = uTime * 0.25;
+                        vec2 uv = fract(vUv * 3. - vec2(time, 0.));
+                        vec3 texture = texture2D(uTexture, uv).rgb;
+                        gl_FragColor = vec4(texture, 1.);
+                    }
+                `,
+                demo4: /* glsl */ `
+                    varying vec2 vUv;
+                    varying float vWave;
+                    uniform float uTime;
+                    uniform sampler2D uTexture;
+
+                    float map(float value, float min1, float max1, float min2, float max2) {
+                        return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
+                    }
+
+                    void main() {
+                        float time = uTime * 0.25;
+                        vec2 repeat = vec2(4., 16.);
+                        vec2 uv = fract(vUv * repeat);
+                        vec3 texture = texture2D(uTexture, uv).rgb;
+                        float wave = vWave;
+                        wave = map(wave, -1., 1., 0., 0.1);
+                        float shadow = 1. - wave;
+                        vec3 fragColor = texture * shadow;
+                        gl_FragColor = vec4(fragColor, 1.);
+                    }
+                `
+            }
+        };
+
+        // ==================== OPTIONS ====================
+        const options = [
+            {
+                word: 'ENDLESS',
+                color: '#ffffff',
+                fill: '#000000',
+                geometry: new THREE.TorusKnotGeometry(9, 3, 768, 3, 4, 3),
+                position: { mesh: [0, 0, 0] },
+                shaders: {
+                    vertex: shaders.vertex.demo1,
+                    fragment: shaders.fragment.demo1
+                },
+                class: 'demo-1'
+            },
+            {
+                word: 'SWIRL',
+                color: '#ffffff',
+                fill: '#3e64ff',
+                geometry: new THREE.SphereGeometry(12, 64, 64),
+                position: { mesh: [0, 0, 0] },
+                shaders: {
+                    vertex: shaders.vertex.demo2,
+                    fragment: shaders.fragment.demo2
+                },
+                class: 'demo-2'
+            },
+            {
+                word: 'TWISTED',
+                color: '#ffffff',
+                fill: '#d8345f',
+                geometry: new THREE.BoxGeometry(100, 10, 10, 64, 64, 64),
+                position: { mesh: [0, 0, 0] },
+                shaders: {
+                    vertex: shaders.vertex.demo3,
+                    fragment: shaders.fragment.demo3
+                },
+                class: 'demo-3'
+            },
+            {
+                word: 'RELAX',
+                color: '#fff',
+                fill: '#e3e6e5',
+                geometry: new THREE.PlaneGeometry(27, 27, 64, 64),
+                position: { mesh: [0, 0, 0] },
+                shaders: {
+                    vertex: shaders.vertex.demo4,
+                    fragment: shaders.fragment.demo4
+                },
+                class: 'demo-4'
+            }
+        ];
+
+        // ==================== TEXT TEXTURE CREATOR ====================
+        function createTextTexture(text, textColor, backgroundColor) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            // Background
+            ctx.fillStyle = backgroundColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Text
+            ctx.fillStyle = textColor;
+            ctx.font = 'bold 120px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+        // ==================== TYPE CLASS ====================
+        class Type extends THREE.Object3D {
+            init(opts) {
+                this.opts = opts;
+                this.createMesh();
+            }
+
+            createMesh() {
+                const texture = createTextTexture(
+                    this.opts.word,
+                    this.opts.color,
+                    this.opts.fill
+                );
+
+                this.material = new THREE.ShaderMaterial({
+                    vertexShader: this.opts.shaders.vertex,
+                    fragmentShader: this.opts.shaders.fragment,
+                    uniforms: {
+                        uTime: { value: 0 },
+                        uTexture: { value: texture },
+                    },
+                    defines: {
+                        PI: Math.PI
+                    },
+                    side: THREE.DoubleSide
+                });
+
+                this.mesh = new THREE.Mesh(this.opts.geometry, this.material);
+                this.mesh.position.set(...this.opts.position.mesh);
+                this.mesh.lookAt(new THREE.Vector3());
+
+                this.add(this.mesh);
+            }
+
+            updateTime(time) {
+                if (this.material) {
+                    this.material.uniforms.uTime.value = time;
+                }
+            }
+        }
+
+        // ==================== GL CLASS ====================
+        class Gl {
+            constructor() {
+                this.renderer = new THREE.WebGLRenderer({
+                    alpha: true,
+                });
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setClearColor(0x000000, 0);
+
+                this.camera = new THREE.PerspectiveCamera(
+                    45,
+                    window.innerWidth / window.innerHeight,
+                    1,
+                    1000
+                );
+                this.camera.position.z = 1;
+
+                this.scene = new THREE.Scene();
+                this.clock = new THREE.Clock();
+
+                this.init();
+            }
+
+            render() {
+                this.renderer.render(this.scene, this.camera);
+            }
+
+            animate() {
+                requestAnimationFrame(this.animate.bind(this));
+
+                for (let i = 0; i < this.scene.children.length; i++) {
+                    const obj = this.scene.children[i];
+                    if (obj.updateTime) {
+                        obj.updateTime(this.clock.getElapsedTime());
+                    }
+                }
+
+                this.render();
+            }
+
+            addEvents() {
+                window.addEventListener('resize', this.resize.bind(this));
+            }
+
+            init() {
+                this.addToDom();
+                this.animate();
+                this.addEvents();
+            }
+
+            addToDom() {
+                const canvas = this.renderer.domElement;
+                const container = document.querySelector('#webgl');
+                container.appendChild(canvas);
+            }
+
+            resize() {
+                let width = window.innerWidth;
+                let height = window.innerHeight;
+
+                this.camera.aspect = width / height;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(width, height);
+            }
+        }
+
+        // ==================== APP CLASS ====================
+        class App {
+            constructor() {
+                this.elems = [...document.querySelectorAll('.frame__demo')];
+                this.prev = 0;
+                this.current = 0;
+                this.turn = 0;
+                this.gl = null;
+
+                this.init();
+            }
+
+            init() {
+                this.createGl();
+                this.changeDemo();
+            }
+
+            createGl() {
+                this.gl = new Gl();
+
+                for (let i = 0; i < options.length; i++) {
+                    // Position elements in a circle
+                    let angle = (i / options.length) * (Math.PI * 2) + Math.PI * 1.5;
+                    let radius = 50;
+                    let x = radius * Math.cos(angle);
+                    let z = radius * Math.sin(angle);
+                    options[i].position.mesh = [x, 0, z];
+
+                    // Create kinetic type
+                    let type = new Type();
+                    type.init(options[i]);
+                    this.gl.scene.add(type);
+                }
+            }
+
+            changeDemo() {
+                this.elems.forEach((el, index) =>
+                    el.addEventListener('click', this.onClick.bind(this, index))
+                );
+            }
+
+            onClick(index, { currentTarget }) {
+                this.elems.forEach(el => el.classList.remove('frame__demo--current'));
+                currentTarget.classList.add('frame__demo--current');
+
+                this.prev = this.current;
+                this.current = this.elems.indexOf(currentTarget);
+
+                if (this.prev === this.current) return;
+
+                this.turn = (Math.PI / 2) * (this.current - this.prev);
+
+                gsap.timeline({
+                    onStart: () => {
+                        document.body.className = "";
+                        document.body.classList.add(options[index].class);
+                    }
+                })
+                .to(this.gl.scene.rotation, {
+                    duration: 1.5,
+                    ease: "expo.inOut",
+                    y: `+=${this.turn}`,
+                });
+            }
+        }
+
+        // ==================== START APP ====================
+        new App();
+    </script>
+</body>
+</html>
