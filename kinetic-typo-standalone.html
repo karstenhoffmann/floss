@@ -170,6 +170,86 @@
             top: 0;
             left: 0;
         }
+
+        .font-size-control {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            transition: opacity 0.3s;
+        }
+
+        .font-size-control:hover {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .font-size-control label {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .font-size-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 200px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            border-radius: 1px;
+        }
+
+        .font-size-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--color-text);
+            cursor: pointer;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .font-size-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .font-size-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: var(--color-text);
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+            transition: transform 0.2s;
+        }
+
+        .font-size-slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .font-size-value {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 2000;
+            font-size: 0.75rem;
+            opacity: 0.5;
+            font-variant-numeric: tabular-nums;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+        }
     </style>
 </head>
 <body class="demo-1">
@@ -192,6 +272,21 @@
         <div class="content">
             <div id="webgl"></div>
         </div>
+
+        <!-- Font Size Control -->
+        <div class="font-size-control">
+            <label for="fontSizeSlider">Font Size</label>
+            <input
+                type="range"
+                id="fontSizeSlider"
+                class="font-size-slider"
+                min="0.5"
+                max="2.5"
+                step="0.05"
+                value="1.0"
+            />
+        </div>
+        <div class="font-size-value" id="fontSizeValue">1.00x</div>
     </main>
 
     <!-- Load libraries as global scripts for mobile compatibility -->
@@ -397,7 +492,8 @@
             ];
 
             // ==================== TEXT TEXTURE CREATOR ====================
-            function createTextTexture(text, textColor, backgroundColor) {
+            function createTextTexture(text, textColor, backgroundColor, fontScale) {
+                fontScale = fontScale || 1.0;
                 const canvas = document.createElement('canvas');
                 canvas.width = 1024;
                 canvas.height = 512;
@@ -409,7 +505,8 @@
 
                 // Text
                 ctx.fillStyle = textColor;
-                ctx.font = 'bold 120px Arial, sans-serif';
+                const fontSize = Math.round(120 * fontScale);
+                ctx.font = 'bold ' + fontSize + 'px Arial, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(text, canvas.width / 2, canvas.height / 2);
@@ -423,6 +520,7 @@
             class Type extends THREE.Object3D {
                 init(opts) {
                     this.opts = opts;
+                    this.fontScale = 1.0;
                     this.createMesh();
                 }
 
@@ -430,7 +528,8 @@
                     const texture = createTextTexture(
                         this.opts.word,
                         this.opts.color,
-                        this.opts.fill
+                        this.opts.fill,
+                        this.fontScale
                     );
 
                     this.material = new THREE.ShaderMaterial({
@@ -451,6 +550,24 @@
                     this.mesh.lookAt(new THREE.Vector3());
 
                     this.add(this.mesh);
+                }
+
+                updateFontScale(scale) {
+                    this.fontScale = scale;
+                    const newTexture = createTextTexture(
+                        this.opts.word,
+                        this.opts.color,
+                        this.opts.fill,
+                        this.fontScale
+                    );
+
+                    if (this.material) {
+                        // Dispose old texture
+                        if (this.material.uniforms.uTexture.value) {
+                            this.material.uniforms.uTexture.value.dispose();
+                        }
+                        this.material.uniforms.uTexture.value = newTexture;
+                    }
                 }
 
                 updateTime(time) {
@@ -535,6 +652,7 @@
                     this.current = 0;
                     this.turn = 0;
                     this.gl = null;
+                    this.types = [];
 
                     this.init();
                 }
@@ -542,6 +660,7 @@
                 init() {
                     this.createGl();
                     this.changeDemo();
+                    this.setupFontSizeControl();
                 }
 
                 createGl() {
@@ -559,7 +678,24 @@
                         let type = new Type();
                         type.init(options[i]);
                         this.gl.scene.add(type);
+                        this.types.push(type);
                     }
+                }
+
+                setupFontSizeControl() {
+                    const slider = document.getElementById('fontSizeSlider');
+                    const valueDisplay = document.getElementById('fontSizeValue');
+                    const self = this;
+
+                    slider.addEventListener('input', function(e) {
+                        const scale = parseFloat(e.target.value);
+                        valueDisplay.textContent = scale.toFixed(2) + 'x';
+
+                        // Update all type instances
+                        for (let i = 0; i < self.types.length; i++) {
+                            self.types[i].updateFontScale(scale);
+                        }
+                    });
                 }
 
                 changeDemo() {
