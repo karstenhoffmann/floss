@@ -171,84 +171,121 @@
             left: 0;
         }
 
-        .font-size-control {
+        .controls-panel {
             position: fixed;
-            bottom: 2rem;
+            bottom: 1rem;
             left: 50%;
             transform: translateX(-50%);
             z-index: 2000;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 1rem;
+            border-radius: 1rem;
+            max-width: 90vw;
+            width: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-row {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            padding: 0.75rem 1.5rem;
-            border-radius: 2rem;
-            transition: opacity 0.3s;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
         }
 
-        .font-size-control:hover {
-            background: rgba(0, 0, 0, 0.4);
+        .control-row:last-child {
+            margin-bottom: 0;
         }
 
-        .font-size-control label {
-            font-size: 0.75rem;
+        .control-row label {
+            font-size: 0.7rem;
             opacity: 0.7;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.05em;
+            min-width: 60px;
+            flex-shrink: 0;
         }
 
-        .font-size-slider {
+        .control-row input[type="text"] {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            padding: 0.4rem 0.7rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            outline: none;
+            flex: 1;
+            min-width: 100px;
+            max-width: 200px;
+        }
+
+        .control-row input[type="text"]:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .control-row input[type="range"] {
             -webkit-appearance: none;
             appearance: none;
-            width: 200px;
-            height: 2px;
+            flex: 1;
+            height: 3px;
             background: rgba(255, 255, 255, 0.2);
             outline: none;
-            border-radius: 1px;
+            border-radius: 2px;
+            min-width: 100px;
+            max-width: 180px;
         }
 
-        .font-size-slider::-webkit-slider-thumb {
+        .control-row input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             background: var(--color-text);
             cursor: pointer;
             border-radius: 50%;
-            transition: transform 0.2s;
         }
 
-        .font-size-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-        }
-
-        .font-size-slider::-moz-range-thumb {
-            width: 16px;
-            height: 16px;
+        .control-row input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
             background: var(--color-text);
             cursor: pointer;
             border-radius: 50%;
             border: none;
-            transition: transform 0.2s;
         }
 
-        .font-size-slider::-moz-range-thumb:hover {
-            transform: scale(1.2);
-        }
-
-        .font-size-value {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 2000;
-            font-size: 0.75rem;
-            opacity: 0.5;
+        .control-value {
+            font-size: 0.7rem;
+            opacity: 0.6;
             font-variant-numeric: tabular-nums;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            padding: 0.5rem 1rem;
-            border-radius: 1rem;
+            min-width: 35px;
+            text-align: right;
+        }
+
+        @media screen and (max-width: 600px) {
+            .controls-panel {
+                width: 95vw;
+                max-width: 95vw;
+                padding: 0.75rem;
+            }
+
+            .control-row {
+                gap: 0.5rem;
+                margin-bottom: 0.6rem;
+            }
+
+            .control-row label {
+                font-size: 0.65rem;
+                min-width: 50px;
+            }
+
+            .control-row input[type="text"] {
+                font-size: 0.8rem;
+                padding: 0.35rem 0.6rem;
+            }
         }
     </style>
 </head>
@@ -273,20 +310,23 @@
             <div id="webgl"></div>
         </div>
 
-        <!-- Font Size Control -->
-        <div class="font-size-control">
-            <label for="fontSizeSlider">Font Size</label>
-            <input
-                type="range"
-                id="fontSizeSlider"
-                class="font-size-slider"
-                min="0.5"
-                max="2.5"
-                step="0.05"
-                value="1.0"
-            />
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <div class="control-row">
+                <label for="textInput">Text</label>
+                <input type="text" id="textInput" value="ENDLESS" />
+            </div>
+            <div class="control-row">
+                <label for="fontSizeSlider">Size</label>
+                <input type="range" id="fontSizeSlider" min="0.5" max="2.5" step="0.05" value="1.0" />
+                <span class="control-value" id="fontSizeValue">1.00</span>
+            </div>
+            <div class="control-row">
+                <label for="repeatSlider">Repeat</label>
+                <input type="range" id="repeatSlider" min="0.5" max="3.0" step="0.1" value="1.0" />
+                <span class="control-value" id="repeatValue">1.00</span>
+            </div>
         </div>
-        <div class="font-size-value" id="fontSizeValue">1.00x</div>
     </main>
 
     <!-- Load libraries as global scripts for mobile compatibility -->
@@ -374,11 +414,12 @@
                         varying vec2 vUv;
                         varying vec3 vPosition;
                         uniform float uTime;
+                        uniform float uRepeatScale;
                         uniform sampler2D uTexture;
 
                         void main() {
                             float time = uTime * 0.4;
-                            vec2 repeat = -vec2(12., 3.);
+                            vec2 repeat = -vec2(12., 3.) * uRepeatScale;
                             vec2 uv = fract(vUv * repeat - vec2(time, 0.));
                             vec3 texture = texture2D(uTexture, uv).rgb;
                             float fog = clamp(vPosition.z / 6., 0., 1.);
@@ -390,11 +431,12 @@
                         varying vec2 vUv;
                         varying vec3 vPosition;
                         uniform float uTime;
+                        uniform float uRepeatScale;
                         uniform sampler2D uTexture;
 
                         void main() {
                             float time = uTime * 1.5;
-                            vec2 repeat = vec2(12., 12.);
+                            vec2 repeat = vec2(12., 12.) * uRepeatScale;
                             vec2 uv = fract(vUv * repeat + vec2(sin(vUv.y * 1.) * 5., time));
                             vec3 texture = texture2D(uTexture, uv).rgb;
                             float depth = vPosition.z / 10.;
@@ -405,11 +447,12 @@
                     demo3: `
                         varying vec2 vUv;
                         uniform float uTime;
+                        uniform float uRepeatScale;
                         uniform sampler2D uTexture;
 
                         void main() {
                             float time = uTime * 0.25;
-                            vec2 uv = fract(vUv * 3. - vec2(time, 0.));
+                            vec2 uv = fract(vUv * 3. * uRepeatScale - vec2(time, 0.));
                             vec3 texture = texture2D(uTexture, uv).rgb;
                             gl_FragColor = vec4(texture, 1.);
                         }
@@ -418,6 +461,7 @@
                         varying vec2 vUv;
                         varying float vWave;
                         uniform float uTime;
+                        uniform float uRepeatScale;
                         uniform sampler2D uTexture;
 
                         float map(float value, float min1, float max1, float min2, float max2) {
@@ -426,7 +470,7 @@
 
                         void main() {
                             float time = uTime * 0.25;
-                            vec2 repeat = vec2(4., 16.);
+                            vec2 repeat = vec2(4., 16.) * uRepeatScale;
                             vec2 uv = fract(vUv * repeat);
                             vec3 texture = texture2D(uTexture, uv).rgb;
                             float wave = vWave;
@@ -521,6 +565,7 @@
                 init(opts) {
                     this.opts = opts;
                     this.fontScale = 1.0;
+                    this.repeatScale = 1.0;
                     this.createMesh();
                 }
 
@@ -538,6 +583,7 @@
                         uniforms: {
                             uTime: { value: 0 },
                             uTexture: { value: texture },
+                            uRepeatScale: { value: this.repeatScale },
                         },
                         defines: {
                             PI: Math.PI
@@ -552,6 +598,23 @@
                     this.add(this.mesh);
                 }
 
+                updateText(text) {
+                    this.opts.word = text;
+                    const newTexture = createTextTexture(
+                        this.opts.word,
+                        this.opts.color,
+                        this.opts.fill,
+                        this.fontScale
+                    );
+
+                    if (this.material) {
+                        if (this.material.uniforms.uTexture.value) {
+                            this.material.uniforms.uTexture.value.dispose();
+                        }
+                        this.material.uniforms.uTexture.value = newTexture;
+                    }
+                }
+
                 updateFontScale(scale) {
                     this.fontScale = scale;
                     const newTexture = createTextTexture(
@@ -562,11 +625,17 @@
                     );
 
                     if (this.material) {
-                        // Dispose old texture
                         if (this.material.uniforms.uTexture.value) {
                             this.material.uniforms.uTexture.value.dispose();
                         }
                         this.material.uniforms.uTexture.value = newTexture;
+                    }
+                }
+
+                updateRepeatScale(scale) {
+                    this.repeatScale = scale;
+                    if (this.material) {
+                        this.material.uniforms.uRepeatScale.value = scale;
                     }
                 }
 
@@ -683,17 +752,36 @@
                 }
 
                 setupFontSizeControl() {
-                    const slider = document.getElementById('fontSizeSlider');
-                    const valueDisplay = document.getElementById('fontSizeValue');
+                    const textInput = document.getElementById('textInput');
+                    const fontSizeSlider = document.getElementById('fontSizeSlider');
+                    const fontSizeValue = document.getElementById('fontSizeValue');
+                    const repeatSlider = document.getElementById('repeatSlider');
+                    const repeatValue = document.getElementById('repeatValue');
                     const self = this;
 
-                    slider.addEventListener('input', function(e) {
-                        const scale = parseFloat(e.target.value);
-                        valueDisplay.textContent = scale.toFixed(2) + 'x';
+                    // Text input handler
+                    textInput.addEventListener('input', function(e) {
+                        const text = e.target.value.toUpperCase();
+                        if (self.types[self.current]) {
+                            self.types[self.current].updateText(text);
+                        }
+                    });
 
-                        // Update all type instances
-                        for (let i = 0; i < self.types.length; i++) {
-                            self.types[i].updateFontScale(scale);
+                    // Font size slider handler
+                    fontSizeSlider.addEventListener('input', function(e) {
+                        const scale = parseFloat(e.target.value);
+                        fontSizeValue.textContent = scale.toFixed(2);
+                        if (self.types[self.current]) {
+                            self.types[self.current].updateFontScale(scale);
+                        }
+                    });
+
+                    // Repeat slider handler
+                    repeatSlider.addEventListener('input', function(e) {
+                        const scale = parseFloat(e.target.value);
+                        repeatValue.textContent = scale.toFixed(2);
+                        if (self.types[self.current]) {
+                            self.types[self.current].updateRepeatScale(scale);
                         }
                     });
                 }
@@ -718,6 +806,12 @@
                     this.current = this.elems.indexOf(currentTarget);
 
                     if (this.prev === this.current) return;
+
+                    // Update text input to show current demo's text
+                    const textInput = document.getElementById('textInput');
+                    if (textInput && this.types[this.current]) {
+                        textInput.value = this.types[this.current].opts.word;
+                    }
 
                     this.turn = (Math.PI / 2) * (this.current - this.prev);
 
