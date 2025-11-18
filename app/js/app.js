@@ -285,10 +285,17 @@ class App {
      */
     updateSettingsPanel(effect) {
         const settingsContent = document.getElementById('settings-content');
+        if (!settingsContent) {
+            console.error('❌ Settings content element not found!');
+            return;
+        }
+
         settingsContent.innerHTML = '';
 
         const schema = effect.getSettingsSchema();
         const settings = effect.settings;
+
+        console.log('✓ Updating settings panel, schema keys:', Object.keys(schema).length);
 
         // Group settings
         const groups = {
@@ -299,8 +306,13 @@ class App {
 
         Object.entries(groups).forEach(([groupName, keys]) => {
             const group = this.createControlGroup(groupName, keys, schema, settings, effect);
-            settingsContent.appendChild(group);
+            if (group && group.children.length > 1) {
+                settingsContent.appendChild(group);
+                console.log(`✓ Added ${groupName} group`);
+            }
         });
+
+        console.log('✓ Settings panel updated, total groups:', settingsContent.children.length);
     }
 
     /**
