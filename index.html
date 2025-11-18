@@ -216,11 +216,11 @@
         <p class="loader__text">Loading kinetic magic...</p>
     </div>
 
-    <!-- Import Map (THREE as ESM, others as local shims) -->
+    <!-- Import Map (local ESM wrappers for UMD globals) -->
     <script type="importmap">
     {
       "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+        "three": "./js/vendor/three.js",
         "load-bmfont": "./js/vendor/load-bmfont.js",
         "three-bmfont-text": "./js/vendor/three-bmfont-text.js",
         "three-bmfont-text/shaders/msdf.js": "./js/vendor/three-bmfont-text.js"
@@ -251,6 +251,13 @@
                 }
             }
 
+            // Load THREE.js as global (required by three-bmfont-text.umd.js)
+            const threeScript = document.createElement('script');
+            threeScript.src = 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js';
+            threeScript.onload = onScriptLoaded;
+            threeScript.onerror = () => console.error('Failed to load THREE.js');
+            document.body.appendChild(threeScript);
+
             // Load GSAP
             const gsapScript = document.createElement('script');
             gsapScript.src = 'https://unpkg.com/gsap@3.12.4/dist/gsap.min.js';
@@ -265,7 +272,7 @@
             bmfontScript.onerror = () => console.error('Failed to load load-bmfont');
             document.body.appendChild(bmfontScript);
 
-            // Load three-bmfont-text (local UMD bundle)
+            // Load three-bmfont-text (local UMD bundle - requires THREE global)
             const bmfontTextScript = document.createElement('script');
             bmfontTextScript.src = './js/vendor/three-bmfont-text.umd.js';
             bmfontTextScript.onload = onScriptLoaded;
