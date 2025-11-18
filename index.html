@@ -228,17 +228,23 @@
     }
     </script>
 
-    <!-- Load non-ESM dependencies as globals first (with proper loading order) -->
+    <!-- Load non-ESM dependencies SEQUENTIALLY (not in parallel!) -->
     <script>
-        // Load UMD dependencies sequentially, then start ESM modules
+        // CRITICAL: Load scripts ONE AT A TIME in strict sequence!
+        // three-bmfont-text.umd.js requires THREE to be fully loaded first
         (function() {
-            let loadedCount = 0;
-            const totalScripts = 3;
+            const scripts = [
+                'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js',
+                'https://unpkg.com/gsap@3.12.4/dist/gsap.min.js',
+                './js/vendor/load-bmfont.umd.js',
+                './js/vendor/three-bmfont-text.umd.js'
+            ];
 
-            function onScriptLoaded() {
-                loadedCount++;
-                if (loadedCount === totalScripts) {
-                    // All UMD scripts loaded, now start ESM modules
+            let currentIndex = 0;
+
+            function loadNextScript() {
+                if (currentIndex >= scripts.length) {
+                    // All UMD scripts loaded sequentially, now start ESM modules
                     const uiScript = document.createElement('script');
                     uiScript.type = 'module';
                     uiScript.src = 'js/ui.js';
@@ -248,36 +254,29 @@
                     mainScript.type = 'module';
                     mainScript.src = 'js/index.js';
                     document.body.appendChild(mainScript);
+                    return;
                 }
+
+                const script = document.createElement('script');
+                script.src = scripts[currentIndex];
+
+                script.onload = () => {
+                    console.log(`✓ Loaded: ${scripts[currentIndex]}`);
+                    currentIndex++;
+                    loadNextScript(); // Load next script AFTER this one finishes
+                };
+
+                script.onerror = () => {
+                    console.error(`✗ Failed to load: ${scripts[currentIndex]}`);
+                    currentIndex++;
+                    loadNextScript(); // Continue even if one fails
+                };
+
+                document.body.appendChild(script);
             }
 
-            // Load THREE.js as global (required by three-bmfont-text.umd.js)
-            const threeScript = document.createElement('script');
-            threeScript.src = 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js';
-            threeScript.onload = onScriptLoaded;
-            threeScript.onerror = () => console.error('Failed to load THREE.js');
-            document.body.appendChild(threeScript);
-
-            // Load GSAP
-            const gsapScript = document.createElement('script');
-            gsapScript.src = 'https://unpkg.com/gsap@3.12.4/dist/gsap.min.js';
-            gsapScript.onload = onScriptLoaded;
-            gsapScript.onerror = () => console.error('Failed to load GSAP');
-            document.body.appendChild(gsapScript);
-
-            // Load load-bmfont (local UMD bundle)
-            const bmfontScript = document.createElement('script');
-            bmfontScript.src = './js/vendor/load-bmfont.umd.js';
-            bmfontScript.onload = onScriptLoaded;
-            bmfontScript.onerror = () => console.error('Failed to load load-bmfont');
-            document.body.appendChild(bmfontScript);
-
-            // Load three-bmfont-text (local UMD bundle - requires THREE global)
-            const bmfontTextScript = document.createElement('script');
-            bmfontTextScript.src = './js/vendor/three-bmfont-text.umd.js';
-            bmfontTextScript.onload = onScriptLoaded;
-            bmfontTextScript.onerror = () => console.error('Failed to load three-bmfont-text');
-            document.body.appendChild(bmfontTextScript);
+            // Start the sequential loading chain
+            loadNextScript();
         })();
     </script>
 
