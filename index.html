@@ -216,11 +216,6 @@
         <p class="loader__text">Loading kinetic magic...</p>
     </div>
 
-    <!-- Load non-ESM dependencies as globals first -->
-    <script src="https://unpkg.com/gsap@3.12.4/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/load-bmfont@2.3.4/browser.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three-bmfont-text@3.0.1/dist/three-bmfont-text.js"></script>
-
     <!-- Import Map (THREE as ESM, others as local shims) -->
     <script type="importmap">
     {
@@ -233,9 +228,51 @@
     }
     </script>
 
-    <!-- App Scripts (ES Modules) -->
-    <script type="module" src="js/ui.js"></script>
-    <script type="module" src="js/index.js"></script>
+    <!-- Load non-ESM dependencies as globals first (with proper loading order) -->
+    <script>
+        // Load UMD dependencies sequentially, then start ESM modules
+        (function() {
+            let loadedCount = 0;
+            const totalScripts = 3;
+
+            function onScriptLoaded() {
+                loadedCount++;
+                if (loadedCount === totalScripts) {
+                    // All UMD scripts loaded, now start ESM modules
+                    const uiScript = document.createElement('script');
+                    uiScript.type = 'module';
+                    uiScript.src = 'js/ui.js';
+                    document.body.appendChild(uiScript);
+
+                    const mainScript = document.createElement('script');
+                    mainScript.type = 'module';
+                    mainScript.src = 'js/index.js';
+                    document.body.appendChild(mainScript);
+                }
+            }
+
+            // Load GSAP
+            const gsapScript = document.createElement('script');
+            gsapScript.src = 'https://unpkg.com/gsap@3.12.4/dist/gsap.min.js';
+            gsapScript.onload = onScriptLoaded;
+            gsapScript.onerror = () => console.error('Failed to load GSAP');
+            document.body.appendChild(gsapScript);
+
+            // Load load-bmfont
+            const bmfontScript = document.createElement('script');
+            bmfontScript.src = 'https://cdn.jsdelivr.net/npm/load-bmfont@2.3.4/browser.js';
+            bmfontScript.onload = onScriptLoaded;
+            bmfontScript.onerror = () => console.error('Failed to load load-bmfont');
+            document.body.appendChild(bmfontScript);
+
+            // Load three-bmfont-text
+            const bmfontTextScript = document.createElement('script');
+            bmfontTextScript.src = 'https://cdn.jsdelivr.net/npm/three-bmfont-text@3.0.1/dist/three-bmfont-text.js';
+            bmfontTextScript.onload = onScriptLoaded;
+            bmfontTextScript.onerror = () => console.error('Failed to load three-bmfont-text');
+            document.body.appendChild(bmfontTextScript);
+        })();
+    </script>
 
     <!-- Service Worker Registration -->
     <script>
