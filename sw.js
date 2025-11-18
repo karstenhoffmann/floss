@@ -3,11 +3,11 @@
  * Enables offline functionality and asset caching
  */
 
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3-offline-first';
 const CACHE_NAME = `floss-${CACHE_VERSION}`;
 
-// Assets to cache immediately on install
-const PRECACHE_ASSETS = [
+// Local assets to precache (excluding CDN resources)
+const LOCAL_ASSETS = [
   './',
   './index.html',
   './css/design-tokens.css',
@@ -21,13 +21,24 @@ const PRECACHE_ASSETS = [
   './js/gl/index.js',
   './js/gl/Type.js',
   './js/gl/shaders.js',
-  './manifest.json',
-  // CDN resources (cache after first load)
+  './js/vendor/three.js',
+  './js/vendor/load-bmfont.js',
+  './js/vendor/three-bmfont-text.js',
+  './manifest.json'
+];
+
+// CDN resources to cache on first fetch (for offline-first)
+const CDN_RESOURCES = [
   'https://unpkg.com/open-props@1.7.3/open-props.min.css',
   'https://unpkg.com/open-props@1.7.3/normalize.min.css',
   'https://unpkg.com/open-props@1.7.3/buttons.min.css',
-  'https://unpkg.com/gsap@3.12.4/dist/gsap.min.js'
+  'https://unpkg.com/gsap@3.12.4/dist/gsap.min.js',
+  'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js',
+  'https://cdn.jsdelivr.net/npm/load-bmfont@2.3.4/browser.js',
+  'https://cdn.jsdelivr.net/npm/three-bmfont-text@3.0.1/dist/three-bmfont-text.js'
 ];
+
+const PRECACHE_ASSETS = [...LOCAL_ASSETS];
 
 // Install event - precache essential assets
 self.addEventListener('install', (event) => {

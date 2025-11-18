@@ -1,11 +1,15 @@
 /**
- * load-bmfont ESM shim
- * Wraps globally loaded loadBMFont as ES module
+ * load-bmfont ESM wrapper
+ * Exports globally loaded loadBMFont as ES module
+ *
+ * The UMD script is loaded via <script> tag in index.html
+ * After first load, it's cached by Service Worker = Offline-First!
  */
 
-// Wait for global script to load
-if (!window.loadBMFont) {
-  throw new Error('loadBMFont global not found. Make sure browser.js is loaded first.');
+// Check if global is available
+if (typeof window.loadBMFont !== 'function') {
+  console.error('loadBMFont global not found. Script may not have loaded yet.');
 }
 
+// Export the global function as default export
 export default window.loadBMFont;
