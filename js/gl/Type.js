@@ -1,10 +1,10 @@
-import * as THREE from 'three';
-import Gl from './index.js';
+// Libraries loaded globally from script tags
+const THREE = window.THREE;
+const loadFont = window.loadBMFont;
+const createGeometry = window.createGeometry || window.createText;
+const MSDFShader = window.MSDFShader;
 
-// THREE BMFONT TEXT
-import loadFont from 'load-bmfont';
-import createGeometry from 'three-bmfont-text';
-import MSDFShader from 'three-bmfont-text/shaders/msdf';
+import Gl from './index.js';
 
 export default class extends THREE.Object3D {
   init(options) {

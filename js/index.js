@@ -1,9 +1,11 @@
 /**
- * TT K1n3t1c - Main Application Entry Point
+ * Floss - Main Application Entry Point
  * Modern kinetic typography with Three.js
  */
 
-import * as THREE from 'three';
+// THREE loaded globally from script tag
+const THREE = window.THREE;
+
 import Gl from './gl/index.js';
 import Type from './gl/Type.js';
 import options from './options.js';

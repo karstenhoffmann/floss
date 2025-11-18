@@ -1,4 +1,6 @@
-import * as THREE from 'three';
+// THREE loaded globally from script tag
+const THREE = window.THREE;
+
 import shaders from './gl/shaders.js';
 import f from './fonts.js';
 

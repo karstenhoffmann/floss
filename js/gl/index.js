@@ -1,4 +1,5 @@
-import * as THREE from 'three';
+// THREE loaded globally from script tag
+const THREE = window.THREE;
 
 export default new class {
   constructor() {
