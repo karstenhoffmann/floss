@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Professional kinetic typography motion design tool with real-time parameter controls and preset management">
+    <title>Kinetic Typography Motion Design</title>
+
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="./styles/main.css">
+    <link rel="stylesheet" href="./styles/controls.css">
+    <link rel="stylesheet" href="./styles/preset-panel.css">
+    <link rel="stylesheet" href="./styles/settings-panel.css">
+    <link rel="stylesheet" href="./styles/help-overlay.css">
+    <link rel="stylesheet" href="./styles/notifications.css">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+
+    <!-- Three.js via CDN (v0.115.0) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.115.0/build/three.min.js"></script>
+</head>
+<body>
+    <div id="app" class="app">
+        <!-- Toolbar -->
+        <header id="toolbar" class="toolbar">
+            <div class="toolbar__left">
+                <h1 class="toolbar__logo">✨ Kinetic Typography</h1>
+            </div>
+            <div class="toolbar__center">
+                <select id="effect-selector" class="effect-selector">
+                    <option value="">Loading effects...</option>
+                </select>
+                <select id="preset-selector" class="preset-selector">
+                    <option value="">No preset selected</option>
+                </select>
+            </div>
+            <div class="toolbar__right">
+                <div id="fps-counter" class="fps-counter" style="display: none;">
+                    <span id="fps-value">60</span> FPS
+                </div>
+                <button id="help-btn" class="btn-icon" title="Help (H)">?</button>
+                <button id="ui-toggle-btn" class="btn-icon" title="Toggle UI (Space)">👁️</button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="content-wrapper">
+            <!-- Preset Panel (Left Sidebar) -->
+            <aside id="preset-panel" class="preset-panel">
+                <div class="preset-panel__header">
+                    <h2>Presets</h2>
+                    <input type="search" id="preset-search" class="preset-search" placeholder="Search presets...">
+                </div>
+                <div class="preset-panel__actions">
+                    <button id="save-preset-btn" class="btn-primary">💾 Save Current</button>
+                    <button id="import-preset-btn" class="btn-secondary">📥 Import</button>
+                </div>
+                <div id="preset-list" class="preset-list">
+                    <!-- Preset cards will be dynamically inserted here -->
+                </div>
+            </aside>
+
+            <!-- Canvas Container -->
+            <main class="canvas-container">
+                <div id="webgl-container"></div>
+                <div id="offline-indicator" class="offline-indicator" style="display: none;">
+                    📡 Offline Mode
+                </div>
+            </main>
+        </div>
+
+        <!-- Settings Panel (Bottom, Collapsible) -->
+        <aside id="settings-panel" class="settings-panel">
+            <div class="settings-panel__header">
+                <h3>Settings</h3>
+                <div class="settings-panel__actions">
+                    <button id="reset-settings-btn" class="btn-text" title="Reset to default (R)">↻ Reset</button>
+                    <button id="export-settings-btn" class="btn-text" title="Export settings (E)">📤 Export</button>
+                    <button id="toggle-settings-btn" class="btn-icon">⌄</button>
+                </div>
+            </div>
+            <div id="settings-content" class="settings-content">
+                <!-- Settings controls will be dynamically generated here -->
+            </div>
+        </aside>
+
+        <!-- Help Overlay -->
+        <div id="help-overlay" class="help-overlay" style="display: none;">
+            <div class="help-overlay__content">
+                <div class="help-overlay__header">
+                    <h2>Keyboard Shortcuts</h2>
+                    <button id="close-help-btn" class="btn-close">×</button>
+                </div>
+                <div class="help-overlay__body">
+                    <div class="shortcut-group">
+                        <h3>Navigation</h3>
+                        <div class="shortcut-item">
+                            <kbd>Space</kbd>
+                            <span>Toggle UI visibility</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>H</kbd>
+                            <span>Show/hide this help</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>F</kbd>
+                            <span>Toggle FPS counter</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>←</kbd> <kbd>→</kbd>
+                            <span>Navigate between presets</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Esc</kbd>
+                            <span>Close modals/overlays</span>
+                        </div>
+                    </div>
+
+                    <div class="shortcut-group">
+                        <h3>Effects</h3>
+                        <div class="shortcut-item">
+                            <kbd>1</kbd> - <kbd>9</kbd>
+                            <span>Quick-switch between effects</span>
+                        </div>
+                    </div>
+
+                    <div class="shortcut-group">
+                        <h3>Settings</h3>
+                        <div class="shortcut-item">
+                            <kbd>R</kbd>
+                            <span>Reset to default settings</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>S</kbd>
+                            <span>Save as new preset</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>E</kbd>
+                            <span>Export settings as JSON</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>I</kbd>
+                            <span>Import settings from JSON</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Container -->
+        <div id="notification-container" class="notification-container"></div>
+    </div>
+
+    <!-- Main App (ES6 Module) -->
+    <script type="module" src="./js/app.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('✓ ServiceWorker registered:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
