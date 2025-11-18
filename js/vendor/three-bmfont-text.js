@@ -1,20 +1,23 @@
 /**
  * three-bmfont-text ESM wrapper
- * Exports globally loaded three-bmfont-text as ES module
+ * Exports globally loaded threeBmfontText (from wzrd.in UMD bundle) as ES module
  *
- * The UMD script is loaded via <script> tag in index.html
+ * The UMD script is loaded via <script> tag in index.html from wzrd.in
  * After first load, it's cached by Service Worker = Offline-First!
+ *
+ * wzrd.in standalone bundle exposes module as: window.threeBmfontText
+ * The module is a factory function that creates geometry
  */
 
-// Check if globals are available
-if (typeof window.createGeometry !== 'function') {
-  console.error('createGeometry global not found. Script may not have loaded yet.');
+// Check if global is available
+if (typeof window.threeBmfontText !== 'function') {
+  console.error('threeBmfontText global not found. Script may not have loaded yet.',
+    'Available globals:', Object.keys(window).filter(k => k.toLowerCase().includes('bmfont')));
 }
 
-if (typeof window.MSDFShader !== 'function') {
-  console.error('MSDFShader global not found. Script may not have loaded yet.');
-}
+// Export the module as default
+// Note: threeBmfontText is the main export (factory function)
+export default window.threeBmfontText;
 
-// Export the globals
-export default window.createGeometry;
-export const MSDFShader = window.MSDFShader;
+// MSDFShader might be a property of the module
+export const MSDFShader = window.threeBmfontText?.MSDFShader;
