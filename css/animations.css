@@ -1,0 +1,504 @@
+/**
+ * TT K1n3t1c - Animations
+ * Smooth spring animations and micro-interactions
+ */
+
+/* ========================================
+ * MICRO-INTERACTIONS - Hover Effects
+ * ======================================== */
+
+/* Radial gradient hover glow */
+@keyframes radialGlow {
+  0% {
+    background-size: 0% 0%;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    background-size: 200% 200%;
+    opacity: 0;
+  }
+}
+
+/* Button press ripple effect */
+.icon-btn::before,
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: var(--radius-full);
+  background-color: rgba(139, 92, 246, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width var(--duration-slow) var(--ease-decelerate),
+              height var(--duration-slow) var(--ease-decelerate),
+              opacity var(--duration-slow) var(--ease-decelerate);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.icon-btn:active::before,
+.btn:active::before {
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transition: 0s;
+}
+
+/* ========================================
+ * PANEL ANIMATIONS - Slide & Spring
+ * ======================================== */
+
+/* Panel slide-in from right */
+@keyframes panelSlideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Panel slide-in from left */
+@keyframes panelSlideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Panel slide-out to right */
+@keyframes panelSlideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Panel slide-out to left */
+@keyframes panelSlideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+/* ========================================
+ * FLOATING UI ANIMATIONS
+ * ======================================== */
+
+/* Toolbar float-in from left */
+@keyframes toolbarFloatIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-100px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0) scale(1);
+  }
+}
+
+/* Playback float-in from bottom */
+@keyframes playbackFloatIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(100px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+/* Topbar slide-in from top */
+@keyframes topbarSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+ * DROPDOWN ANIMATIONS
+ * ======================================== */
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dropdownFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.95);
+  }
+}
+
+/* ========================================
+ * ICON ANIMATIONS
+ * ======================================== */
+
+/* Play/Pause icon transition */
+@keyframes iconFadeSwap {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Icon hover bounce */
+.icon-btn:hover .icon {
+  animation: iconBounce var(--duration-slow) var(--ease-spring);
+}
+
+@keyframes iconBounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ========================================
+ * LOADING ANIMATIONS
+ * ======================================== */
+
+/* Spinner rotation with glow pulse */
+@keyframes spinnerRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spinnerGlow {
+  0%, 100% {
+    box-shadow: var(--glow-violet-md);
+  }
+  50% {
+    box-shadow: var(--glow-violet-lg),
+                var(--glow-blue-lg);
+  }
+}
+
+.loader__spinner {
+  animation: spinnerRotate 2s linear infinite,
+             spinnerGlow 2s ease-in-out infinite;
+}
+
+/* Skeleton loading shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-3) 0%,
+    var(--surface-4) 50%,
+    var(--surface-3) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+/* ========================================
+ * ACCENT GRADIENT ANIMATIONS
+ * ======================================== */
+
+/* Animated gradient for active states */
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.gradient-animated {
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease-in-out infinite;
+}
+
+/* Gradient rotation */
+@keyframes gradientRotate {
+  from {
+    filter: hue-rotate(0deg);
+  }
+  to {
+    filter: hue-rotate(360deg);
+  }
+}
+
+/* ========================================
+ * GLOW PULSE ANIMATIONS
+ * ======================================== */
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: var(--glow-violet-sm);
+  }
+  50% {
+    box-shadow: var(--glow-violet-lg);
+  }
+}
+
+@keyframes glowPulseBlue {
+  0%, 100% {
+    box-shadow: var(--glow-blue-sm);
+  }
+  50% {
+    box-shadow: var(--glow-blue-lg);
+  }
+}
+
+/* Apply to active elements */
+.icon-btn.active {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* ========================================
+ * SPRING BOUNCE ANIMATIONS
+ * ======================================== */
+
+/* Bounce in from scale */
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Bounce out to scale */
+@keyframes bounceOut {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+
+/* ========================================
+ * PAGE LOAD ANIMATIONS
+ * ======================================== */
+
+/* Initial page load - stagger UI elements */
+.topbar {
+  animation: topbarSlideIn var(--duration-slow) var(--ease-spring) 0.1s backwards;
+}
+
+.toolbar {
+  animation: toolbarFloatIn var(--duration-slow) var(--ease-spring) 0.3s backwards;
+}
+
+.playback {
+  animation: playbackFloatIn var(--duration-slow) var(--ease-spring) 0.5s backwards;
+}
+
+/* ========================================
+ * FOCUS ANIMATIONS
+ * ======================================== */
+
+@keyframes focusRing {
+  from {
+    outline-offset: 0px;
+    outline-color: rgba(139, 92, 246, 0);
+  }
+  to {
+    outline-offset: 2px;
+    outline-color: rgba(139, 92, 246, 1);
+  }
+}
+
+:focus-visible {
+  animation: focusRing var(--duration-fast) var(--ease-decelerate) forwards;
+}
+
+/* ========================================
+ * HOVER LIFT ANIMATION
+ * ======================================== */
+
+/* Subtle lift on hover for cards/panels */
+.hover-lift {
+  transition: transform var(--duration-normal) var(--ease-standard),
+              box-shadow var(--duration-normal) var(--ease-standard);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+/* ========================================
+ * SCALE TRANSITIONS
+ * ======================================== */
+
+/* Scale with spring bounce */
+.scale-spring {
+  transition: transform var(--duration-slow) var(--ease-spring);
+}
+
+.scale-spring:hover {
+  transform: scale(1.05);
+}
+
+.scale-spring:active {
+  transform: scale(0.95);
+}
+
+/* ========================================
+ * BACKDROP BLUR FADE
+ * ======================================== */
+
+@keyframes backdropFadeIn {
+  from {
+    backdrop-filter: blur(0px);
+    background-color: rgba(0, 0, 0, 0);
+  }
+  to {
+    backdrop-filter: var(--glass-blur);
+    background-color: var(--glass-bg);
+  }
+}
+
+/* ========================================
+ * NOTIFICATION/TOAST ANIMATIONS
+ * ======================================== */
+
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+/* ========================================
+ * PERFORMANCE OPTIMIZATIONS
+ * ======================================== */
+
+/* GPU acceleration for animated elements */
+.topbar,
+.toolbar,
+.playback,
+.panel,
+.icon-btn,
+.btn {
+  will-change: auto; /* Only set to specific properties during animation */
+  transform: translateZ(0); /* Force GPU layer */
+  backface-visibility: hidden;
+}
+
+/* Optimize transforms */
+@media (prefers-reduced-motion: no-preference) {
+  .icon-btn,
+  .btn {
+    transition-property: transform, opacity, background-color, border-color, color, box-shadow;
+    transition-timing-function: var(--ease-standard);
+  }
+}
+
+/* ========================================
+ * ACCESSIBILITY - Reduced Motion
+ * ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .loader__spinner {
+    animation: none;
+  }
+
+  .icon-btn:hover .icon {
+    animation: none;
+  }
+}

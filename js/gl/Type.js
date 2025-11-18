@@ -1,12 +1,9 @@
 import * as THREE from 'three';
-import Gl from './index';
-
-// THREE BMFONT TEXT
 import loadFont from 'load-bmfont';
 import createGeometry from 'three-bmfont-text';
-import MSDFShader from 'three-bmfont-text/shaders/msdf';
-import fontFile from '../../assets/Orbitron-Black.fnt';
-import fontAtlas from '../../assets/Orbitron-Black.png';
+import MSDFShader from 'three-bmfont-text/shaders/msdf.js';
+
+import Gl from './index.js';
 
 export default class extends THREE.Object3D {
   init(options) {
@@ -21,18 +18,23 @@ export default class extends THREE.Object3D {
       geometry: options.geometry,
       vertex: options.shaders.vertex,
       fragment: options.shaders.fragment,
-      fontFile: options.font.file || fontFile,
-      fontAtlas: options.font.atlas || fontAtlas
+      fontFile: options.font.file,
+      fontAtlas: options.font.atlas
     };
 
     // Create geometry of packed glyphs
     loadFont(this.opts.fontFile, (err, font) => {
+      if (err) {
+        console.error('Error loading font:', err);
+        return;
+      }
+
       this.fontGeometry = createGeometry({
         font,
         text: this.opts.word,
-      })
+      });
 
-      // Load texture containing font glyps
+      // Load texture containing font glyphs
       this.loader = new THREE.TextureLoader();
       this.loader.load(this.opts.fontAtlas, (texture) => {
         this.fontMaterial = new THREE.RawShaderMaterial(
@@ -80,7 +82,6 @@ export default class extends THREE.Object3D {
       defines: {
         PI: Math.PI
       },
-      // wireframe: true,
       side: THREE.DoubleSide
     });
 
@@ -93,7 +94,7 @@ export default class extends THREE.Object3D {
       renderer.setRenderTarget(this.rt);
       renderer.render(this.rtScene, this.rtCamera);
       renderer.setRenderTarget(null);
-    }
+    };
 
     this.add(this.mesh);
 
@@ -101,6 +102,8 @@ export default class extends THREE.Object3D {
   }
 
   updateTime(time) {
-    this.material.uniforms.uTime.value = time;
+    if (this.material) {
+      this.material.uniforms.uTime.value = time;
+    }
   }
 }

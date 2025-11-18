@@ -1,53 +1,131 @@
-# Kinetic typography with Three.js
+# ⚡ Floss
 
-*Discover how to use Three.js to render kinetic typography.*
+**Professional Kinetic Typography Tool** for Motion Designers
 
-![Image Title](https://codropspz-tympanus.netdna-ssl.com/codrops/wp-content/uploads/2020/05/thumbnail.jpg)
+Ultra-modern, Rive-inspired interface with offline-first PWA functionality.
 
-[Article on Codrops](https://tympanus.net/codrops/?p=)
+---
 
-[Demo](https://tympanus.net/codrops/2020/06/02/kinetic-typography-with-three-js/)
+## ✨ Features
 
+- 🌑 **Ultra-Dark UI**: Glassmorphism with violet/blue gradients
+- 🎨 **4 Kinetic Effects**: Endless, Swirl, Twisted, Relax
+- ⚡ **Zero Build-Step**: Pure ES Modules, no compilation needed
+- 📴 **Offline-First**: Service Worker with intelligent caching
+- 🎯 **Canvas-First**: Full viewport WebGL rendering
+- ⌨️ **Keyboard Shortcuts**: Space, Esc, 1-4
+- 💾 **State Persistence**: LocalStorage saves preferences
+- 📱 **PWA-Ready**: Installable on desktop and mobile
 
-## Installation
+---
 
-Install dependencies:
+## 🚀 Quick Start
+
+### No build required! Just serve the files:
+
+```bash
+# Python
+python -m http.server 8000
+
+# Node.js
+npx http-server -p 8000
+
+# PHP
+php -S localhost:8000
+```
+
+Then visit: `http://localhost:8000`
+
+### Requirements
+- Modern browser (Chrome 89+, Safari 16.4+, Firefox 108+)
+- HTTP server (not `file://` protocol)
+
+---
+
+## ⌨️ Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| **Space** | Play/Pause |
+| **Esc** | Close Panels |
+| **1-4** | Quick Effect Selection |
+
+---
+
+## 🎨 Technology
+
+- **Three.js** (0.158.0) - WebGL rendering
+- **GSAP** (3.12.4) - Smooth animations
+- **Open Props** (1.7.3) - Design tokens
+- **Native ESM** - Zero build-step architecture
+
+---
+
+## 📁 Project Structure
 
 ```
-npm install
+floss/
+├── assets/           # Font files (BMFONT MSDF)
+├── css/
+│   ├── design-tokens.css  # Rive-inspired design system
+│   ├── base.css           # Foundation styles
+│   ├── components.css     # UI components
+│   └── animations.css     # Micro-interactions
+├── js/
+│   ├── index.js      # App entry point
+│   ├── ui.js         # UI state management
+│   ├── options.js    # Effect configurations
+│   └── gl/           # WebGL renderer
+├── index.html        # Main app
+├── manifest.json     # PWA manifest
+└── sw.js             # Service worker
 ```
 
-Compile the code for development and start a local server:
+---
 
+## 🎯 For Developers
+
+### Adding New Effects
+
+Edit `js/options.js`:
+
+```javascript
+{
+  word: 'YOUR_WORD',
+  color: '#ffffff',
+  fill: '#000000',
+  geometry: new THREE.SphereGeometry(12, 64, 64),
+  // ... configuration
+}
 ```
-npm start
+
+### Customizing Colors
+
+Edit `css/design-tokens.css`:
+
+```css
+--accent-violet: #8b5cf6;
+--accent-blue: #3b82f6;
 ```
 
-Create the build:
+---
 
-```
-npm run build
-```
+## 📄 License
 
-## Credits
+Built with inspiration from [Codrops Kinetic Typography](https://github.com/marioecg/codrops-kinetic-typo) (see `/archive`)
 
-- [Three.js](https://threejs.org/docs/)
-- [The Book of Shaders](https://www.npmjs.com/package/glsl-noise)
-- [three-bmfont-text](https://github.com/Jam3/three-bmfont-text)
-- [All Your Html](https://www.youtube.com/watch?v=jtXnN6-ezms&t=29m47s)
+---
 
-## Misc
+## 🔮 Roadmap
 
-Follow *@marioecg*: [Twitter](https://twitter.com/marioecg), [Instagram](https://www.instagram.com/marioecg/)
+- [ ] Screenshot/Video export
+- [ ] Custom text input
+- [ ] More effect presets
+- [ ] Touch gesture controls
+- [ ] Advanced camera controls
 
-Follow Codrops: [Twitter](http://www.twitter.com/codrops), [Facebook](http://www.facebook.com/codrops), [GitHub](https://github.com/codrops), [Instagram](https://www.instagram.com/codropsss/)
+---
 
-## License
-[MIT](LICENSE)
+**Built for professional motion designers in 2025** ⚡
 
-Made with :blue_heart: by [Codrops](http://www.codrops.com)
-
-
-
-
-
+[View Demo](https://karstenhoffmann.github.io/codrops-kinetic-typo/)
