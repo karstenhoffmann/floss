@@ -6,6 +6,29 @@
 
 ---
 
+## ⚠️ Development Environment
+
+**IMPORTANT:** This project uses **Claude Code Web** (not CLI version).
+
+### Key Implications:
+- ✅ Claude has full git/terminal access via Bash tool
+- ❌ User has NO direct file access (files must be shared/explained)
+- ❌ User has NO CLI access (all commands run by Claude)
+- 🔄 All git operations (merge, push, branch) must be done by Claude
+- 📱 Testing happens via GitHub Pages (live deployment)
+
+### Testing Workflow:
+Since user can't run local servers, testing requires:
+1. Claude commits + pushes changes to branch
+2. Claude merges branch to `master` (or creates PR)
+3. GitHub Pages auto-deploys (~1-2 min)
+4. User tests at: https://karstenhoffmann.github.io/floss/
+5. User reports issues back to Claude
+
+**Golden Rule:** Always explain what files changed and what the user should expect to see when testing!
+
+---
+
 ## Quick Start for New Sessions
 
 ### Project Purpose
