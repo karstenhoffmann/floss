@@ -255,7 +255,7 @@ class UIManager {
   // State Persistence
   loadState() {
     try {
-      const saved = localStorage.getItem('ttk1n3t1c-state');
+      const saved = localStorage.getItem('floss-state');
       if (saved) {
         const parsed = JSON.parse(saved);
         this.state = { ...this.state, ...parsed };
@@ -277,7 +277,7 @@ class UIManager {
 
   saveState() {
     try {
-      localStorage.setItem('ttk1n3t1c-state', JSON.stringify({
+      localStorage.setItem('floss-state', JSON.stringify({
         currentEffect: this.state.currentEffect,
         speed: this.state.speed,
         autoHideUI: this.state.autoHideUI

@@ -1,10 +1,10 @@
 /**
- * Service Worker for TT K1n3t1c
+ * Service Worker for Floss
  * Enables offline functionality and asset caching
  */
 
-const CACHE_VERSION = 'v1';
-const CACHE_NAME = `ttk1n3t1c-${CACHE_VERSION}`;
+const CACHE_VERSION = 'v2';
+const CACHE_NAME = `floss-${CACHE_VERSION}`;
 
 // Assets to cache immediately on install
 const PRECACHE_ASSETS = [

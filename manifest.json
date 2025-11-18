@@ -1,7 +1,7 @@
 {
-  "name": "TT K1n3t1c - Kinetic Typography",
-  "short_name": "TT K1n3t1c",
-  "description": "Professional kinetic typography tool with Three.js",
+  "name": "Floss - Kinetic Typography",
+  "short_name": "Floss",
+  "description": "Professional kinetic typography tool for motion designers",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#0a0a0a",
