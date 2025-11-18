@@ -22,7 +22,13 @@
     <link rel="manifest" href="./manifest.json">
 
     <!-- Three.js via CDN (v0.115.0) -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.115.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.115.0/build/three.min.js"></script>
+    <!-- Fallback CDN if unpkg fails -->
+    <script>
+        if (typeof THREE === 'undefined') {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r115/three.min.js"><\/script>');
+        }
+    </script>
 </head>
 <body>
     <div id="app" class="app">
