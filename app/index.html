@@ -108,43 +108,27 @@
             <!-- Camera Controls Section -->
             <div class="controls-section">
                 <h3 class="controls-section__title">Camera</h3>
-                <div class="controls-section__content camera-controls">
-                    <!-- Zoom -->
-                    <div class="camera-control">
+                <div class="controls-section__content camera-controls-compact">
+                    <div class="camera-row">
                         <label>Zoom</label>
                         <input type="range" id="camera-zoom" min="20" max="100" step="1" value="50">
                         <span id="camera-zoom-value">50</span>
                     </div>
-
-                    <!-- Pan X -->
-                    <div class="camera-control">
-                        <label>Pan X</label>
+                    <div class="camera-row">
+                        <label>Pan</label>
                         <input type="range" id="camera-pan-x" min="-50" max="50" step="1" value="0">
                         <span id="camera-pan-x-value">0</span>
-                    </div>
-
-                    <!-- Pan Y -->
-                    <div class="camera-control">
-                        <label>Pan Y</label>
                         <input type="range" id="camera-pan-y" min="-50" max="50" step="1" value="0">
                         <span id="camera-pan-y-value">0</span>
                     </div>
-
-                    <!-- Rotate X -->
-                    <div class="camera-control">
-                        <label>Rotate X</label>
+                    <div class="camera-row">
+                        <label>Rotate</label>
                         <input type="range" id="camera-rotate-x" min="-180" max="180" step="1" value="0">
                         <span id="camera-rotate-x-value">0°</span>
-                    </div>
-
-                    <!-- Rotate Y -->
-                    <div class="camera-control">
-                        <label>Rotate Y</label>
                         <input type="range" id="camera-rotate-y" min="-180" max="180" step="1" value="0">
                         <span id="camera-rotate-y-value">0°</span>
                     </div>
-
-                    <button id="camera-reset-btn" class="btn-text">Reset Camera</button>
+                    <button id="camera-reset-btn" class="btn-text-small">Reset</button>
                 </div>
             </div>
 

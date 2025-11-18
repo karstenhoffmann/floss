@@ -165,67 +165,77 @@
     font-family: 'Courier New', monospace;
 }
 
-/* === CAMERA CONTROLS === */
-.camera-controls {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: var(--spacing-sm);
-    width: 100%;
-}
-
-.camera-control {
+/* === CAMERA CONTROLS (Compact) === */
+.camera-controls-compact {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xs);
 }
 
-.camera-control label {
+.camera-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.camera-row label {
     font-size: 11px;
     color: var(--color-text-muted);
+    min-width: 50px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
-.camera-control input[type="range"] {
-    width: 100%;
-    height: 6px;
+.camera-row input[type="range"] {
+    width: 100px;
+    height: 5px;
     background: var(--color-bg-tertiary);
     border-radius: 3px;
     outline: none;
     -webkit-appearance: none;
 }
 
-.camera-control input[type="range"]::-webkit-slider-thumb {
+.camera-row input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     background: var(--color-accent-primary);
     border-radius: 50%;
     cursor: pointer;
 }
 
-.camera-control input[type="range"]::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
+.camera-row input[type="range"]::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
     background: var(--color-accent-primary);
     border-radius: 50%;
     cursor: pointer;
     border: none;
 }
 
-.camera-control span {
-    font-size: 12px;
+.camera-row span {
+    font-size: 11px;
     color: var(--color-text-secondary);
     font-family: 'Courier New', monospace;
-    text-align: center;
+    min-width: 32px;
+    text-align: right;
 }
 
-#camera-reset-btn {
-    grid-column: 1 / -1;
-    margin-top: var(--spacing-sm);
+.btn-text-small {
     padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: 12px;
+    background: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: var(--border-radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.btn-text-small:hover {
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
 }
 
 /* === MOBILE RESPONSIVE === */

@@ -137,10 +137,13 @@ class App {
             this.savePreset();
         });
 
-        // Toggle settings button
-        document.getElementById('toggle-settings-btn').addEventListener('click', () => {
-            this.toggleSettingsPanel();
-        });
+        // Toggle controls panel button (bottom)
+        const toggleControlsBtn = document.getElementById('toggle-controls-btn');
+        if (toggleControlsBtn) {
+            toggleControlsBtn.addEventListener('click', () => {
+                this.toggleControlsPanel();
+            });
+        }
 
         // Reset settings button
         document.getElementById('reset-settings-btn').addEventListener('click', () => {
@@ -156,6 +159,12 @@ class App {
         document.getElementById('import-preset-btn').addEventListener('click', () => {
             this.importPreset();
         });
+
+        // Camera controls
+        this.setupCameraControls();
+
+        // Playback controls
+        this.setupPlaybackControls();
 
         // Help overlay close
         document.getElementById('close-help-btn').addEventListener('click', () => {
@@ -665,6 +674,137 @@ class App {
         });
 
         input.click();
+    }
+
+    /**
+     * Setup camera controls
+     */
+    setupCameraControls() {
+        const zoomSlider = document.getElementById('camera-zoom');
+        const panXSlider = document.getElementById('camera-pan-x');
+        const panYSlider = document.getElementById('camera-pan-y');
+        const rotateXSlider = document.getElementById('camera-rotate-x');
+        const rotateYSlider = document.getElementById('camera-rotate-y');
+        const resetBtn = document.getElementById('camera-reset-btn');
+
+        if (!zoomSlider || !this.sceneManager.controls) return;
+
+        // Zoom
+        zoomSlider.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            this.sceneManager.camera.position.z = value;
+            document.getElementById('camera-zoom-value').textContent = value;
+        });
+
+        // Pan X
+        panXSlider.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            this.sceneManager.controls.target.x = value;
+            document.getElementById('camera-pan-x-value').textContent = value;
+        });
+
+        // Pan Y
+        panYSlider.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            this.sceneManager.controls.target.y = value;
+            document.getElementById('camera-pan-y-value').textContent = value;
+        });
+
+        // Rotate X
+        rotateXSlider.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            const radians = (value * Math.PI) / 180;
+            this.sceneManager.camera.rotation.x = radians;
+            document.getElementById('camera-rotate-x-value').textContent = value + '°';
+        });
+
+        // Rotate Y
+        rotateYSlider.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            const radians = (value * Math.PI) / 180;
+            this.sceneManager.camera.rotation.y = radians;
+            document.getElementById('camera-rotate-y-value').textContent = value + '°';
+        });
+
+        // Reset camera
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                this.sceneManager.camera.position.set(0, 0, 50);
+                this.sceneManager.camera.rotation.set(0, 0, 0);
+                this.sceneManager.controls.target.set(0, 0, 0);
+
+                zoomSlider.value = 50;
+                panXSlider.value = 0;
+                panYSlider.value = 0;
+                rotateXSlider.value = 0;
+                rotateYSlider.value = 0;
+
+                document.getElementById('camera-zoom-value').textContent = '50';
+                document.getElementById('camera-pan-x-value').textContent = '0';
+                document.getElementById('camera-pan-y-value').textContent = '0';
+                document.getElementById('camera-rotate-x-value').textContent = '0°';
+                document.getElementById('camera-rotate-y-value').textContent = '0°';
+
+                notification.success('Camera reset');
+            });
+        }
+    }
+
+    /**
+     * Setup playback controls
+     */
+    setupPlaybackControls() {
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const speedSlider = document.getElementById('speed-slider');
+
+        if (!playPauseBtn) return;
+
+        let isPaused = false;
+
+        playPauseBtn.addEventListener('click', () => {
+            isPaused = !isPaused;
+
+            if (isPaused) {
+                this.renderLoop.stop();
+                playPauseBtn.textContent = '▶️ Play';
+                playPauseBtn.classList.add('active');
+            } else {
+                this.renderLoop.start();
+                playPauseBtn.textContent = '⏸️ Pause';
+                playPauseBtn.classList.remove('active');
+            }
+        });
+
+        if (speedSlider) {
+            speedSlider.addEventListener('input', (e) => {
+                const speed = parseFloat(e.target.value);
+                document.getElementById('speed-value').textContent = speed.toFixed(1) + 'x';
+
+                if (this.currentEffect && this.currentEffect.settings) {
+                    // Update animation speed if effect has this setting
+                    if ('animationSpeed' in this.currentEffect.settings) {
+                        this.currentEffect.updateSetting('animationSpeed', speed);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Toggle controls panel
+     */
+    toggleControlsPanel() {
+        const panel = document.getElementById('controls-panel');
+        if (panel) {
+            panel.classList.toggle('collapsed');
+        }
+    }
+
+    /**
+     * Toggle settings panel (legacy - now just collapses controls)
+     */
+    toggleSettingsPanel() {
+        this.toggleControlsPanel();
     }
 
     /**
