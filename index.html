@@ -258,16 +258,16 @@
             gsapScript.onerror = () => console.error('Failed to load GSAP');
             document.body.appendChild(gsapScript);
 
-            // Load load-bmfont (standalone UMD bundle via wzrd.in)
+            // Load load-bmfont (local UMD bundle)
             const bmfontScript = document.createElement('script');
-            bmfontScript.src = 'https://wzrd.in/standalone/load-bmfont@2.3.4';
+            bmfontScript.src = './js/vendor/load-bmfont.umd.js';
             bmfontScript.onload = onScriptLoaded;
             bmfontScript.onerror = () => console.error('Failed to load load-bmfont');
             document.body.appendChild(bmfontScript);
 
-            // Load three-bmfont-text (standalone UMD bundle via wzrd.in)
+            // Load three-bmfont-text (local UMD bundle)
             const bmfontTextScript = document.createElement('script');
-            bmfontTextScript.src = 'https://wzrd.in/standalone/three-bmfont-text@3.0.1';
+            bmfontTextScript.src = './js/vendor/three-bmfont-text.umd.js';
             bmfontTextScript.onload = onScriptLoaded;
             bmfontTextScript.onerror = () => console.error('Failed to load three-bmfont-text');
             document.body.appendChild(bmfontTextScript);

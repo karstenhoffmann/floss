@@ -3,7 +3,7 @@
  * Enables offline functionality and asset caching
  */
 
-const CACHE_VERSION = 'v5-wzrd-umd';
+const CACHE_VERSION = 'v6-local-bundles';
 const CACHE_NAME = `floss-${CACHE_VERSION}`;
 
 // Local assets to precache (excluding CDN resources)
@@ -24,6 +24,8 @@ const LOCAL_ASSETS = [
   './js/vendor/three.js',
   './js/vendor/load-bmfont.js',
   './js/vendor/three-bmfont-text.js',
+  './js/vendor/load-bmfont.umd.js',
+  './js/vendor/three-bmfont-text.umd.js',
   './manifest.json'
 ];
 
@@ -33,9 +35,7 @@ const CDN_RESOURCES = [
   'https://unpkg.com/open-props@1.7.3/normalize.min.css',
   'https://unpkg.com/open-props@1.7.3/buttons.min.css',
   'https://unpkg.com/gsap@3.12.4/dist/gsap.min.js',
-  'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js',
-  'https://wzrd.in/standalone/load-bmfont@2.3.4',
-  'https://wzrd.in/standalone/three-bmfont-text@3.0.1'
+  'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js'
 ];
 
 const PRECACHE_ASSETS = [...LOCAL_ASSETS];
