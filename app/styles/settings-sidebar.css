@@ -1,0 +1,66 @@
+/* ========================================
+   SETTINGS SIDEBAR STYLING (Left)
+   ======================================== */
+
+.settings-sidebar {
+    width: 320px;
+    background: var(--color-bg-secondary);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: var(--z-panels);
+}
+
+.settings-sidebar__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.settings-sidebar__header h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.settings-sidebar__actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+/* === SETTINGS CONTENT === */
+.settings-sidebar__content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-lg);
+}
+
+.settings-sidebar__content:empty::before {
+    content: 'Select an effect to see its settings';
+    display: block;
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--color-text-muted);
+    font-size: 13px;
+}
+
+/* === MOBILE RESPONSIVE === */
+@media (max-width: 768px) {
+    .settings-sidebar {
+        position: fixed;
+        top: var(--toolbar-height);
+        left: 0;
+        width: 100%;
+        height: calc(100% - var(--toolbar-height));
+        transform: translateX(-100%);
+        transition: transform var(--transition-base);
+        z-index: var(--z-panels);
+    }
+
+    .settings-sidebar.open {
+        transform: translateX(0);
+    }
+}

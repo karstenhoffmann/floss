@@ -94,16 +94,16 @@ body {
 
 /* UI Hidden State */
 .app.ui-hidden .toolbar,
-.app.ui-hidden .preset-panel,
-.app.ui-hidden .settings-panel,
+.app.ui-hidden .settings-sidebar,
+.app.ui-hidden .controls-panel,
 .app.ui-hidden .offline-indicator {
     opacity: 0;
     pointer-events: none;
 }
 
 .app .toolbar,
-.app .preset-panel,
-.app .settings-panel,
+.app .settings-sidebar,
+.app .controls-panel,
 .app .offline-indicator {
     transition: opacity var(--transition-base);
 }
@@ -150,16 +150,7 @@ body {
     position: relative;
 }
 
-/* === PRESET PANEL === */
-.preset-panel {
-    width: var(--preset-panel-width);
-    background: var(--color-bg-secondary);
-    border-right: 1px solid var(--color-border);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    z-index: var(--z-panels);
-}
+/* Preset panel styles moved to controls-panel.css */
 
 /* === CANVAS CONTAINER === */
 .canvas-container {
@@ -200,24 +191,7 @@ body {
     box-shadow: var(--shadow-md);
 }
 
-/* === SETTINGS PANEL === */
-.settings-panel {
-    max-height: var(--settings-panel-height);
-    background: var(--color-bg-secondary);
-    border-top: 1px solid var(--color-border);
-    display: flex;
-    flex-direction: column;
-    z-index: var(--z-settings);
-    transition: max-height var(--transition-base);
-}
-
-.settings-panel.collapsed {
-    max-height: 50px;
-}
-
-.settings-panel.collapsed .settings-content {
-    display: none;
-}
+/* Settings panel styles moved to settings-sidebar.css */
 
 /* === FPS COUNTER === */
 .fps-counter {

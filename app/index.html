@@ -13,8 +13,8 @@
     <!-- Styles -->
     <link rel="stylesheet" href="./styles/main.css">
     <link rel="stylesheet" href="./styles/controls.css">
-    <link rel="stylesheet" href="./styles/preset-panel.css">
-    <link rel="stylesheet" href="./styles/settings-panel.css">
+    <link rel="stylesheet" href="./styles/settings-sidebar.css">
+    <link rel="stylesheet" href="./styles/controls-panel.css">
     <link rel="stylesheet" href="./styles/help-overlay.css">
     <link rel="stylesheet" href="./styles/notifications.css">
 
@@ -23,6 +23,8 @@
 
     <!-- Three.js via CDN (v0.115.0) -->
     <script src="https://unpkg.com/three@0.115.0/build/three.min.js"></script>
+    <!-- OrbitControls for camera interaction -->
+    <script src="https://unpkg.com/three@0.115.0/examples/js/controls/OrbitControls.js"></script>
     <!-- Fallback CDN if unpkg fails -->
     <script>
         if (typeof THREE === 'undefined') {
@@ -41,9 +43,6 @@
                 <select id="effect-selector" class="effect-selector">
                     <option value="">Loading effects...</option>
                 </select>
-                <select id="preset-selector" class="preset-selector">
-                    <option value="">No preset selected</option>
-                </select>
             </div>
             <div class="toolbar__right">
                 <div id="fps-counter" class="fps-counter" style="display: none;">
@@ -56,18 +55,17 @@
 
         <!-- Main Content Area -->
         <div class="content-wrapper">
-            <!-- Preset Panel (Left Sidebar) -->
-            <aside id="preset-panel" class="preset-panel">
-                <div class="preset-panel__header">
-                    <h2>Presets</h2>
-                    <input type="search" id="preset-search" class="preset-search" placeholder="Search presets...">
+            <!-- Settings Panel (Left Sidebar) -->
+            <aside id="settings-panel" class="settings-sidebar">
+                <div class="settings-sidebar__header">
+                    <h2>Settings</h2>
+                    <div class="settings-sidebar__actions">
+                        <button id="reset-settings-btn" class="btn-icon" title="Reset to default (R)">↻</button>
+                        <button id="export-settings-btn" class="btn-icon" title="Export settings (E)">📤</button>
+                    </div>
                 </div>
-                <div class="preset-panel__actions">
-                    <button id="save-preset-btn" class="btn-primary">💾 Save Current</button>
-                    <button id="import-preset-btn" class="btn-secondary">📥 Import</button>
-                </div>
-                <div id="preset-list" class="preset-list">
-                    <!-- Preset cards will be dynamically inserted here -->
+                <div id="settings-content" class="settings-sidebar__content">
+                    <!-- Settings controls will be dynamically generated here -->
                 </div>
             </aside>
 
@@ -80,19 +78,78 @@
             </main>
         </div>
 
-        <!-- Settings Panel (Bottom, Collapsible) -->
-        <aside id="settings-panel" class="settings-panel">
-            <div class="settings-panel__header">
-                <h3>Settings</h3>
-                <div class="settings-panel__actions">
-                    <button id="reset-settings-btn" class="btn-text" title="Reset to default (R)">↻ Reset</button>
-                    <button id="export-settings-btn" class="btn-text" title="Export settings (E)">📤 Export</button>
-                    <button id="toggle-settings-btn" class="btn-icon">⌄</button>
+        <!-- Controls Panel (Bottom) -->
+        <aside id="controls-panel" class="controls-panel">
+            <!-- Presets Section -->
+            <div class="controls-section">
+                <h3 class="controls-section__title">Presets</h3>
+                <div class="controls-section__content">
+                    <select id="preset-selector" class="preset-selector-large">
+                        <option value="">No preset selected</option>
+                    </select>
+                    <button id="save-preset-btn" class="btn-primary">💾 Save</button>
+                    <button id="import-preset-btn" class="btn-secondary">📥 Import</button>
                 </div>
             </div>
-            <div id="settings-content" class="settings-content">
-                <!-- Settings controls will be dynamically generated here -->
+
+            <!-- Playback Section -->
+            <div class="controls-section">
+                <h3 class="controls-section__title">Playback</h3>
+                <div class="controls-section__content">
+                    <button id="play-pause-btn" class="btn-control">⏸️ Pause</button>
+                    <div class="speed-control">
+                        <label>Speed</label>
+                        <input type="range" id="speed-slider" min="0" max="5" step="0.1" value="1">
+                        <span id="speed-value">1.0x</span>
+                    </div>
+                </div>
             </div>
+
+            <!-- Camera Controls Section -->
+            <div class="controls-section">
+                <h3 class="controls-section__title">Camera</h3>
+                <div class="controls-section__content camera-controls">
+                    <!-- Zoom -->
+                    <div class="camera-control">
+                        <label>Zoom</label>
+                        <input type="range" id="camera-zoom" min="20" max="100" step="1" value="50">
+                        <span id="camera-zoom-value">50</span>
+                    </div>
+
+                    <!-- Pan X -->
+                    <div class="camera-control">
+                        <label>Pan X</label>
+                        <input type="range" id="camera-pan-x" min="-50" max="50" step="1" value="0">
+                        <span id="camera-pan-x-value">0</span>
+                    </div>
+
+                    <!-- Pan Y -->
+                    <div class="camera-control">
+                        <label>Pan Y</label>
+                        <input type="range" id="camera-pan-y" min="-50" max="50" step="1" value="0">
+                        <span id="camera-pan-y-value">0</span>
+                    </div>
+
+                    <!-- Rotate X -->
+                    <div class="camera-control">
+                        <label>Rotate X</label>
+                        <input type="range" id="camera-rotate-x" min="-180" max="180" step="1" value="0">
+                        <span id="camera-rotate-x-value">0°</span>
+                    </div>
+
+                    <!-- Rotate Y -->
+                    <div class="camera-control">
+                        <label>Rotate Y</label>
+                        <input type="range" id="camera-rotate-y" min="-180" max="180" step="1" value="0">
+                        <span id="camera-rotate-y-value">0°</span>
+                    </div>
+
+                    <button id="camera-reset-btn" class="btn-text">Reset Camera</button>
+                </div>
+            </div>
+
+            <!-- Toggle Button -->
+            <button id="toggle-controls-btn" class="controls-panel__toggle">▼</button>
         </aside>
 
         <!-- Help Overlay -->
@@ -118,12 +175,24 @@
                             <span>Toggle FPS counter</span>
                         </div>
                         <div class="shortcut-item">
-                            <kbd>←</kbd> <kbd>→</kbd>
-                            <span>Navigate between presets</span>
-                        </div>
-                        <div class="shortcut-item">
                             <kbd>Esc</kbd>
                             <span>Close modals/overlays</span>
+                        </div>
+                    </div>
+
+                    <div class="shortcut-group">
+                        <h3>Camera Controls</h3>
+                        <div class="shortcut-item">
+                            <kbd>Left Click + Drag</kbd>
+                            <span>Pan camera</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Right Click + Drag</kbd>
+                            <span>Rotate camera</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Mouse Wheel</kbd>
+                            <span>Zoom in/out</span>
                         </div>
                     </div>
 

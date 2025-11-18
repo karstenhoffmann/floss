@@ -32,7 +32,7 @@ export class SceneManager {
             0.1,
             1000
         );
-        this.camera.position.z = 30; // Moved back to see the geometry (torus knot radius = 9)
+        this.camera.position.set(0, 0, 50); // Position to see complete geometry
 
         // Scene
         this.scene = new THREE.Scene();
@@ -42,6 +42,24 @@ export class SceneManager {
 
         // Add canvas to DOM
         this.container.appendChild(this.renderer.domElement);
+
+        // OrbitControls for camera interaction
+        if (typeof THREE.OrbitControls !== 'undefined') {
+            this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+            this.controls.enableDamping = true;
+            this.controls.dampingFactor = 0.05;
+            this.controls.enableZoom = true;
+            this.controls.enablePan = true;
+            this.controls.enableRotate = true;
+            this.controls.mouseButtons = {
+                LEFT: THREE.MOUSE.PAN,
+                MIDDLE: THREE.MOUSE.DOLLY,
+                RIGHT: THREE.MOUSE.ROTATE
+            };
+        } else {
+            console.warn('OrbitControls not available');
+            this.controls = null;
+        }
 
         // Event listeners
         window.addEventListener('resize', this.resize.bind(this));
@@ -75,6 +93,11 @@ export class SceneManager {
     update() {
         const deltaTime = this.clock.getDelta();
         const elapsedTime = this.clock.getElapsedTime();
+
+        // Update controls
+        if (this.controls) {
+            this.controls.update();
+        }
 
         if (this.activeEffect) {
             this.activeEffect.update(deltaTime, elapsedTime);
