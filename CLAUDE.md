@@ -17,15 +17,25 @@
 - 🔄 All git operations (merge, push, branch) must be done by Claude
 - 📱 Testing happens via GitHub Pages (live deployment)
 
-### Testing Workflow:
-Since user can't run local servers, testing requires:
-1. Claude commits + pushes changes to branch
-2. Claude merges branch to `master` (or creates PR)
-3. GitHub Pages auto-deploys (~1-2 min)
-4. User tests at: https://karstenhoffmann.github.io/floss/
-5. User reports issues back to Claude
+### Testing Workflow (Branch-Based Development):
+
+**Important:** Claude Code Web can only push to `claude/*` branches, NOT to `master` (HTTP 403).
+
+**Development & Testing Flow:**
+1. **Develop** on current `claude/*` branch (e.g., `claude/feature-xyz`)
+2. **Claude commits + pushes** changes to that branch
+3. **GitHub Pages Preview:** User configures GitHub Pages to deploy from branch
+   - Settings → Pages → Source: Deploy from a branch
+   - Select: `claude/feature-xyz` (or current branch)
+   - Wait ~1-2 min for deployment
+4. **User tests** preview at: `https://karstenhoffmann.github.io/floss/`
+5. **Iterate** until feature works perfectly
+6. **User creates PR** on GitHub: `claude/feature-xyz` → `master`
+7. **User merges PR** → Production deployment to same URL
 
 **Golden Rule:** Always explain what files changed and what the user should expect to see when testing!
+
+**Pro Tip:** Keep GitHub Pages pointed at your active development branch during a session. Only switch back to `master` when ready for production.
 
 ---
 
@@ -116,17 +126,33 @@ Floss is a professional kinetic typography tool for motion designers, featuring:
 ## Common Tasks
 
 ### Running Locally
+**Note:** With Claude Code Web, user can't run local servers. Use GitHub Pages for testing.
+
 ```bash
-# Simple HTTP server (root directory)
+# (For reference - Claude can't use this in Web mode)
 python3 -m http.server 8080
 # → http://localhost:8080
 ```
 
 ### Deploying to GitHub Pages
-1. Ensure changes are on `master` branch
-2. GitHub Pages auto-deploys from `master` root
-3. Wait ~1 minute for deployment
-4. Clear browser cache if needed (Service Worker!)
+
+**During Development (Branch Testing):**
+1. Claude pushes to `claude/feature-xyz` branch
+2. User configures GitHub Pages to deploy from that branch:
+   - Repo → Settings → Pages
+   - Source: "Deploy from a branch"
+   - Branch: Select `claude/feature-xyz` + `/ (root)`
+   - Save
+3. Wait ~1-2 min for deployment
+4. Test at: https://karstenhoffmann.github.io/floss/
+5. Clear browser cache if needed (Service Worker!)
+
+**Production Deployment:**
+1. User creates PR: `claude/feature-xyz` → `master`
+2. User reviews + merges PR on GitHub
+3. User switches GitHub Pages back to `master` branch
+4. Wait ~1 min for production deployment
+5. Same URL, now serving from `master`
 
 ### Testing Offline Functionality
 1. Load app once (caches resources)
@@ -158,18 +184,31 @@ python3 -m http.server 8080
 **Solution:** Import Map is at `index.html:219-229`, before dynamic script loader
 
 ### 4. GitHub Pages Deployment
-**Branch:** Must deploy from `master` (or configure Settings → Pages)
+**Branch:** Can deploy from any branch via Settings → Pages
 **Path:** Root directory only (no `/dist` or `/build`)
 **Cache:** GitHub Pages CDN caches aggressively - wait ~1 min or hard refresh
+**Testing:** Point Pages to `claude/*` branch during development, switch to `master` for production
 
 ---
 
 ## Development Workflow
 
-### Git Branch Strategy
-- `master` - Production (GitHub Pages deploys from here)
-- `claude/*` - Feature branches for Claude Code sessions
-- Merge to master via PR when ready
+### Git Branch Strategy (Claude Code Web)
+
+**Branches:**
+- `master` - Production (stable, user-tested)
+- `claude/*` - Feature branches for Claude Code sessions (e.g., `claude/feature-xyz`)
+
+**Workflow:**
+1. **Develop** on `claude/*` branch
+2. **Claude pushes** to that branch (only `claude/*` allowed, NOT `master`)
+3. **User configures GitHub Pages** to deploy from `claude/*` branch
+4. **User tests** preview at https://karstenhoffmann.github.io/floss/
+5. **Iterate** until ready
+6. **User creates + merges PR** on GitHub: `claude/*` → `master`
+7. **User switches GitHub Pages** back to `master` for production
+
+**Key Point:** Claude Code Web cannot push to `master` (HTTP 403). All development happens on `claude/*` branches.
 
 ### Commit Message Format
 ```
