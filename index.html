@@ -220,11 +220,10 @@
     <script type="importmap">
     {
       "imports": {
-        "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
-        "gsap": "https://unpkg.com/gsap@3.12.4/dist/gsap.min.js",
-        "load-bmfont": "https://esm.sh/load-bmfont@2.3.4",
-        "three-bmfont-text": "https://esm.sh/three-bmfont-text@3.0.1",
-        "three-bmfont-text/shaders/msdf": "https://esm.sh/three-bmfont-text@3.0.1/shaders/msdf"
+        "three": "https://cdn.skypack.dev/three@0.158.0",
+        "load-bmfont": "https://cdn.skypack.dev/load-bmfont@2.3.4",
+        "three-bmfont-text": "https://cdn.skypack.dev/three-bmfont-text@3.0.1",
+        "three-bmfont-text/shaders/msdf": "https://cdn.skypack.dev/three-bmfont-text@3.0.1/shaders/msdf"
       }
     }
     </script>
@@ -240,7 +239,11 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
+                // Get the base path (works for both localhost and GitHub Pages)
+                const base = document.querySelector('base')?.href || window.location.pathname.replace(/\/[^\/]*$/, '/');
+                const swPath = base.endsWith('/') ? base + 'sw.js' : base + '/sw.js';
+
+                navigator.serviceWorker.register(swPath)
                     .then(reg => console.log('SW registered:', reg.scope))
                     .catch(err => console.log('SW registration failed:', err));
             });

@@ -8,24 +8,24 @@ const CACHE_NAME = `ttk1n3t1c-${CACHE_VERSION}`;
 
 // Assets to cache immediately on install
 const PRECACHE_ASSETS = [
-  '/',
-  '/index.html',
-  '/css/design-tokens.css',
-  '/css/base.css',
-  '/css/components.css',
-  '/css/animations.css',
-  '/js/index.js',
-  '/js/options.js',
-  '/js/fonts.js',
-  '/js/gl/index.js',
-  '/js/gl/Type.js',
-  '/js/gl/shaders.js',
-  '/manifest.json',
+  './',
+  './index.html',
+  './css/design-tokens.css',
+  './css/base.css',
+  './css/components.css',
+  './css/animations.css',
+  './js/index.js',
+  './js/ui.js',
+  './js/options.js',
+  './js/fonts.js',
+  './js/gl/index.js',
+  './js/gl/Type.js',
+  './js/gl/shaders.js',
+  './manifest.json',
   // CDN resources (cache after first load)
   'https://unpkg.com/open-props@1.7.3/open-props.min.css',
   'https://unpkg.com/open-props@1.7.3/normalize.min.css',
   'https://unpkg.com/open-props@1.7.3/buttons.min.css',
-  'https://unpkg.com/three@0.158.0/build/three.min.js',
   'https://unpkg.com/gsap@3.12.4/dist/gsap.min.js'
 ];
 

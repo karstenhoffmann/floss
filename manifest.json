@@ -2,7 +2,7 @@
   "name": "TT K1n3t1c - Kinetic Typography",
   "short_name": "TT K1n3t1c",
   "description": "Professional kinetic typography tool with Three.js",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
