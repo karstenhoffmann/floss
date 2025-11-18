@@ -260,14 +260,14 @@
 
             // Load load-bmfont
             const bmfontScript = document.createElement('script');
-            bmfontScript.src = 'https://cdn.jsdelivr.net/npm/load-bmfont@2.3.4/browser.js';
+            bmfontScript.src = 'https://unpkg.com/load-bmfont@2.3.4/browser.js';
             bmfontScript.onload = onScriptLoaded;
             bmfontScript.onerror = () => console.error('Failed to load load-bmfont');
             document.body.appendChild(bmfontScript);
 
             // Load three-bmfont-text
             const bmfontTextScript = document.createElement('script');
-            bmfontTextScript.src = 'https://cdn.jsdelivr.net/npm/three-bmfont-text@3.0.1/dist/three-bmfont-text.js';
+            bmfontTextScript.src = 'https://unpkg.com/three-bmfont-text@3.0.1/index.js';
             bmfontTextScript.onload = onScriptLoaded;
             bmfontTextScript.onerror = () => console.error('Failed to load three-bmfont-text');
             document.body.appendChild(bmfontTextScript);
