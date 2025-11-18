@@ -1,0 +1,240 @@
+/**
+ * TT K1n3t1c - Design Tokens
+ * Rive-inspired ultra-modern design system
+ */
+
+:root {
+  /* ========================================
+   * COLOR SYSTEM - Ultra Dark Theme
+   * ======================================== */
+
+  /* Surface Colors - Layered darkness */
+  --surface-1: #0a0a0a;           /* Deepest black - canvas bg */
+  --surface-2: #0d0d0d;           /* Panel backgrounds */
+  --surface-3: #121212;           /* Elevated elements */
+  --surface-4: #1a1a1a;           /* Highest elevation */
+
+  /* Glass Overlay - for glassmorphism */
+  --glass-bg: rgba(18, 18, 18, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.03);
+
+  /* Border Colors - Subtle separators */
+  --border-1: rgba(255, 255, 255, 0.06);
+  --border-2: rgba(255, 255, 255, 0.12);
+  --border-3: rgba(255, 255, 255, 0.18);
+
+  /* Text Colors */
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.65);
+  --text-tertiary: rgba(255, 255, 255, 0.45);
+  --text-disabled: rgba(255, 255, 255, 0.25);
+
+  /* Accent Gradient - Violet/Blue like Rive */
+  --accent-violet: #8b5cf6;
+  --accent-blue: #3b82f6;
+  --accent-gradient: linear-gradient(135deg, var(--accent-violet) 0%, var(--accent-blue) 100%);
+  --accent-gradient-hover: linear-gradient(135deg, #9d6fff 0%, #4f8fff 100%);
+
+  /* Radial Gradients for hover effects */
+  --radial-gradient-violet: radial-gradient(circle at center, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+  --radial-gradient-blue: radial-gradient(circle at center, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+
+  /* State Colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* ========================================
+   * GLOW & SHADOW SYSTEM
+   * ======================================== */
+
+  /* Shadows - layered depth */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4),
+               0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5),
+               0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6),
+               0 10px 10px -5px rgba(0, 0, 0, 0.3);
+
+  /* Glows - accent highlights */
+  --glow-violet-sm: 0 0 10px rgba(139, 92, 246, 0.3);
+  --glow-violet-md: 0 0 20px rgba(139, 92, 246, 0.4);
+  --glow-violet-lg: 0 0 30px rgba(139, 92, 246, 0.5);
+
+  --glow-blue-sm: 0 0 10px rgba(59, 130, 246, 0.3);
+  --glow-blue-md: 0 0 20px rgba(59, 130, 246, 0.4);
+  --glow-blue-lg: 0 0 30px rgba(59, 130, 246, 0.5);
+
+  /* Combined shadow + glow */
+  --shadow-glow: var(--shadow-lg), var(--glow-violet-md);
+  --shadow-glow-hover: var(--shadow-xl), var(--glow-violet-lg);
+
+  /* ========================================
+   * SPACING SYSTEM (using Open Props as base)
+   * ======================================== */
+
+  /* Custom spacing for Rive-style layouts */
+  --space-topbar: var(--size-10);        /* 2.5rem / 40px */
+  --space-toolbar: var(--size-12);       /* 3rem / 48px */
+  --space-playback: var(--size-14);      /* 3.5rem / 56px */
+  --space-panel: var(--size-fluid-5);    /* Responsive panel width */
+
+  /* Padding & Gaps */
+  --padding-btn: var(--size-2) var(--size-3);
+  --padding-panel: var(--size-5);
+  --gap-topbar: var(--size-4);
+  --gap-toolbar: var(--size-3);
+
+  /* ========================================
+   * TYPOGRAPHY SYSTEM
+   * ======================================== */
+
+  /* Font Families */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', 'Courier New', monospace;
+
+  /* Font Sizes (using Open Props scale) */
+  --font-size-xs: var(--font-size-0);    /* 0.75rem */
+  --font-size-sm: var(--font-size-1);    /* 0.875rem */
+  --font-size-base: var(--font-size-2);  /* 1rem */
+  --font-size-lg: var(--font-size-3);    /* 1.125rem */
+  --font-size-xl: var(--font-size-4);    /* 1.25rem */
+
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* ========================================
+   * BORDER RADIUS (using Open Props)
+   * ======================================== */
+
+  --radius-btn: var(--radius-2);         /* 8px - buttons */
+  --radius-panel: var(--radius-3);       /* 12px - panels */
+  --radius-input: var(--radius-2);       /* 8px - inputs */
+  --radius-dropdown: var(--radius-2);    /* 8px - dropdowns */
+  --radius-full: 9999px;                 /* Fully rounded */
+
+  /* ========================================
+   * TRANSITIONS & ANIMATIONS
+   * ======================================== */
+
+  /* Durations (using Open Props) */
+  --duration-instant: 100ms;
+  --duration-fast: var(--animation-fade-in-duration);     /* 150ms */
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+  --duration-slower: 500ms;
+
+  /* Easing Functions */
+  --ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --ease-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
+  --ease-accelerate: cubic-bezier(0.4, 0.0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);      /* Spring bounce */
+  --ease-smooth: cubic-bezier(0.4, 0.0, 0.6, 1);
+
+  /* Combined transitions */
+  --transition-standard: all var(--duration-normal) var(--ease-standard);
+  --transition-fast: all var(--duration-fast) var(--ease-standard);
+  --transition-spring: all var(--duration-slow) var(--ease-spring);
+
+  /* ========================================
+   * Z-INDEX SYSTEM
+   * ======================================== */
+
+  --z-canvas: 1;
+  --z-toolbar: 10;
+  --z-playback: 10;
+  --z-topbar: 20;
+  --z-panel: 30;
+  --z-dropdown: 40;
+  --z-modal: 50;
+  --z-loader: 100;
+
+  /* ========================================
+   * BACKDROP BLUR (for glassmorphism)
+   * ======================================== */
+
+  --blur-light: blur(8px);
+  --blur-medium: blur(16px);
+  --blur-heavy: blur(24px);
+
+  /* Combined with saturation for better effect */
+  --glass-blur: blur(20px) saturate(180%);
+
+  /* ========================================
+   * COMPONENT-SPECIFIC TOKENS
+   * ======================================== */
+
+  /* Icon Button */
+  --icon-btn-size: 40px;
+  --icon-btn-size-sm: 32px;
+  --icon-btn-size-lg: 48px;
+
+  /* Topbar */
+  --topbar-height: 56px;
+
+  /* Toolbar */
+  --toolbar-width: 60px;
+  --toolbar-offset: var(--size-4);
+
+  /* Playback */
+  --playback-height: 72px;
+  --playback-offset: var(--size-4);
+
+  /* Panel */
+  --panel-width: 320px;
+  --panel-width-wide: 480px;
+
+  /* ========================================
+   * RESPONSIVE BREAKPOINTS
+   * ======================================== */
+
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+/* ========================================
+ * DARK MODE OVERRIDES (in case user has light mode preference)
+ * ======================================== */
+
+@media (prefers-color-scheme: light) {
+  :root {
+    /* We intentionally force dark mode - this is a pro tool */
+    /* Motion designers expect dark interfaces */
+  }
+}
+
+/* ========================================
+ * REDUCED MOTION (accessibility)
+ * ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-instant: 0ms;
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+    --duration-slower: 0ms;
+
+    --ease-spring: var(--ease-standard);
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

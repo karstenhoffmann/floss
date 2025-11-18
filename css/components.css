@@ -1,0 +1,493 @@
+/**
+ * TT K1n3t1c - Components
+ * Floating glassmorphism UI components
+ */
+
+/* ========================================
+ * TOPBAR - Minimal header
+ * ======================================== */
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--topbar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--size-5);
+  background-color: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+  z-index: var(--z-topbar);
+}
+
+.topbar__left,
+.topbar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-topbar);
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+  user-select: none;
+}
+
+.logo__text {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Effect Selector Dropdown */
+.effect-selector {
+  position: relative;
+}
+
+.effect-selector__button {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2);
+  padding: var(--size-2) var(--size-4);
+  background-color: var(--surface-3);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-btn);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: var(--transition-standard);
+  cursor: pointer;
+}
+
+.effect-selector__button:hover {
+  background-color: var(--surface-4);
+  border-color: var(--border-3);
+}
+
+.effect-selector__button[aria-expanded="true"] {
+  background: var(--accent-gradient);
+  border-color: transparent;
+  color: white;
+}
+
+.effect-selector__dropdown {
+  position: absolute;
+  top: calc(100% + var(--size-2));
+  left: 0;
+  min-width: 160px;
+  background-color: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-dropdown);
+  box-shadow: var(--shadow-lg);
+  padding: var(--size-2);
+  z-index: var(--z-dropdown);
+  animation: slideDown var(--duration-fast) var(--ease-decelerate);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.effect-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--size-2) var(--size-3);
+  border-radius: var(--radius-btn);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  transition: var(--transition-fast);
+  cursor: pointer;
+}
+
+.effect-option:hover {
+  background-color: var(--surface-4);
+  color: var(--text-primary);
+}
+
+.effect-option.active {
+  background: var(--accent-gradient);
+  color: white;
+}
+
+/* ========================================
+ * FLOATING TOOLBAR - Left side
+ * ======================================== */
+
+.toolbar {
+  position: fixed;
+  left: var(--toolbar-offset);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-toolbar);
+  padding: var(--size-3);
+  background-color: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-lg),
+              inset 0 1px 0 var(--glass-highlight);
+  z-index: var(--z-toolbar);
+  transition: var(--transition-spring);
+}
+
+.toolbar.hide {
+  opacity: 0;
+  transform: translateY(-50%) translateX(-100px);
+  pointer-events: none;
+}
+
+.toolbar__btn {
+  /* Inherits from .icon-btn */
+}
+
+/* ========================================
+ * FLOATING PLAYBACK - Bottom center
+ * ======================================== */
+
+.playback {
+  position: fixed;
+  bottom: var(--playback-offset);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--size-5);
+  padding: var(--size-4) var(--size-5);
+  background-color: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-lg),
+              inset 0 1px 0 var(--glass-highlight);
+  z-index: var(--z-playback);
+  transition: var(--transition-spring);
+}
+
+.playback.hide {
+  opacity: 0;
+  transform: translateX(-50%) translateY(100px);
+  pointer-events: none;
+}
+
+.playback__play {
+  position: relative;
+  width: var(--icon-btn-size-lg);
+  height: var(--icon-btn-size-lg);
+  background: var(--accent-gradient);
+  border-color: transparent;
+  color: white;
+  box-shadow: var(--glow-violet-md);
+}
+
+.playback__play:hover {
+  background: var(--accent-gradient-hover);
+  box-shadow: var(--glow-violet-lg);
+  transform: scale(1.08);
+}
+
+.playback__play svg {
+  width: 24px;
+  height: 24px;
+}
+
+.playback__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2);
+}
+
+.playback__speed {
+  display: flex;
+  align-items: center;
+  gap: var(--size-3);
+}
+
+.speed-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.speed-value {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+  min-width: 3ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.speed-slider {
+  width: 120px;
+}
+
+/* ========================================
+ * SIDE PANEL - Settings, etc.
+ * ======================================== */
+
+.panel {
+  position: fixed;
+  top: 0;
+  width: var(--panel-width);
+  height: 100vh;
+  background-color: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-xl);
+  z-index: var(--z-panel);
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--duration-slow) var(--ease-spring);
+}
+
+.panel--right {
+  right: 0;
+  border-left: 1px solid var(--glass-border);
+  transform: translateX(100%);
+}
+
+.panel--right:not([hidden]) {
+  transform: translateX(0);
+}
+
+.panel--left {
+  left: 0;
+  border-right: 1px solid var(--glass-border);
+  transform: translateX(-100%);
+}
+
+.panel--left:not([hidden]) {
+  transform: translateX(0);
+}
+
+.panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--size-5);
+  border-bottom: 1px solid var(--border-1);
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.panel__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.panel__close {
+  /* Inherits from .icon-btn */
+}
+
+.panel__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--size-5);
+}
+
+/* ========================================
+ * SETTINGS COMPONENTS
+ * ======================================== */
+
+.setting-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--size-4) 0;
+  border-bottom: 1px solid var(--border-1);
+}
+
+.setting-group:last-child {
+  border-bottom: none;
+}
+
+.setting-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+.setting-input {
+  min-width: 120px;
+}
+
+/* ========================================
+ * LOADER - Initial loading screen
+ * ======================================== */
+
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--size-5);
+  background-color: var(--surface-1);
+  z-index: var(--z-loader);
+  transition: opacity var(--duration-slow) var(--ease-standard);
+}
+
+.loader.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loader__spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: var(--accent-gradient);
+  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+}
+
+.loader__text {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ========================================
+ * RESPONSIVE DESIGN
+ * ======================================== */
+
+/* Mobile & Tablet */
+@media (max-width: 1023px) {
+  .topbar {
+    padding: 0 var(--size-3);
+  }
+
+  .logo__text {
+    display: none;
+  }
+
+  .toolbar {
+    left: var(--size-2);
+    gap: var(--size-2);
+    padding: var(--size-2);
+  }
+
+  .playback {
+    flex-direction: column;
+    gap: var(--size-3);
+    padding: var(--size-3);
+    bottom: var(--size-2);
+  }
+
+  .playback__controls {
+    order: -1;
+  }
+
+  .playback__speed {
+    flex-direction: column;
+    gap: var(--size-2);
+  }
+
+  .speed-slider {
+    width: 100px;
+  }
+
+  .panel {
+    width: 100vw;
+    max-width: 320px;
+  }
+}
+
+/* Desktop Large */
+@media (min-width: 1536px) {
+  .panel--wide {
+    width: var(--panel-width-wide);
+  }
+}
+
+/* Touch Devices - Larger hit targets */
+@media (hover: none) and (pointer: coarse) {
+  .icon-btn {
+    width: var(--icon-btn-size-lg);
+    height: var(--icon-btn-size-lg);
+  }
+
+  .effect-option,
+  .setting-group {
+    padding: var(--size-3) var(--size-4);
+  }
+}
+
+/* ========================================
+ * TOOLTIP (using title attribute)
+ * ======================================== */
+
+[title] {
+  position: relative;
+}
+
+/* Native tooltips are fine for now, but we could implement custom ones later */
+
+/* ========================================
+ * UTILITY ANIMATIONS
+ * ======================================== */
+
+.fade-in {
+  animation: fadeIn var(--duration-normal) var(--ease-standard);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.slide-up {
+  animation: slideUp var(--duration-slow) var(--ease-spring);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,5 +1,6 @@
-import shaders from './gl/shaders';
-import f from './fonts';
+import * as THREE from 'three';
+import shaders from './gl/shaders.js';
+import f from './fonts.js';
 
 const options = [
   {

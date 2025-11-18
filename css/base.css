@@ -1,200 +1,442 @@
+/**
+ * TT K1n3t1c - Base Styles
+ * Foundation styles for Rive-inspired interface
+ */
+
+/* ========================================
+ * RESET & FOUNDATIONS
+ * ======================================== */
+
 *,
-*::after,
-*::before {
-	box-sizing: border-box;
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-:root {
-	font-size: 16px;
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-	margin: 0;
-	--color-text: #fff;
-	--color-bg: #000;
-	--color-link: #aaa;
-	--color-link-hover: #aaa;
-	color: var(--color-text);
-	background-color: var(--color-bg);
-	font-family: arpona, serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	transition: all 1.5s cubic-bezier(1, 0, 0, 1);
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--text-primary);
+  background-color: var(--surface-1);
+  overflow: hidden; /* Prevent scrollbars - canvas is fixed */
 }
 
-body.demo-2 {
-	--color-bg: #3e64ff;
-	--color-link: #13246d;
-	--color-link-hover: #13246d;
+/* ========================================
+ * APP CONTAINER - Full Viewport
+ * ======================================== */
+
+.app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--surface-1);
 }
 
-body.demo-3 {
-	--color-bg: #d8345f;
-	--color-text: #fff;
-	--color-link: #000;
-	--color-link-hover: #000;
+/* ========================================
+ * CANVAS CONTAINER - Sacred Space
+ * ======================================== */
+
+.canvas-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: var(--z-canvas);
+  background-color: var(--surface-1);
 }
 
-body.demo-4 {
-	--color-bg: #f2f3f3;
-	--color-text: #888;
-	--color-link: #000;
-	--color-link-hover: #000;
+#webgl {
+  width: 100%;
+  height: 100%;
 }
 
-/* Page Loader */
-.js .loading::before,
-.js .loading::after {
-	content: '';
-	position: fixed;
-	z-index: 1000;
-}
-
-.js .loading::before {
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: var(--color-bg);
-}
-
-.js .loading::after {
-	top: 50%;
-	left: 50%;
-	width: 60px;
-	height: 60px;
-	margin: -30px 0 0 -30px;
-	border-radius: 50%;
-	opacity: 0.4;
-	background: var(--color-link);
-	animation: loaderAnim 0.7s linear infinite alternate forwards;
-
-}
-
-@keyframes loaderAnim {
-	to {
-		opacity: 1;
-		transform: scale3d(0.5, 0.5, 1);
-	}
-}
-
-a {
-	text-decoration: none;
-	color: var(--color-link);
-	outline: none;
-	cursor: pointer;
-	transition: color 1.5s cubic-bezier(1, 0, 0, 1);
-}
-
-a:hover,
-a:focus {
-	color: var(--color-link-hover);
-	outline: none;
-	transition: none;
-}
-
-.frame {
-	padding: 3rem 5vw;
-	text-align: center;
-	position: relative;
-	z-index: 1000;
-}
-
-.frame__title {
-	font-size: 1rem;
-	margin: 0 0 1rem;
-	font-weight: normal;
-}
-
-.frame__links {
-	display: inline;
-}
-
-.frame__links a:not(:last-child),
-.frame__demos a:not(:last-child) {
-	margin-right: 1rem;
-}
-
-.frame__demos {
-	margin: 1rem 0;
-}
-
-.frame__demo--current,
-.frame__demo--current:hover {
-	color: var(--color-text);
-}
-
-.content {
-	display: flex;
-	flex-direction: column;
-	width: 100vw;
-	height: calc(100vh - 13rem);
-	position: relative;
-	justify-content: flex-start;
-	align-items: center;
-}
-
-@media screen and (min-width: 53em) {
-	.frame {
-		position: fixed;
-		text-align: left;
-		z-index: 100;
-		top: 0;
-		left: 0;
-		display: grid;
-		align-content: space-between;
-		width: 100%;
-		max-width: none;
-		height: 100vh;
-		padding: 3rem;
-		pointer-events: none;
-		grid-template-columns: 75% 25%;
-		grid-template-rows: auto auto auto;
-		grid-template-areas: 'title links'
-			'... ...'
-			'... demos';
-	}
-
-	.frame__title-wrap {
-		grid-area: title;
-		display: flex;
-	}
-
-	.frame__title {
-		margin: 0;
-	}
-
-	.frame__tagline {
-		position: relative;
-		margin: 0 0 0 1rem;
-		padding: 0 0 0 1rem;
-		opacity: 0.5;
-	}
-
-	.frame__demos {
-		margin: 0;
-		grid-area: demos;
-		justify-self: end;
-	}
-
-	.frame__links {
-		grid-area: links;
-		padding: 0;
-		justify-self: end;
-	}
-
-	.frame a {
-		pointer-events: auto;
-	}
-
-	.content {
-		height: 100vh;
-		justify-content: center;
-	}
-}
-
+/* Canvas element from Three.js */
 canvas {
-	position: fixed;
-	top: 0;
-	left: 0;
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ========================================
+ * TYPOGRAPHY
+ * ======================================== */
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--text-primary);
+}
+
+h1 { font-size: var(--font-size-xl); }
+h2 { font-size: var(--font-size-lg); }
+h3 { font-size: var(--font-size-base); }
+
+p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* ========================================
+ * ICON SYSTEM
+ * ======================================== */
+
+.icon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.icon--sm {
+  width: 16px;
+  height: 16px;
+}
+
+.icon--lg {
+  width: 24px;
+  height: 24px;
+}
+
+.icon--logo {
+  width: 24px;
+  height: 24px;
+}
+
+/* ========================================
+ * BUTTON SYSTEM
+ * ======================================== */
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+  outline: none;
+}
+
+/* Icon Button - Primary interactive element */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--icon-btn-size);
+  height: var(--icon-btn-size);
+  padding: 0;
+  border-radius: var(--radius-btn);
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  transition: var(--transition-standard);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.icon-btn:hover {
+  background-color: var(--surface-3);
+  border-color: var(--border-2);
+  color: var(--text-primary);
+  transform: scale(1.05);
+}
+
+.icon-btn:active {
+  transform: scale(0.98);
+}
+
+.icon-btn.active {
+  background: var(--accent-gradient);
+  border-color: transparent;
+  color: white;
+  box-shadow: var(--glow-violet-md);
+}
+
+.icon-btn:focus-visible {
+  outline: 2px solid var(--accent-violet);
+  outline-offset: 2px;
+}
+
+/* Standard Button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--size-2);
+  padding: var(--size-2) var(--size-4);
+  border-radius: var(--radius-btn);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border: 1px solid var(--border-2);
+  background-color: var(--surface-3);
+  color: var(--text-primary);
+  transition: var(--transition-standard);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  background-color: var(--surface-4);
+  border-color: var(--border-3);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn--primary {
+  background: var(--accent-gradient);
+  border-color: transparent;
+  color: white;
+  box-shadow: var(--glow-violet-sm);
+}
+
+.btn--primary:hover {
+  background: var(--accent-gradient-hover);
+  box-shadow: var(--glow-violet-md);
+}
+
+.btn--secondary {
+  background-color: transparent;
+  border-color: var(--border-2);
+}
+
+/* ========================================
+ * INPUT SYSTEM
+ * ======================================== */
+
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  border: none;
+  outline: none;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Range slider track */
+input[type="range"]::-webkit-slider-track {
+  background-color: var(--surface-4);
+  height: 4px;
+  border-radius: var(--radius-full);
+}
+
+input[type="range"]::-moz-range-track {
+  background-color: var(--surface-4);
+  height: 4px;
+  border-radius: var(--radius-full);
+}
+
+/* Range slider thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  background: var(--accent-gradient);
+  box-shadow: var(--glow-violet-sm);
+  margin-top: -6px;
+  cursor: grab;
+  transition: var(--transition-fast);
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: var(--glow-violet-md);
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  background: var(--accent-gradient);
+  box-shadow: var(--glow-violet-sm);
+  border: none;
+  cursor: grab;
+  transition: var(--transition-fast);
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: var(--glow-violet-md);
+}
+
+select {
+  padding: var(--size-2) var(--size-3);
+  background-color: var(--surface-3);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-input);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition-standard);
+}
+
+select:hover {
+  background-color: var(--surface-4);
+  border-color: var(--border-3);
+}
+
+select:focus {
+  outline: 2px solid var(--accent-violet);
+  outline-offset: 2px;
+}
+
+/* ========================================
+ * TOGGLE SWITCH
+ * ======================================== */
+
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle__slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--surface-4);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-full);
+  transition: var(--transition-standard);
+}
+
+.toggle__slider::before {
+  content: '';
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  transition: var(--transition-spring);
+}
+
+.toggle input:checked + .toggle__slider {
+  background: var(--accent-gradient);
+  border-color: transparent;
+}
+
+.toggle input:checked + .toggle__slider::before {
+  transform: translateX(20px);
+  background-color: white;
+}
+
+.toggle input:focus-visible + .toggle__slider {
+  outline: 2px solid var(--accent-violet);
+  outline-offset: 2px;
+}
+
+/* ========================================
+ * UTILITY CLASSES
+ * ======================================== */
+
+[hidden] {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--accent-violet);
+  outline-offset: 2px;
+  border-radius: var(--radius-btn);
+}
+
+/* Smooth focus for better UX */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Selection styling */
+::selection {
+  background-color: rgba(139, 92, 246, 0.3);
+  color: var(--text-primary);
+}
+
+/* ========================================
+ * SCROLLBAR STYLING (for panels)
+ * ======================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface-4);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-3);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-4) var(--surface-2);
 }

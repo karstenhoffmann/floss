@@ -1,10 +1,10 @@
 import * as THREE from 'three';
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 export default new class {
   constructor() {
     this.renderer = new THREE.WebGLRenderer({
       alpha: true,
+      antialias: true
     });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -21,15 +21,12 @@ export default new class {
 
     this.scene = new THREE.Scene();
 
-    // this.controls = new OrbitControls(this.camera, this.renderer.domElement);    
-
     this.clock = new THREE.Clock();
 
     this.init();
   }
 
   render() {
-    // this.controls.update();
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -38,8 +35,10 @@ export default new class {
 
     for (let i = 0; i < this.scene.children.length; i++) {
       const obj = this.scene.children[i];
-      obj.updateTime(this.clock.getElapsedTime());
-    }    
+      if (obj.updateTime) {
+        obj.updateTime(this.clock.getElapsedTime());
+      }
+    }
 
     this.render();
   }
