@@ -66,6 +66,11 @@ export class EffectBase {
                 max: 100,
                 label: 'Padding'
             },
+            fitToTile: {
+                type: 'boolean',
+                default: false,
+                label: 'Fit to Tile'
+            },
             repeats: {
                 type: 'number',
                 default: 3,

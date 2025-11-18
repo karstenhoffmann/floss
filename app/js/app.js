@@ -160,6 +160,17 @@ class App {
             this.importPreset();
         });
 
+        // Preset selector
+        const presetSelector = document.getElementById('preset-selector');
+        if (presetSelector) {
+            presetSelector.addEventListener('change', (e) => {
+                this.loadPreset(e.target.value);
+            });
+        }
+
+        // Update preset selector with saved presets
+        this.updatePresetSelector();
+
         // Camera controls
         this.setupCameraControls();
 
@@ -297,11 +308,11 @@ class App {
 
         console.log('✓ Updating settings panel, schema keys:', Object.keys(schema).length);
 
-        // Group settings
+        // Group settings (order matters for display)
+        // Note: animationSpeed removed - controlled via Playback Controls panel instead
         const groups = {
-            'Typography': ['text', 'fontSize', 'fontFamily', 'letterSpacing', 'padding', 'repeats'],
-            'Colors': ['textColor', 'surfaceColor', 'backgroundColor'],
-            'Animation': ['animationSpeed']
+            'Typography': ['text', 'fontFamily', 'fontSize', 'letterSpacing', 'repeats'],
+            'Colors': ['textColor', 'surfaceColor', 'backgroundColor']
         };
 
         Object.entries(groups).forEach(([groupName, keys]) => {
@@ -383,6 +394,9 @@ class App {
                 break;
             case 'font':
                 input = this.createFontSelect(value, onChange);
+                break;
+            case 'boolean':
+                input = this.createCheckboxInput(value, onChange);
                 break;
             default:
                 input = this.createTextInput(value, onChange);
@@ -547,6 +561,33 @@ class App {
     }
 
     /**
+     * Create checkbox input
+     */
+    createCheckboxInput(value, onChange) {
+        const container = document.createElement('div');
+        container.className = 'control-checkbox';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = value;
+        checkbox.id = `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+
+        const label = document.createElement('label');
+        label.htmlFor = checkbox.id;
+        label.textContent = value ? 'Enabled' : 'Disabled';
+
+        checkbox.addEventListener('change', (e) => {
+            const checked = e.target.checked;
+            label.textContent = checked ? 'Enabled' : 'Disabled';
+            onChange(checked);
+        });
+
+        container.appendChild(checkbox);
+        container.appendChild(label);
+        return container;
+    }
+
+    /**
      * Toggle UI visibility
      */
     toggleUI() {
@@ -620,6 +661,57 @@ class App {
 
         notification.success(`Preset "${name}" saved!`);
         console.log('Preset saved:', preset);
+
+        // Update preset selector to show new preset
+        this.updatePresetSelector();
+    }
+
+    /**
+     * Load preset by ID
+     */
+    loadPreset(presetId) {
+        if (!presetId) return;
+
+        const preset = presetManager.get(presetId);
+        if (!preset) {
+            notification.error('Preset not found');
+            return;
+        }
+
+        // Load effect if different
+        if (preset.effectId !== state.get('activeEffectId')) {
+            this.loadEffect(preset.effectId);
+        }
+
+        // Apply preset settings
+        if (this.currentEffect) {
+            this.currentEffect.updateSettings(preset.settings);
+            this.updateSettingsPanel(this.currentEffect);
+            notification.success(`Loaded preset: ${preset.name}`);
+        }
+    }
+
+    /**
+     * Update preset selector dropdown
+     */
+    updatePresetSelector() {
+        const selector = document.getElementById('preset-selector');
+        if (!selector) return;
+
+        const presets = presetManager.getAll();
+
+        // Clear existing options
+        selector.innerHTML = '<option value="">No preset selected</option>';
+
+        // Add preset options
+        presets.forEach(preset => {
+            const option = document.createElement('option');
+            option.value = preset.id;
+            option.textContent = `${preset.icon} ${preset.name}`;
+            selector.appendChild(option);
+        });
+
+        console.log(`✓ Preset selector updated with ${presets.length} presets`);
     }
 
     /**

@@ -45,6 +45,7 @@ export class EndlessEffect extends EffectBase {
             fontFamily: this.settings.fontFamily,
             letterSpacing: this.settings.letterSpacing,
             padding: this.settings.padding,
+            fitToTile: this.settings.fitToTile,
             textColor: this.settings.textColor,
             backgroundColor: this.settings.surfaceColor
         });
@@ -128,6 +129,7 @@ export class EndlessEffect extends EffectBase {
             case 'fontFamily':
             case 'letterSpacing':
             case 'padding':
+            case 'fitToTile':
             case 'textColor':
             case 'surfaceColor':
                 // Update text texture
@@ -136,6 +138,8 @@ export class EndlessEffect extends EffectBase {
                     fontSize: this.settings.fontSize,
                     fontFamily: this.settings.fontFamily,
                     letterSpacing: this.settings.letterSpacing,
+                    padding: this.settings.padding,
+                    fitToTile: this.settings.fitToTile,
                     textColor: this.settings.textColor,
                     backgroundColor: this.settings.surfaceColor
                 });

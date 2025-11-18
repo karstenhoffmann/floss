@@ -184,6 +184,27 @@
     padding: var(--spacing-sm);
 }
 
+/* === CHECKBOX === */
+.control-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.control-checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--color-accent-primary);
+}
+
+.control-checkbox label {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    user-select: none;
+}
+
 /* === TOGGLE SWITCH === */
 .control-toggle {
     display: flex;
