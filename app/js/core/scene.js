@@ -32,7 +32,7 @@ export class SceneManager {
             0.1,
             1000
         );
-        this.camera.position.z = 1;
+        this.camera.position.z = 30; // Moved back to see the geometry (torus knot radius = 9)
 
         // Scene
         this.scene = new THREE.Scene();
