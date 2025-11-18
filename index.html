@@ -216,11 +216,21 @@
         <p class="loader__text">Loading kinetic magic...</p>
     </div>
 
-    <!-- Dependencies (UMD builds as globals) -->
-    <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+    <!-- Import Map for ESM dependencies -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://esm.run/three@0.158.0",
+        "three/": "https://esm.run/three@0.158.0/",
+        "load-bmfont": "https://esm.run/load-bmfont@2.3.4",
+        "three-bmfont-text": "https://esm.run/three-bmfont-text@3.0.1",
+        "three-bmfont-text/": "https://esm.run/three-bmfont-text@3.0.1/"
+      }
+    }
+    </script>
+
+    <!-- GSAP (non-ESM, loaded globally) -->
     <script src="https://unpkg.com/gsap@3.12.4/dist/gsap.min.js"></script>
-    <script src="https://unpkg.com/load-bmfont@2.3.4/browser.js"></script>
-    <script src="https://unpkg.com/three-bmfont-text@3.0.1/dist/three-bmfont-text.js"></script>
 
     <!-- App Scripts (ES Modules) -->
     <script type="module" src="js/ui.js"></script>

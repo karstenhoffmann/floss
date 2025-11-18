@@ -3,9 +3,6 @@
  * Modern kinetic typography with Three.js
  */
 
-// THREE loaded globally from script tag
-const THREE = window.THREE;
-
 import Gl from './gl/index.js';
 import Type from './gl/Type.js';
 import options from './options.js';

@@ -1,8 +1,7 @@
-// Libraries loaded globally from script tags
-const THREE = window.THREE;
-const loadFont = window.loadBMFont;
-const createGeometry = window.createGeometry || window.createText;
-const MSDFShader = window.MSDFShader;
+import * as THREE from 'three';
+import loadFont from 'load-bmfont';
+import createGeometry from 'three-bmfont-text';
+import MSDFShader from 'three-bmfont-text/shaders/msdf.js';
 
 import Gl from './index.js';
 
