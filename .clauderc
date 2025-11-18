@@ -1,0 +1,29 @@
+# Claude Code Project Configuration
+
+## Project Identity
+project_name: "Floss"
+project_type: "webapp"
+primary_language: "javascript"
+
+## Key Files to Read First
+context_files:
+  - CLAUDE.md
+  - README.md
+  - index.html
+  - js/index.js
+
+## Common Commands
+local_server: "python3 -m http.server 8080"
+test_offline: "Open DevTools → Application → Service Workers → Offline checkbox"
+
+## Architecture Notes
+- No build step required
+- Hybrid UMD+ESM dependency loading
+- Sequential script loading is critical (see index.html:232-275)
+- Service Worker version bump required for cache invalidation
+
+## Deployment
+platform: "GitHub Pages"
+branch: "master"
+url: "https://karstenhoffmann.github.io/floss/"
+deploy_time: "~1 minute after push to master"

@@ -128,4 +128,4 @@ Built with inspiration from [Codrops Kinetic Typography](https://github.com/mari
 
 **Built for professional motion designers in 2025** ⚡
 
-[View Demo](https://karstenhoffmann.github.io/codrops-kinetic-typo/)
+[View Live Demo](https://karstenhoffmann.github.io/floss/)
