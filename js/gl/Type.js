@@ -77,15 +77,15 @@ export default class extends THREE.Object3D {
       canvasSize: `${canvas.width}x${canvas.height}`
     });
 
-    // Debug: Append canvas to DOM to verify rendering
-    canvas.style.position = 'fixed';
-    canvas.style.top = '10px';
-    canvas.style.left = '10px';
-    canvas.style.zIndex = '10000';
-    canvas.style.border = '2px solid red';
-    canvas.style.width = '512px';
-    canvas.style.height = '128px';
-    document.body.appendChild(canvas);
+    // Debug: Optionally append canvas to DOM to verify rendering
+    // canvas.style.position = 'fixed';
+    // canvas.style.top = '10px';
+    // canvas.style.left = '10px';
+    // canvas.style.zIndex = '10000';
+    // canvas.style.border = '2px solid red';
+    // canvas.style.width = '512px';
+    // canvas.style.height = '128px';
+    // document.body.appendChild(canvas);
 
     // Create texture from canvas
     this.canvasTexture = new THREE.CanvasTexture(canvas);
@@ -102,6 +102,7 @@ export default class extends THREE.Object3D {
     this.textMesh = new THREE.Mesh(planeGeometry, planeMaterial);
     this.textMesh.position.set(...this.opts.wordPosition);
     this.textMesh.scale.set(...this.opts.wordScale);
+    this.textMesh.rotation.set(Math.PI, 0, 0); // Flip 180° (Canvas text is mirrored)
 
     console.log('[Type] TextMesh created at position:', this.opts.wordPosition, 'scale:', this.opts.wordScale);
   }
