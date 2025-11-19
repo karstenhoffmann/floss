@@ -31,10 +31,21 @@ class App {
     }
 
     async init() {
-        console.log('🚀 Initializing Kinetic Typography App...');
+        // App version and build info
+        const appVersion = '2.1.1';
+        const buildCommit = '6a4a4cf';
+        const buildDate = '2025-11-19';
+
+        console.log(`
+╔════════════════════════════════════════╗
+║   TT K1n3t1c Motion Design             ║
+║   Version: ${appVersion}                      ║
+║   Build: ${buildCommit}                   ║
+║   Date: ${buildDate}                ║
+╚════════════════════════════════════════╝
+        `);
 
         // Clear old localStorage if needed (one-time migration)
-        const appVersion = '2.1.0';
         const storedVersion = localStorage.getItem('appVersion');
         if (storedVersion !== appVersion) {
             console.log('🔄 Clearing old cache and localStorage...');
@@ -71,36 +82,41 @@ class App {
         const initialEffectId = state.get('activeEffectId') || 'endless';
         this.loadEffect(initialEffectId);
 
-        // Configure Coloris color picker (after color inputs are created)
-        if (window.Coloris) {
-            Coloris({
-                theme: 'pill',
-                themeMode: 'dark',
-                alpha: false,
-                format: 'hex',
-                swatches: [
-                    '#000000',
-                    '#ffffff',
-                    '#8b5cf6',
-                    '#6366f1',
-                    '#ec4899',
-                    '#f59e0b',
-                    '#10b981',
-                    '#3b82f6',
-                    '#ef4444'
-                ],
-                clearButton: {
-                    show: false
-                },
-                closeButton: true,
-                closeLabel: 'Close',
-                selectInput: true,
-                focusInput: false
-            });
-        }
-
         // Start render loop
         this.renderLoop.start();
+
+        // Configure Coloris color picker (after color inputs are created)
+        try {
+            if (window.Coloris) {
+                Coloris({
+                    theme: 'pill',
+                    themeMode: 'dark',
+                    alpha: false,
+                    format: 'hex',
+                    swatches: [
+                        '#000000',
+                        '#ffffff',
+                        '#8b5cf6',
+                        '#6366f1',
+                        '#ec4899',
+                        '#f59e0b',
+                        '#10b981',
+                        '#3b82f6',
+                        '#ef4444'
+                    ],
+                    clearButton: {
+                        show: false
+                    },
+                    closeButton: true,
+                    closeLabel: 'Close',
+                    selectInput: true,
+                    focusInput: false
+                });
+                console.log('✓ Coloris initialized');
+            }
+        } catch (err) {
+            console.warn('Coloris initialization failed:', err);
+        }
 
         // Show welcome notification
         notification.success('App loaded successfully! Press H for help.');
@@ -535,10 +551,6 @@ class App {
         const container = document.createElement('div');
         container.className = 'control-color';
 
-        const preview = document.createElement('div');
-        preview.className = 'color-preview';
-        preview.style.backgroundColor = value;
-
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'coloris'; // Coloris will auto-attach to this
@@ -561,7 +573,6 @@ class App {
                     const color = result.sRGBHex;
 
                     input.value = color;
-                    preview.style.backgroundColor = color;
                     onChange(color);
 
                     // Trigger Coloris update
@@ -576,7 +587,6 @@ class App {
         // Coloris change event
         input.addEventListener('change', (e) => {
             const color = e.target.value;
-            preview.style.backgroundColor = color;
             onChange(color);
         });
 
@@ -584,12 +594,10 @@ class App {
         input.addEventListener('input', (e) => {
             const color = e.target.value;
             if (/^#[0-9A-F]{6}$/i.test(color)) {
-                preview.style.backgroundColor = color;
                 onChange(color);
             }
         });
 
-        container.appendChild(preview);
         container.appendChild(input);
         if (eyedropperBtn) {
             container.appendChild(eyedropperBtn);
