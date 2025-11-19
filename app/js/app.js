@@ -16,6 +16,7 @@ import ICONS from './ui/icons.js';
 // Import effects
 import EndlessEffect from './effects/endless.js';
 import GlitchEffect from './effects/glitch.js';
+import ParticlesEffect from './effects/particles.js';
 
 class App {
     constructor() {
@@ -104,6 +105,7 @@ class App {
     registerEffects() {
         effectManager.register(EndlessEffect);
         effectManager.register(GlitchEffect);
+        effectManager.register(ParticlesEffect);
         // More effects will be added here
     }
 
