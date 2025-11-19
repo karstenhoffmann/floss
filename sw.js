@@ -3,7 +3,7 @@
  * Enables offline functionality and asset caching
  */
 
-const CACHE_VERSION = 'v7-three-global';
+const CACHE_VERSION = 'v8-three-r118';
 const CACHE_NAME = `floss-${CACHE_VERSION}`;
 
 // Local assets to precache (excluding CDN resources)
@@ -35,7 +35,7 @@ const CDN_RESOURCES = [
   'https://unpkg.com/open-props@1.7.3/normalize.min.css',
   'https://unpkg.com/open-props@1.7.3/buttons.min.css',
   'https://unpkg.com/gsap@3.12.4/dist/gsap.min.js',
-  'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js'
+  'https://cdn.jsdelivr.net/npm/three@0.118.3/build/three.min.js'
 ];
 
 const PRECACHE_ASSETS = [...LOCAL_ASSETS];
