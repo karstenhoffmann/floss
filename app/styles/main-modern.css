@@ -891,7 +891,6 @@ input[type="range"]::-moz-range-thumb:hover {
 .clr-field button {
     background: var(--surface-3) !important;
     border: 1px solid var(--glass-border) !important;
-    color: var(--text-1) !important;
     font-family: var(--font-mono) !important;
 }
 

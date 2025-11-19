@@ -32,8 +32,8 @@ class App {
 
     async init() {
         // App version and build info
-        const appVersion = '2.1.1';
-        const buildCommit = '8e8b318';
+        const appVersion = '2.1.2';
+        const buildCommit = 'pending';
         const buildDate = '2025-11-19';
 
         console.log(`
@@ -85,38 +85,40 @@ class App {
         // Start render loop
         this.renderLoop.start();
 
-        // Configure Coloris color picker (after color inputs are created)
-        try {
-            if (window.Coloris) {
-                Coloris({
-                    theme: 'pill',
-                    themeMode: 'dark',
-                    alpha: false,
-                    format: 'hex',
-                    swatches: [
-                        '#000000',
-                        '#ffffff',
-                        '#8b5cf6',
-                        '#6366f1',
-                        '#ec4899',
-                        '#f59e0b',
-                        '#10b981',
-                        '#3b82f6',
-                        '#ef4444'
-                    ],
-                    clearButton: {
-                        show: false
-                    },
-                    closeButton: true,
-                    closeLabel: 'Close',
-                    selectInput: true,
-                    focusInput: false
-                });
-                console.log('✓ Coloris initialized');
+        // Configure Coloris color picker (delayed to ensure DOM is ready)
+        setTimeout(() => {
+            try {
+                if (window.Coloris) {
+                    Coloris({
+                        theme: 'pill',
+                        themeMode: 'dark',
+                        alpha: false,
+                        format: 'hex',
+                        swatches: [
+                            '#000000',
+                            '#ffffff',
+                            '#8b5cf6',
+                            '#6366f1',
+                            '#ec4899',
+                            '#f59e0b',
+                            '#10b981',
+                            '#3b82f6',
+                            '#ef4444'
+                        ],
+                        clearButton: {
+                            show: false
+                        },
+                        closeButton: true,
+                        closeLabel: 'Close',
+                        selectInput: true,
+                        focusInput: false
+                    });
+                    console.log('✓ Coloris initialized');
+                }
+            } catch (err) {
+                console.warn('⚠️ Coloris initialization failed:', err);
             }
-        } catch (err) {
-            console.warn('Coloris initialization failed:', err);
-        }
+        }, 100);
 
         // Show welcome notification
         notification.success('App loaded successfully! Press H for help.');

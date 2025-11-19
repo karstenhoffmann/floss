@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'kinetic-typo-v2.1.1'; // Fix Coloris integration issues
+const CACHE_NAME = 'kinetic-typo-v2.1.2'; // Fix Coloris color preview and crash
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
