@@ -3,7 +3,7 @@
  * Enables offline functionality and asset caching
  */
 
-const CACHE_VERSION = 'v14-three-r168';
+const CACHE_VERSION = 'v15-three-r150';
 const CACHE_NAME = `floss-${CACHE_VERSION}`;
 
 // Local assets to precache (excluding CDN resources)
@@ -28,7 +28,7 @@ const CDN_RESOURCES = [
   'https://unpkg.com/open-props@1.7.3/open-props.min.css',
   'https://unpkg.com/open-props@1.7.3/normalize.min.css',
   'https://unpkg.com/open-props@1.7.3/buttons.min.css',
-  'https://cdn.jsdelivr.net/npm/three@0.168.0/build/three.module.js',
+  'https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js',
   'https://unpkg.com/gsap@3.12.4/dist/gsap.min.js',
   'https://unpkg.com/troika-three-text@0.49.1?module',
   'https://unpkg.com/troika-worker-utils@0.49.1?module',
