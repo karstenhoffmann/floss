@@ -216,69 +216,22 @@
         <p class="loader__text">Loading kinetic magic...</p>
     </div>
 
-    <!-- Import Map (local ESM wrappers for UMD globals) -->
+    <!-- Import Map (pure ESM - modern approach) -->
     <script type="importmap">
     {
       "imports": {
-        "three": "./js/vendor/three.js",
-        "load-bmfont": "./js/vendor/load-bmfont.js",
-        "three-bmfont-text": "./js/vendor/three-bmfont-text.js",
-        "three-bmfont-text/shaders/msdf.js": "./js/vendor/three-bmfont-text.js"
+        "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+        "gsap": "https://cdn.jsdelivr.net/npm/gsap@3.12.4/dist/gsap.min.js",
+        "load-bmfont": "https://cdn.jsdelivr.net/npm/load-bmfont@1.4.2/+esm",
+        "three-bmfont-text": "https://cdn.jsdelivr.net/npm/three-bmfont-text@3.0.2/+esm",
+        "three-bmfont-text/shaders/msdf": "https://cdn.jsdelivr.net/npm/three-bmfont-text@3.0.2/shaders/msdf.js"
       }
     }
     </script>
 
-    <!-- Load non-ESM dependencies SEQUENTIALLY (not in parallel!) -->
-    <script>
-        // CRITICAL: Load scripts ONE AT A TIME in strict sequence!
-        // three-bmfont-text.umd.js requires THREE to be fully loaded first
-        (function() {
-            const scripts = [
-                'https://cdn.jsdelivr.net/npm/three@0.118.3/build/three.min.js',
-                'https://unpkg.com/gsap@3.12.4/dist/gsap.min.js',
-                './js/vendor/load-bmfont.umd.js',
-                './js/vendor/three-bmfont-text.umd.js'
-            ];
-
-            let currentIndex = 0;
-
-            function loadNextScript() {
-                if (currentIndex >= scripts.length) {
-                    // All UMD scripts loaded sequentially, now start ESM modules
-                    const uiScript = document.createElement('script');
-                    uiScript.type = 'module';
-                    uiScript.src = 'js/ui.js';
-                    document.body.appendChild(uiScript);
-
-                    const mainScript = document.createElement('script');
-                    mainScript.type = 'module';
-                    mainScript.src = 'js/index.js';
-                    document.body.appendChild(mainScript);
-                    return;
-                }
-
-                const script = document.createElement('script');
-                script.src = scripts[currentIndex];
-
-                script.onload = () => {
-                    console.log(`✓ Loaded: ${scripts[currentIndex]}`);
-                    currentIndex++;
-                    loadNextScript(); // Load next script AFTER this one finishes
-                };
-
-                script.onerror = () => {
-                    console.error(`✗ Failed to load: ${scripts[currentIndex]}`);
-                    currentIndex++;
-                    loadNextScript(); // Continue even if one fails
-                };
-
-                document.body.appendChild(script);
-            }
-
-            // Start the sequential loading chain
-            loadNextScript();
-        })();
-    </script>
+    <!-- Load ESM modules directly -->
+    <script type="module" src="js/ui.js"></script>
+    <script type="module" src="js/index.js"></script>
 
     <!-- Service Worker Registration -->
     <script>
