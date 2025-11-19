@@ -48,7 +48,30 @@ class App {
             }
         }
 
-        // Configure Coloris color picker
+        // Register effects
+        this.registerEffects();
+
+        // Initialize scene
+        const container = document.getElementById('webgl-container');
+        this.sceneManager = new SceneManager(container);
+
+        // Initialize render loop
+        this.renderLoop = new RenderLoop(this.sceneManager);
+
+        // Setup UI
+        this.setupUI();
+
+        // Setup keyboard shortcuts
+        this.setupKeyboardShortcuts();
+
+        // Setup event listeners
+        this.setupEventListeners();
+
+        // Load initial effect
+        const initialEffectId = state.get('activeEffectId') || 'endless';
+        this.loadEffect(initialEffectId);
+
+        // Configure Coloris color picker (after color inputs are created)
         if (window.Coloris) {
             Coloris({
                 theme: 'pill',
@@ -75,29 +98,6 @@ class App {
                 focusInput: false
             });
         }
-
-        // Register effects
-        this.registerEffects();
-
-        // Initialize scene
-        const container = document.getElementById('webgl-container');
-        this.sceneManager = new SceneManager(container);
-
-        // Initialize render loop
-        this.renderLoop = new RenderLoop(this.sceneManager);
-
-        // Setup UI
-        this.setupUI();
-
-        // Setup keyboard shortcuts
-        this.setupKeyboardShortcuts();
-
-        // Setup event listeners
-        this.setupEventListeners();
-
-        // Load initial effect
-        const initialEffectId = state.get('activeEffectId') || 'endless';
-        this.loadEffect(initialEffectId);
 
         // Start render loop
         this.renderLoop.start();
