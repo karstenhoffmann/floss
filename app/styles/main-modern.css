@@ -99,7 +99,7 @@ body {
 .toolbar__center {
     flex: 1;
     justify-content: center;
-    max-width: 400px;
+    max-width: 700px; /* Increased for preset controls */
 }
 
 .toolbar__right {
@@ -171,7 +171,8 @@ body {
 .effect-selector {
     width: 100%;
     max-width: 300px;
-    padding: var(--space-sm) var(--space-md);
+    padding: 8px 12px; /* Reduced by ~10% for more compact UI */
+    height: 34px; /* Fixed height to prevent overflow */
 
     background: var(--surface-2);
     border: 1px solid var(--glass-border);
@@ -936,7 +937,8 @@ input[type="range"]::-moz-range-thumb:hover {
 /* ===== PRESET SELECTOR (Compact, in Toolbar) ===== */
 .preset-selector {
     min-width: 180px;
-    padding: var(--space-sm) var(--space-md);
+    padding: 8px 12px; /* Reduced by ~10% for more compact UI */
+    height: 34px; /* Fixed height to match effect-selector */
     background: var(--surface-2);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
@@ -961,4 +963,41 @@ input[type="range"]::-moz-range-thumb:hover {
 .preset-selector option {
     background: var(--surface-2);
     color: var(--text-1);
+}
+
+/* ===== INPUT ELEMENTS - COMPACT & POLISHED ===== */
+
+/* Remove spinner buttons from number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+}
+
+/* Make all text inputs more compact */
+input[type="text"],
+input[type="number"],
+select,
+.font-select {
+    padding: 7px 10px !important; /* ~10% smaller than default */
+    height: auto;
+}
+
+/* Color preview - square and visible */
+.color-preview {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px;
+    min-height: 32px;
+    flex-shrink: 0;
+}
+
+/* Buttons in toolbar center more compact */
+.toolbar__center .btn-icon {
+    width: 34px !important;
+    height: 34px !important;
 }

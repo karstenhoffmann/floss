@@ -54,6 +54,7 @@ export class EndlessEffect extends EffectBase {
         this.geometry = new THREE.TorusKnotGeometry(9, 3, 768, 3, 4, 3);
 
         // Create material with custom shader
+        const fogColor = new THREE.Color(this.settings.fogColor);
         this.material = new THREE.ShaderMaterial({
             vertexShader: this.getVertexShader(),
             fragmentShader: this.getFragmentShader(),
@@ -61,7 +62,8 @@ export class EndlessEffect extends EffectBase {
                 uTime: { value: 0 },
                 uTexture: { value: this.textTextureData.texture },
                 uRepeats: { value: new THREE.Vector2(this.settings.repeats, 3) },
-                uSpeed: { value: this.settings.animationSpeed }
+                uSpeed: { value: this.settings.animationSpeed },
+                uFogColor: { value: fogColor }
             },
             side: THREE.DoubleSide
         });
@@ -98,6 +100,7 @@ export class EndlessEffect extends EffectBase {
             uniform sampler2D uTexture;
             uniform vec2 uRepeats;
             uniform float uSpeed;
+            uniform vec3 uFogColor;
 
             void main() {
                 float time = uTime * uSpeed;
@@ -106,9 +109,9 @@ export class EndlessEffect extends EffectBase {
                 vec2 uv = fract(vUv * uRepeats - vec2(time, 0.0));
                 vec3 texture = texture2D(uTexture, uv).rgb;
 
-                // Depth fog effect
+                // Depth fog effect with customizable fog color
                 float fog = clamp(vPosition.z / 6.0, 0.0, 1.0);
-                vec3 fragColor = mix(vec3(0.0), texture, fog);
+                vec3 fragColor = mix(uFogColor, texture, fog);
 
                 gl_FragColor = vec4(fragColor, 1.0);
             }
@@ -147,6 +150,12 @@ export class EndlessEffect extends EffectBase {
 
             case 'backgroundColor':
                 this.scene.background = new THREE.Color(value);
+                break;
+
+            case 'fogColor':
+                if (this.material && this.material.uniforms.uFogColor) {
+                    this.material.uniforms.uFogColor.value = new THREE.Color(value);
+                }
                 break;
 
             case 'repeats':

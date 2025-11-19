@@ -93,6 +93,11 @@ export class EffectBase {
                 default: '#000000',
                 label: 'Background Color'
             },
+            fogColor: {
+                type: 'color',
+                default: '#000000',
+                label: 'Shadow/Fade Color'
+            },
             animationSpeed: {
                 type: 'number',
                 default: 1.0,
