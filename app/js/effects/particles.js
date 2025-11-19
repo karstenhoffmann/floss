@@ -262,7 +262,7 @@ export class ParticlesEffect extends EffectBase {
     getVertexShader() {
         return `
             attribute float size;
-            attribute vec3 color;
+            // Note: 'color' attribute is automatically added by THREE.js when vertexColors: true
 
             varying vec3 vColor;
 
