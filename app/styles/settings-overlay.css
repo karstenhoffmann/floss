@@ -1,0 +1,149 @@
+/**
+ * Settings Overlay Styles
+ * Similar to help-overlay but for app settings
+ */
+
+.settings-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+}
+
+.settings-overlay__content {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.settings-overlay__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.settings-overlay__header h2 {
+    margin: 0;
+    font-size: var(--text-2xl);
+    color: var(--text-1);
+}
+
+.settings-overlay__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+.settings-section {
+    background: var(--surface-2);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+}
+
+.settings-section h3 {
+    margin: 0 0 var(--space-md) 0;
+    font-size: var(--text-lg);
+    color: var(--text-1);
+}
+
+.settings-section p {
+    margin: 0 0 var(--space-md) 0;
+    font-size: var(--text-sm);
+    color: var(--text-2);
+}
+
+/* Color Swatches Grid */
+.color-swatches-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+}
+
+.color-swatch-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.color-swatch-preview {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--glass-border);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.color-swatch-preview:hover {
+    transform: scale(1.05);
+    border-color: var(--accent-primary);
+}
+
+.color-swatch-input {
+    width: 100%;
+    padding: var(--space-xs);
+    background: var(--surface-3);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--text-1);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    text-align: center;
+    text-transform: uppercase;
+}
+
+/* Settings Actions */
+.settings-actions {
+    display: flex;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--glass-border);
+}
+
+.settings-actions .btn {
+    flex: 1;
+    padding: var(--space-md) var(--space-lg);
+    background: var(--surface-3);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--text-1);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.settings-actions .btn:hover {
+    background: var(--surface-4, var(--surface-3));
+    border-color: var(--glass-border-hover);
+}
+
+.settings-actions .btn-primary {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
+}
+
+.settings-actions .btn-primary:hover {
+    background: var(--accent-secondary);
+    border-color: var(--accent-secondary);
+}
