@@ -118,6 +118,13 @@ export default class extends THREE.Object3D {
 
     // Add text to render target scene
     this.rtScene.add(this.textMesh);
+
+    // DEBUG: Also add to main scene to verify visibility
+    const debugTextMesh = this.textMesh.clone();
+    debugTextMesh.position.set(0, 0, 0); // Center of main scene
+    debugTextMesh.scale.set(10, 10, 1); // Make it MUCH bigger
+    Gl.scene.add(debugTextMesh);
+    console.log('[Type] DEBUG: Added visible text mesh to main scene');
   }
 
   createMesh() {
