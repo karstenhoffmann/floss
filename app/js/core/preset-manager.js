@@ -5,7 +5,8 @@
 
 import { getItem, setItem } from '../utils/storage.js';
 
-const STORAGE_KEY = 'kt-presets';
+// Unique storage key to isolate presets from other forks/versions
+const STORAGE_KEY = 'tt-kinetic-v2-presets';
 
 export class PresetManager {
     constructor() {

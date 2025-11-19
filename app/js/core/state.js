@@ -94,7 +94,7 @@ export class AppState {
         clearTimeout(this.persistTimer);
         this.persistTimer = setTimeout(() => {
             try {
-                localStorage.setItem('kt-app-state', JSON.stringify(this.state));
+                localStorage.setItem('tt-kinetic-v2-state', JSON.stringify(this.state));
             } catch (e) {
                 console.error('Failed to persist state:', e);
                 // Emit error event for UI notification
@@ -110,7 +110,7 @@ export class AppState {
      */
     restore() {
         try {
-            const saved = localStorage.getItem('kt-app-state');
+            const saved = localStorage.getItem('tt-kinetic-v2-state');
             if (saved) {
                 const parsed = JSON.parse(saved);
                 this.state = { ...this.state, ...parsed };

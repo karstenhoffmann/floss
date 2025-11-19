@@ -843,7 +843,9 @@ class App {
         rotateXSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
             const radians = (value * Math.PI) / 180;
-            this.sceneManager.camera.rotation.x = radians;
+            if (this.currentEffect && this.currentEffect.mesh) {
+                this.currentEffect.mesh.rotation.x = radians;
+            }
             document.getElementById('camera-rotate-x-value').textContent = value + '°';
         });
 
@@ -851,7 +853,9 @@ class App {
         rotateYSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
             const radians = (value * Math.PI) / 180;
-            this.sceneManager.camera.rotation.y = radians;
+            if (this.currentEffect && this.currentEffect.mesh) {
+                this.currentEffect.mesh.rotation.y = radians;
+            }
             document.getElementById('camera-rotate-y-value').textContent = value + '°';
         });
 
@@ -859,8 +863,11 @@ class App {
         if (resetBtn) {
             resetBtn.addEventListener('click', () => {
                 this.sceneManager.camera.position.set(0, 0, 50);
-                this.sceneManager.camera.rotation.set(0, 0, 0);
                 this.sceneManager.controls.target.set(0, 0, 0);
+
+                if (this.currentEffect && this.currentEffect.mesh) {
+                    this.currentEffect.mesh.rotation.set(0, 0, 0);
+                }
 
                 zoomSlider.value = 50;
                 panXSlider.value = 0;

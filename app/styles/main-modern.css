@@ -489,32 +489,32 @@ input[type="range"]::-webkit-slider-thumb {
     appearance: none;
     width: 16px;
     height: 16px;
-    background: var(--accent-primary);
+    background: #ffffff;
     border-radius: var(--radius-full);
     cursor: pointer;
     transition: all var(--duration-fast) var(--ease-out);
-    box-shadow: var(--glow-subtle);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
     transform: scale(1.2);
-    box-shadow: var(--glow-medium);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 input[type="range"]::-moz-range-thumb {
     width: 16px;
     height: 16px;
-    background: var(--accent-primary);
+    background: #ffffff;
     border: none;
     border-radius: var(--radius-full);
     cursor: pointer;
     transition: all var(--duration-fast) var(--ease-out);
-    box-shadow: var(--glow-subtle);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 input[type="range"]::-moz-range-thumb:hover {
     transform: scale(1.2);
-    box-shadow: var(--glow-medium);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 /* ===== CAMERA CONTROLS ===== */
