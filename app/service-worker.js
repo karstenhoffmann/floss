@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'kinetic-typo-v2.0.0'; // Updated version to force cache refresh
+const CACHE_NAME = 'kinetic-typo-v2.1.0'; // Updated for Coloris integration
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
@@ -32,7 +32,10 @@ const ASSETS_TO_CACHE = [
     'https://unpkg.com/three@0.115.0/examples/js/controls/OrbitControls.js',
     // Open Props
     'https://unpkg.com/open-props',
-    'https://unpkg.com/open-props/normalize.min.css'
+    'https://unpkg.com/open-props/normalize.min.css',
+    // Coloris Color Picker
+    'https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css',
+    'https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js'
 ];
 
 // Install event - cache assets

@@ -840,6 +840,83 @@ input[type="range"]::-moz-range-thumb:hover {
     box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
 }
 
+/* Eyedropper button */
+.btn-eyedropper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: var(--surface-2);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.btn-eyedropper:hover {
+    background: var(--surface-3);
+    border-color: var(--glass-border-hover);
+    color: var(--text-1);
+    transform: scale(1.05);
+}
+
+.btn-eyedropper svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ===== COLORIS THEME OVERRIDES ===== */
+.clr-picker {
+    background: var(--surface-2) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+}
+
+.clr-gradient,
+.clr-color,
+.clr-hue,
+.clr-alpha {
+    border-radius: var(--radius-sm) !important;
+}
+
+.clr-field button {
+    border-radius: var(--radius-sm) !important;
+}
+
+.clr-field input,
+.clr-field button {
+    background: var(--surface-3) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-1) !important;
+    font-family: var(--font-mono) !important;
+}
+
+.clr-field input:focus {
+    border-color: var(--accent-primary) !important;
+}
+
+.clr-swatches button {
+    border-radius: var(--radius-sm) !important;
+    border: 1px solid var(--glass-border) !important;
+}
+
+.clr-swatches button:hover {
+    transform: scale(1.1);
+}
+
+.clr-close {
+    background: var(--surface-3) !important;
+    color: var(--text-1) !important;
+}
+
+.clr-close:hover {
+    background: var(--accent-primary) !important;
+}
+
 /* ===== FONT SELECTOR ===== */
 .control-font {
     width: 100%;

@@ -34,7 +34,7 @@ class App {
         console.log('🚀 Initializing Kinetic Typography App...');
 
         // Clear old localStorage if needed (one-time migration)
-        const appVersion = '2.0.0';
+        const appVersion = '2.1.0';
         const storedVersion = localStorage.getItem('appVersion');
         if (storedVersion !== appVersion) {
             console.log('🔄 Clearing old cache and localStorage...');
@@ -46,6 +46,35 @@ class App {
                     names.forEach(name => caches.delete(name));
                 });
             }
+        }
+
+        // Configure Coloris color picker
+        if (window.Coloris) {
+            Coloris.init();
+            Coloris({
+                theme: 'pill',
+                themeMode: 'dark',
+                alpha: false,
+                format: 'hex',
+                swatches: [
+                    '#000000',
+                    '#ffffff',
+                    '#8b5cf6',
+                    '#6366f1',
+                    '#ec4899',
+                    '#f59e0b',
+                    '#10b981',
+                    '#3b82f6',
+                    '#ef4444'
+                ],
+                clearButton: {
+                    show: false
+                },
+                closeButton: true,
+                closeLabel: 'Close',
+                selectInput: true,
+                focusInput: false
+            });
         }
 
         // Register effects
@@ -501,7 +530,7 @@ class App {
     }
 
     /**
-     * Create color input
+     * Create color input with Coloris picker and eyedropper
      */
     createColorInput(value, onChange) {
         const container = document.createElement('div');
@@ -513,28 +542,49 @@ class App {
 
         const input = document.createElement('input');
         input.type = 'text';
+        input.className = 'coloris'; // Coloris will auto-attach to this
         input.value = value;
-        input.maxLength = 7;
+        input.dataset.coloris = ''; // Enable Coloris on this input
 
-        const colorPicker = document.createElement('input');
-        colorPicker.type = 'color';
-        colorPicker.value = value;
+        // Eyedropper button (if browser supports it)
+        let eyedropperBtn = null;
+        if (window.EyeDropper) {
+            eyedropperBtn = document.createElement('button');
+            eyedropperBtn.className = 'btn-eyedropper';
+            eyedropperBtn.innerHTML = ICONS.eyedropper;
+            eyedropperBtn.title = 'Pick color from screen';
+            eyedropperBtn.type = 'button';
 
-        preview.addEventListener('click', () => {
-            colorPicker.click();
-        });
+            eyedropperBtn.addEventListener('click', async () => {
+                try {
+                    const eyeDropper = new EyeDropper();
+                    const result = await eyeDropper.open();
+                    const color = result.sRGBHex;
 
-        colorPicker.addEventListener('input', (e) => {
+                    input.value = color;
+                    preview.style.backgroundColor = color;
+                    onChange(color);
+
+                    // Trigger Coloris update
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                } catch (err) {
+                    // User cancelled or error occurred
+                    console.log('Eyedropper cancelled or failed:', err);
+                }
+            });
+        }
+
+        // Coloris change event
+        input.addEventListener('change', (e) => {
             const color = e.target.value;
-            input.value = color;
             preview.style.backgroundColor = color;
             onChange(color);
         });
 
+        // Manual text input (for typing HEX values)
         input.addEventListener('input', (e) => {
             const color = e.target.value;
             if (/^#[0-9A-F]{6}$/i.test(color)) {
-                colorPicker.value = color;
                 preview.style.backgroundColor = color;
                 onChange(color);
             }
@@ -542,7 +592,9 @@ class App {
 
         container.appendChild(preview);
         container.appendChild(input);
-        container.appendChild(colorPicker);
+        if (eyedropperBtn) {
+            container.appendChild(eyedropperBtn);
+        }
 
         return container;
     }
