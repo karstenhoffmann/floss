@@ -13,6 +13,7 @@ export class EffectBase {
         this.material = null;
         this.geometry = null;
         this.renderTarget = null;
+        this.composer = null; // For post-processing effects
         this.initialized = false;
     }
 
@@ -191,6 +192,28 @@ export class EffectBase {
     }
 
     /**
+     * Check if effect uses post-processing (override in subclass)
+     */
+    usesPostProcessing() {
+        return false;
+    }
+
+    /**
+     * Get composer for post-processing effects (override in subclass)
+     */
+    getComposer() {
+        return this.composer;
+    }
+
+    /**
+     * Render method (can be overridden for custom rendering)
+     */
+    render() {
+        // Default: no custom rendering (uses scene manager's render)
+        // Override this in effects that use post-processing
+    }
+
+    /**
      * Cleanup resources (must be overridden by subclass)
      */
     destroy() {
@@ -209,6 +232,11 @@ export class EffectBase {
 
         if (this.renderTarget) {
             this.renderTarget.dispose();
+        }
+
+        if (this.composer) {
+            // Composer cleanup will be handled by SceneManager
+            this.composer = null;
         }
 
         this.initialized = false;

@@ -108,7 +108,19 @@ export class SceneManager {
      * Render scene
      */
     render() {
-        this.renderer.render(this.scene, this.camera);
+        // Check if active effect uses post-processing
+        if (this.activeEffect && this.activeEffect.usesPostProcessing()) {
+            const composer = this.activeEffect.getComposer();
+            if (composer) {
+                composer.render();
+            } else {
+                // Fallback to normal rendering
+                this.renderer.render(this.scene, this.camera);
+            }
+        } else {
+            // Normal rendering
+            this.renderer.render(this.scene, this.camera);
+        }
     }
 
     /**
