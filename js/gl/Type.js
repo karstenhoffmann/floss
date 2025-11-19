@@ -17,12 +17,31 @@ export default class extends THREE.Object3D {
       fontFamily: options.font?.family || 'Inter'
     };
 
-    this.createTextCanvas();
-    this.createRenderTarget();
-    this.createMesh();
+    // Wait for fonts to load before creating canvas
+    this.initAsync();
+  }
+
+  async initAsync() {
+    try {
+      // Wait for all fonts to be loaded
+      await document.fonts.ready;
+      console.log('[Type] Fonts loaded, creating text canvas');
+
+      this.createTextCanvas();
+      this.createRenderTarget();
+      this.createMesh();
+    } catch (error) {
+      console.error('[Type] Error during initialization:', error);
+      // Fallback: create anyway
+      this.createTextCanvas();
+      this.createRenderTarget();
+      this.createMesh();
+    }
   }
 
   createTextCanvas() {
+    console.log('[Type] Creating canvas for:', this.opts.word, 'with font:', this.opts.fontFamily);
+
     // Canvas setup for high-quality text
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -50,6 +69,24 @@ export default class extends THREE.Object3D {
     // Draw text centered
     ctx.fillText(this.opts.word, canvas.width / 2, canvas.height / 2);
 
+    // Debug: Log text rendering
+    console.log('[Type] Text rendered:', {
+      word: this.opts.word,
+      font: ctx.font,
+      color: this.opts.color,
+      canvasSize: `${canvas.width}x${canvas.height}`
+    });
+
+    // Debug: Optionally append canvas to DOM to verify rendering
+    // canvas.style.position = 'fixed';
+    // canvas.style.top = '0';
+    // canvas.style.left = '0';
+    // canvas.style.zIndex = '10000';
+    // canvas.style.border = '2px solid red';
+    // canvas.style.width = '512px';
+    // canvas.style.height = '128px';
+    // document.body.appendChild(canvas);
+
     // Create texture from canvas
     this.canvasTexture = new THREE.CanvasTexture(canvas);
     this.canvasTexture.needsUpdate = true;
@@ -65,6 +102,8 @@ export default class extends THREE.Object3D {
     this.textMesh = new THREE.Mesh(planeGeometry, planeMaterial);
     this.textMesh.position.set(...this.opts.wordPosition);
     this.textMesh.scale.set(...this.opts.wordScale);
+
+    console.log('[Type] TextMesh created at position:', this.opts.wordPosition, 'scale:', this.opts.wordScale);
   }
 
   createRenderTarget() {
@@ -96,10 +135,14 @@ export default class extends THREE.Object3D {
       side: THREE.DoubleSide
     });
 
+    console.log('[Type] ShaderMaterial created with texture:', this.rt.texture);
+
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.position.set(...this.opts.position);
     this.mesh.rotation.set(...this.opts.rotation);
     this.mesh.lookAt(new THREE.Vector3());
+
+    console.log('[Type] Main mesh created at position:', this.opts.position);
 
     this.mesh.onBeforeRender = (renderer) => {
       renderer.setRenderTarget(this.rt);
@@ -110,6 +153,8 @@ export default class extends THREE.Object3D {
     this.add(this.mesh);
 
     Gl.scene.add(this);
+
+    console.log('[Type] Added to scene. Total scene children:', Gl.scene.children.length);
   }
 
   updateTime(time) {
