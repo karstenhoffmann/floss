@@ -17,7 +17,7 @@ const options = [
       fragment: shaders.fragment.demo1
     },
     font: {
-      url: 'https://fonts.gstatic.com/s/poppins/v21/pxiByp8kv8JHgFVrLCz7Z1xlFQ.ttf'
+      family: 'Poppins'
     },
     class: 'demo-1'
   },
@@ -37,7 +37,7 @@ const options = [
       fragment: shaders.fragment.demo2
     },
     font: {
-      url: 'https://fonts.gstatic.com/s/montserrat/v26/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.ttf'
+      family: 'Montserrat'
     },
     class: 'demo-2'
   },
@@ -57,7 +57,7 @@ const options = [
       fragment: shaders.fragment.demo3
     },
     font: {
-      url: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxKKTU1Kg.ttf'
+      family: 'Roboto'
     },
     class: 'demo-3'
   },
@@ -77,7 +77,7 @@ const options = [
       fragment: shaders.fragment.demo4
     },
     font: {
-      url: 'https://fonts.gstatic.com/l/font?kit=UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA&skey=fa4e635f2ef2e2c6&v=v18'
+      family: 'Inter'
     },
     class: 'demo-4'
   }

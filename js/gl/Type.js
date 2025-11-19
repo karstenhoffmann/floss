@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { Text } from 'troika-three-text';
 import Gl from './index.js';
 
 export default class extends THREE.Object3D {
@@ -15,32 +14,57 @@ export default class extends THREE.Object3D {
       geometry: options.geometry,
       vertex: options.shaders.vertex,
       fragment: options.shaders.fragment,
-      fontUrl: options.font?.url || 'https://fonts.gstatic.com/l/font?kit=UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA&skey=fa4e635f2ef2e2c6&v=v18'
+      fontFamily: options.font?.family || 'Inter'
     };
 
-    this.createTextMesh();
+    this.createTextCanvas();
     this.createRenderTarget();
     this.createMesh();
   }
 
-  createTextMesh() {
-    // Create troika Text object
-    this.textMesh = new Text();
+  createTextCanvas() {
+    // Canvas setup for high-quality text
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
 
-    // Set text properties
-    this.textMesh.text = this.opts.word;
-    this.textMesh.fontSize = 1;
-    this.textMesh.color = this.opts.color;
-    this.textMesh.font = this.opts.fontUrl;
-    this.textMesh.anchorX = 'center';
-    this.textMesh.anchorY = 'middle';
+    // High resolution for crisp text (retina-ready)
+    const scale = 2;
+    canvas.width = 2048 * scale;
+    canvas.height = 512 * scale;
 
-    // Position and scale
+    // Fill background
+    ctx.fillStyle = this.opts.fill;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Text styling
+    const fontSize = 400 * scale;
+    ctx.font = `bold ${fontSize}px ${this.opts.fontFamily}`;
+    ctx.fillStyle = this.opts.color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Enable anti-aliasing
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    // Draw text centered
+    ctx.fillText(this.opts.word, canvas.width / 2, canvas.height / 2);
+
+    // Create texture from canvas
+    this.canvasTexture = new THREE.CanvasTexture(canvas);
+    this.canvasTexture.needsUpdate = true;
+
+    // Create a plane to display the text
+    const planeGeometry = new THREE.PlaneGeometry(2, 0.5);
+    const planeMaterial = new THREE.MeshBasicMaterial({
+      map: this.canvasTexture,
+      transparent: true,
+      side: THREE.DoubleSide
+    });
+
+    this.textMesh = new THREE.Mesh(planeGeometry, planeMaterial);
     this.textMesh.position.set(...this.opts.wordPosition);
     this.textMesh.scale.set(...this.opts.wordScale);
-
-    // Sync to ensure geometry is ready
-    this.textMesh.sync();
   }
 
   createRenderTarget() {
@@ -96,8 +120,12 @@ export default class extends THREE.Object3D {
 
   // Clean up
   dispose() {
+    if (this.canvasTexture) {
+      this.canvasTexture.dispose();
+    }
     if (this.textMesh) {
-      this.textMesh.dispose();
+      this.textMesh.geometry.dispose();
+      this.textMesh.material.dispose();
     }
     if (this.rt) {
       this.rt.dispose();

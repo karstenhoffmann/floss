@@ -3,7 +3,7 @@
  * Enables offline functionality and asset caching
  */
 
-const CACHE_VERSION = 'v18-ttf-fonts';
+const CACHE_VERSION = 'v19-canvas-texture';
 const CACHE_NAME = `floss-${CACHE_VERSION}`;
 
 // Local assets to precache (excluding CDN resources)
@@ -30,16 +30,7 @@ const CDN_RESOURCES = [
   'https://unpkg.com/open-props@1.7.3/buttons.min.css',
   'https://cdn.jsdelivr.net/npm/three@0.181.1/build/three.module.js',
   'https://unpkg.com/gsap@3.12.5/dist/gsap.min.js',
-  'https://unpkg.com/troika-three-text@0.52.4?module',
-  'https://unpkg.com/troika-worker-utils@0.52.4?module',
-  'https://unpkg.com/troika-three-utils@0.52.4?module',
-  'https://unpkg.com/bidi-js@1.0.3?module',
-  'https://unpkg.com/webgl-sdf-generator@1.1.1?module',
-  // Font files (TTF from Google Fonts - troika requires TTF, not WOFF2!)
-  'https://fonts.gstatic.com/s/poppins/v21/pxiByp8kv8JHgFVrLCz7Z1xlFQ.ttf',
-  'https://fonts.gstatic.com/s/montserrat/v26/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.ttf',
-  'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxKKTU1Kg.ttf',
-  'https://fonts.gstatic.com/l/font?kit=UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA&skey=fa4e635f2ef2e2c6&v=v18'
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Poppins:wght@700&family=Montserrat:wght@700&family=Roboto:wght@700&display=swap'
 ];
 
 const PRECACHE_ASSETS = [...LOCAL_ASSETS];
