@@ -337,7 +337,7 @@ class App {
         header.className = 'control-group-header';
         header.innerHTML = `
             <h4 class="control-group-title">${groupName}</h4>
-            <span class="control-group-toggle">▼</span>
+            <span class="control-group-toggle"><ph-caret-down size="16" weight="bold"></ph-caret-down></span>
         `;
         group.appendChild(header);
 
@@ -870,11 +870,11 @@ class App {
 
             if (isPaused) {
                 this.renderLoop.stop();
-                playPauseBtn.textContent = '▶️ Play';
+                playPauseBtn.innerHTML = '<ph-play size="18" weight="fill"></ph-play> Play';
                 playPauseBtn.classList.add('active');
             } else {
                 this.renderLoop.start();
-                playPauseBtn.textContent = '⏸️ Pause';
+                playPauseBtn.innerHTML = '<ph-pause size="18" weight="fill"></ph-pause> Pause';
                 playPauseBtn.classList.remove('active');
             }
         });

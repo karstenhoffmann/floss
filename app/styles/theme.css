@@ -1,0 +1,194 @@
+/**
+ * TT K1n3t1c - Ultra-Dark Theme
+ * Based on Open Props design tokens with modern glassmorphism
+ */
+
+:root {
+    /* ===== Ultra-Dark Surfaces ===== */
+    --surface-0: #000000;           /* Canvas background - pure black */
+    --surface-1: #0a0a0a;           /* Deepest panels */
+    --surface-2: #121212;           /* Panel backgrounds */
+    --surface-3: #1a1a1a;           /* Elevated panels */
+    --surface-4: #242424;           /* Hover states */
+
+    /* ===== Text Colors ===== */
+    --text-1: #ffffff;              /* Primary text */
+    --text-2: #b0b0b0;              /* Secondary text */
+    --text-3: #808080;              /* Tertiary text */
+    --text-4: #505050;              /* Disabled text */
+
+    /* ===== Accent Colors (Violet/Blue Gradient) ===== */
+    --accent-primary: #8b5cf6;      /* Violet */
+    --accent-secondary: #6366f1;    /* Indigo */
+    --accent-hover: #a78bfa;        /* Lighter violet */
+
+    --accent-gradient: linear-gradient(
+        135deg,
+        var(--accent-primary) 0%,
+        var(--accent-secondary) 100%
+    );
+
+    /* ===== Glassmorphism ===== */
+    --glass-bg: rgba(18, 18, 18, 0.7);
+    --glass-bg-hover: rgba(26, 26, 26, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border-hover: rgba(255, 255, 255, 0.15);
+    --glass-blur: 20px;
+
+    /* ===== Shadows & Glows ===== */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.7);
+    --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.8);
+
+    --glow-subtle: 0 0 10px rgba(139, 92, 246, 0.3);
+    --glow-medium: 0 0 20px rgba(139, 92, 246, 0.4);
+    --glow-strong: 0 0 30px rgba(139, 92, 246, 0.6);
+
+    /* ===== Border Radius (from Open Props) ===== */
+    --radius-xs: var(--radius-2);   /* 4px */
+    --radius-sm: var(--radius-3);   /* 8px */
+    --radius-md: var(--radius-4);   /* 12px */
+    --radius-lg: var(--radius-5);   /* 16px */
+    --radius-xl: var(--radius-6);   /* 24px */
+    --radius-full: var(--radius-round); /* Full round */
+
+    /* ===== Spacing (from Open Props) ===== */
+    --space-xs: var(--size-2);      /* 8px */
+    --space-sm: var(--size-3);      /* 12px */
+    --space-md: var(--size-4);      /* 16px */
+    --space-lg: var(--size-5);      /* 20px */
+    --space-xl: var(--size-6);      /* 24px */
+    --space-2xl: var(--size-7);     /* 28px */
+
+    /* ===== Animations (from Open Props) ===== */
+    --duration-instant: 100ms;
+    --duration-fast: 200ms;
+    --duration-normal: 300ms;
+    --duration-slow: 400ms;
+    --duration-slower: 600ms;
+
+    /* Spring-based easings from Open Props */
+    --ease-spring: var(--ease-spring-5);
+    --ease-in: var(--ease-in-3);
+    --ease-out: var(--ease-out-3);
+    --ease-in-out: var(--ease-in-out-3);
+
+    /* ===== Z-Index Layers ===== */
+    --z-canvas: 1;
+    --z-ui-base: 10;
+    --z-toolbar: 100;
+    --z-panels: 200;
+    --z-overlays: 300;
+    --z-modals: 400;
+    --z-notifications: 500;
+
+    /* ===== Component Sizes ===== */
+    --toolbar-height: 48px;
+    --sidebar-width: 320px;
+    --controls-panel-height: auto;
+    --icon-bar-width: 56px;
+    --panel-width-normal: 360px;
+    --panel-width-wide: 480px;
+
+    /* ===== Font Families ===== */
+    --font-sans: var(--font-sans);  /* From Open Props */
+    --font-mono: var(--font-mono);  /* From Open Props */
+
+    /* ===== Typography Sizes (from Open Props) ===== */
+    --text-xs: var(--font-size-0);   /* 12px */
+    --text-sm: var(--font-size-1);   /* 14px */
+    --text-base: var(--font-size-2); /* 16px */
+    --text-lg: var(--font-size-3);   /* 18px */
+    --text-xl: var(--font-size-4);   /* 20px */
+    --text-2xl: var(--font-size-5);  /* 24px */
+
+    /* ===== Line Heights ===== */
+    --leading-tight: 1.25;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.75;
+
+    /* ===== Focus Rings ===== */
+    --focus-ring: 0 0 0 3px rgba(139, 92, 246, 0.5);
+    --focus-ring-offset: 2px;
+
+    /* ===== Status Colors ===== */
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-error: #ef4444;
+    --color-info: #3b82f6;
+
+    /* ===== Interactive States ===== */
+    --hover-opacity: 0.9;
+    --active-opacity: 0.8;
+    --disabled-opacity: 0.5;
+}
+
+/* ===== Dark Mode Specific Overrides ===== */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+    }
+}
+
+/* ===== Reduced Motion Support ===== */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --duration-instant: 0ms;
+        --duration-fast: 0ms;
+        --duration-normal: 0ms;
+        --duration-slow: 0ms;
+        --duration-slower: 0ms;
+    }
+
+    * {
+        animation-duration: 0ms !important;
+        transition-duration: 0ms !important;
+    }
+}
+
+/* ===== High Contrast Support ===== */
+@media (prefers-contrast: high) {
+    :root {
+        --glass-border: rgba(255, 255, 255, 0.3);
+        --text-2: #d0d0d0;
+        --text-3: #a0a0a0;
+    }
+}
+
+/* ===== Selection Styling ===== */
+::selection {
+    background-color: var(--accent-primary);
+    color: var(--text-1);
+}
+
+::-moz-selection {
+    background-color: var(--accent-primary);
+    color: var(--text-1);
+}
+
+/* ===== Scrollbar Styling (WebKit) ===== */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--surface-1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--surface-3);
+    border-radius: var(--radius-full);
+    border: 2px solid var(--surface-1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--surface-4);
+}
+
+/* ===== Firefox Scrollbar ===== */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--surface-3) var(--surface-1);
+}
