@@ -50,7 +50,6 @@ class App {
 
         // Configure Coloris color picker
         if (window.Coloris) {
-            Coloris.init();
             Coloris({
                 theme: 'pill',
                 themeMode: 'dark',
