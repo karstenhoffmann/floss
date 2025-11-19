@@ -1,8 +1,5 @@
 import * as THREE from 'three';
-import loadFont from 'load-bmfont';
-import createGeometry from 'three-bmfont-text';
-import MSDFShader from 'three-bmfont-text/shaders/msdf.js';
-
+import { Text } from 'troika-three-text';
 import Gl from './index.js';
 
 export default class extends THREE.Object3D {
@@ -18,39 +15,32 @@ export default class extends THREE.Object3D {
       geometry: options.geometry,
       vertex: options.shaders.vertex,
       fragment: options.shaders.fragment,
-      fontFile: options.font.file,
-      fontAtlas: options.font.atlas
+      fontFamily: options.font?.family || 'Inter, sans-serif'
     };
 
-    // Create geometry of packed glyphs
-    loadFont(this.opts.fontFile, (err, font) => {
-      if (err) {
-        console.error('Error loading font:', err);
-        return;
-      }
+    this.createTextMesh();
+    this.createRenderTarget();
+    this.createMesh();
+  }
 
-      this.fontGeometry = createGeometry({
-        font,
-        text: this.opts.word,
-      });
+  createTextMesh() {
+    // Create troika Text object
+    this.textMesh = new Text();
 
-      // Load texture containing font glyphs
-      this.loader = new THREE.TextureLoader();
-      this.loader.load(this.opts.fontAtlas, (texture) => {
-        this.fontMaterial = new THREE.RawShaderMaterial(
-          MSDFShader({
-            map: texture,
-            side: THREE.DoubleSide,
-            transparent: true,
-            negate: false,
-            color: this.opts.color
-          })
-        );
+    // Set text properties
+    this.textMesh.text = this.opts.word;
+    this.textMesh.fontSize = 1;
+    this.textMesh.color = this.opts.color;
+    this.textMesh.font = this.opts.fontFamily;
+    this.textMesh.anchorX = 'center';
+    this.textMesh.anchorY = 'middle';
 
-        this.createRenderTarget();
-        this.createMesh();
-      });
-    });
+    // Position and scale
+    this.textMesh.position.set(...this.opts.wordPosition);
+    this.textMesh.scale.set(...this.opts.wordScale);
+
+    // Sync to ensure geometry is ready
+    this.textMesh.sync();
   }
 
   createRenderTarget() {
@@ -62,11 +52,8 @@ export default class extends THREE.Object3D {
     this.rtScene = new THREE.Scene();
     this.rtScene.background = new THREE.Color(this.opts.fill);
 
-    this.text = new THREE.Mesh(this.fontGeometry, this.fontMaterial);
-    this.text.position.set(...this.opts.wordPosition);
-    this.text.rotation.set(Math.PI, 0, 0);
-    this.text.scale.set(...this.opts.wordScale);
-    this.rtScene.add(this.text);
+    // Add text to render target scene
+    this.rtScene.add(this.textMesh);
   }
 
   createMesh() {
@@ -104,6 +91,22 @@ export default class extends THREE.Object3D {
   updateTime(time) {
     if (this.material) {
       this.material.uniforms.uTime.value = time;
+    }
+  }
+
+  // Clean up
+  dispose() {
+    if (this.textMesh) {
+      this.textMesh.dispose();
+    }
+    if (this.rt) {
+      this.rt.dispose();
+    }
+    if (this.geometry) {
+      this.geometry.dispose();
+    }
+    if (this.material) {
+      this.material.dispose();
     }
   }
 }

@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import shaders from './gl/shaders.js';
-import f from './fonts.js';
 
 const options = [
   {
@@ -18,8 +17,7 @@ const options = [
       fragment: shaders.fragment.demo1
     },
     font: {
-      file: f.file.demo1,
-      atlas: f.atlas.demo1
+      family: 'Poppins, sans-serif'
     },
     class: 'demo-1'
   },
@@ -39,8 +37,7 @@ const options = [
       fragment: shaders.fragment.demo2
     },
     font: {
-      file: f.file.demo2,
-      atlas: f.atlas.demo2
+      family: 'Montserrat, sans-serif'
     },
     class: 'demo-2'
   },
@@ -60,8 +57,7 @@ const options = [
       fragment: shaders.fragment.demo3
     },
     font: {
-      file: f.file.demo3,
-      atlas: f.atlas.demo3
+      family: 'Roboto, sans-serif'
     },
     class: 'demo-3'
   },
@@ -81,8 +77,7 @@ const options = [
       fragment: shaders.fragment.demo4
     },
     font: {
-      file: f.file.demo4,
-      atlas: f.atlas.demo4
+      family: 'Inter, sans-serif'
     },
     class: 'demo-4'
   }

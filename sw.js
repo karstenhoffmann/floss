@@ -3,7 +3,7 @@
  * Enables offline functionality and asset caching
  */
 
-const CACHE_VERSION = 'v10-skypack';
+const CACHE_VERSION = 'v11-troika';
 const CACHE_NAME = `floss-${CACHE_VERSION}`;
 
 // Local assets to precache (excluding CDN resources)
@@ -17,24 +17,21 @@ const LOCAL_ASSETS = [
   './js/index.js',
   './js/ui.js',
   './js/options.js',
-  './js/fonts.js',
   './js/gl/index.js',
   './js/gl/Type.js',
   './js/gl/shaders.js',
-  './js/vendor/three.js',
-  './js/vendor/load-bmfont.js',
-  './js/vendor/three-bmfont-text.js',
   './manifest.json'
 ];
 
 // CDN resources to cache on first fetch (for offline-first)
-// Using skypack.dev for automatic ESM conversion
 const CDN_RESOURCES = [
   'https://unpkg.com/open-props@1.7.3/open-props.min.css',
   'https://unpkg.com/open-props@1.7.3/normalize.min.css',
-  'https://unpkg.com/open-props@1.7.3/buttons.min.css'
-  // Note: Skypack URLs are dynamic and include hashes, so we don't precache them
-  // They will be cached on first fetch via the fetch event handler
+  'https://unpkg.com/open-props@1.7.3/buttons.min.css',
+  'https://unpkg.com/three@0.158.0/build/three.module.js',
+  'https://unpkg.com/gsap@3.12.4/dist/gsap.min.js',
+  'https://unpkg.com/troika-three-text@0.49.1/dist/troika-three-text.esm.js',
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Poppins:wght@700&family=Montserrat:wght@700&family=Roboto:wght@700&display=swap'
 ];
 
 const PRECACHE_ASSETS = [...LOCAL_ASSETS];
