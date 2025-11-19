@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'kinetic-typo-v2.1.2'; // Fix Coloris color preview and crash
+const CACHE_NAME = 'kinetic-typo-v2.2.0'; // Add settings overlay and app settings
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
@@ -12,6 +12,7 @@ const ASSETS_TO_CACHE = [
     './styles/theme.css',
     './styles/main-modern.css',
     './styles/help-overlay.css',
+    './styles/settings-overlay.css',
     './styles/notifications.css',
     './js/app.js',
     './js/core/state.js',
@@ -19,6 +20,7 @@ const ASSETS_TO_CACHE = [
     './js/core/renderer.js',
     './js/core/effect-manager.js',
     './js/core/preset-manager.js',
+    './js/core/app-settings.js',
     './js/effects/effect-base.js',
     './js/effects/endless.js',
     './js/ui/notification.js',

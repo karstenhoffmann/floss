@@ -240,6 +240,50 @@
             </div>
         </div>
 
+        <!-- Settings Overlay -->
+        <div id="settings-overlay" class="settings-overlay" style="display: none;">
+            <div class="settings-overlay__content">
+                <div class="settings-overlay__header">
+                    <h2>App Settings</h2>
+                    <button id="close-settings-btn" class="btn-close">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg>
+                    </button>
+                </div>
+                <div class="settings-overlay__body">
+                    <!-- Color Swatches Section -->
+                    <div class="settings-section">
+                        <h3>Default Color Swatches</h3>
+                        <p>Customize the default color palette shown in color pickers</p>
+                        <div class="color-swatches-grid" id="color-swatches-grid">
+                            <!-- Color swatches will be generated here -->
+                        </div>
+                    </div>
+
+                    <!-- Export/Import Section -->
+                    <div class="settings-section">
+                        <h3>Export & Import</h3>
+                        <p>Save or load your app configuration</p>
+                        <div class="settings-actions">
+                            <button id="export-app-settings-btn" class="btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256" style="margin-right: 8px; vertical-align: middle;"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/></svg>
+                                Export Settings
+                            </button>
+                            <button id="import-app-settings-btn" class="btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256" style="margin-right: 8px; vertical-align: middle;"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/></svg>
+                                Import Settings
+                            </button>
+                        </div>
+                        <input type="file" id="import-settings-file" accept=".json" style="display: none;">
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="settings-actions">
+                        <button id="save-app-settings-btn" class="btn btn-primary">Save Settings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Notification Container -->
         <div id="notification-container" class="notification-container"></div>
     </div>

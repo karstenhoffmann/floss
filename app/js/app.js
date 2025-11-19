@@ -9,6 +9,7 @@ import RenderLoop from './core/renderer.js';
 import effectManager from './core/effect-manager.js';
 import presetManager from './core/preset-manager.js';
 import state from './core/state.js';
+import appSettings from './core/app-settings.js';
 import notification from './ui/notification.js';
 import ICONS from './ui/icons.js';
 
@@ -32,8 +33,8 @@ class App {
 
     async init() {
         // App version and build info
-        const appVersion = '2.1.2';
-        const buildCommit = '8b214f7';
+        const appVersion = '2.2.0';
+        const buildCommit = 'pending';
         const buildDate = '2025-11-19';
 
         console.log(`
@@ -87,37 +88,7 @@ class App {
 
         // Configure Coloris color picker (delayed to ensure DOM is ready)
         setTimeout(() => {
-            try {
-                if (window.Coloris) {
-                    Coloris({
-                        theme: 'pill',
-                        themeMode: 'dark',
-                        alpha: false,
-                        format: 'hex',
-                        swatches: [
-                            '#000000',
-                            '#ffffff',
-                            '#8b5cf6',
-                            '#6366f1',
-                            '#ec4899',
-                            '#f59e0b',
-                            '#10b981',
-                            '#3b82f6',
-                            '#ef4444'
-                        ],
-                        clearButton: {
-                            show: false
-                        },
-                        closeButton: true,
-                        closeLabel: 'Close',
-                        selectInput: true,
-                        focusInput: false
-                    });
-                    console.log('✓ Coloris initialized');
-                }
-            } catch (err) {
-                console.warn('⚠️ Coloris initialization failed:', err);
-            }
+            this.initializeColoris();
         }, 100);
 
         // Show welcome notification
@@ -248,6 +219,38 @@ class App {
         // Playback controls
         this.setupPlaybackControls();
 
+        // Settings button
+        document.getElementById('settings-btn').addEventListener('click', () => {
+            this.toggleSettings();
+        });
+
+        // Settings overlay close
+        document.getElementById('close-settings-btn').addEventListener('click', () => {
+            this.toggleSettings();
+        });
+
+        // Click outside settings to close
+        document.getElementById('settings-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'settings-overlay') {
+                this.toggleSettings();
+            }
+        });
+
+        // Save app settings button
+        document.getElementById('save-app-settings-btn').addEventListener('click', () => {
+            this.saveAppSettings();
+        });
+
+        // Export app settings button
+        document.getElementById('export-app-settings-btn').addEventListener('click', () => {
+            this.exportAppSettings();
+        });
+
+        // Import app settings button
+        document.getElementById('import-app-settings-btn').addEventListener('click', () => {
+            this.importAppSettings();
+        });
+
         // Help overlay close
         document.getElementById('close-help-btn').addEventListener('click', () => {
             this.toggleHelp();
@@ -275,6 +278,10 @@ class App {
                 case ' ':
                     e.preventDefault();
                     this.toggleUI();
+                    break;
+                case 'g':
+                    e.preventDefault();
+                    this.toggleSettings();
                     break;
                 case 'h':
                     e.preventDefault();
@@ -1005,10 +1012,180 @@ class App {
     }
 
     /**
+     * Initialize Coloris with app settings
+     */
+    initializeColoris() {
+        try {
+            if (!window.Coloris) {
+                console.warn('⚠️ Coloris not loaded');
+                return;
+            }
+
+            const swatches = appSettings.getColorSwatches();
+
+            Coloris({
+                theme: 'pill',
+                themeMode: 'dark',
+                alpha: false,
+                format: 'hex',
+                swatches: swatches,
+                clearButton: {
+                    show: false
+                },
+                closeButton: true,
+                closeLabel: 'Close',
+                selectInput: true,
+                focusInput: false
+            });
+            console.log('✓ Coloris initialized with custom swatches');
+        } catch (err) {
+            console.warn('⚠️ Coloris initialization failed:', err);
+        }
+    }
+
+    /**
+     * Toggle settings overlay
+     */
+    toggleSettings() {
+        const overlay = document.getElementById('settings-overlay');
+        if (!overlay) return;
+
+        if (overlay.style.display === 'none' || !overlay.style.display) {
+            overlay.style.display = 'flex';
+            this.renderColorSwatchesGrid();
+        } else {
+            overlay.style.display = 'none';
+        }
+    }
+
+    /**
+     * Render color swatches grid
+     */
+    renderColorSwatchesGrid() {
+        const grid = document.getElementById('color-swatches-grid');
+        if (!grid) return;
+
+        const swatches = appSettings.getColorSwatches();
+        grid.innerHTML = '';
+
+        swatches.forEach((color, index) => {
+            const item = document.createElement('div');
+            item.className = 'color-swatch-item';
+
+            const preview = document.createElement('div');
+            preview.className = 'color-swatch-preview';
+            preview.style.backgroundColor = color;
+            preview.title = `Click to change color ${index + 1}`;
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'color-swatch-input coloris';
+            input.value = color;
+            input.dataset.coloris = '';
+            input.dataset.swatchIndex = index;
+
+            // Update preview when input changes
+            input.addEventListener('change', (e) => {
+                const newColor = e.target.value;
+                if (/^#[0-9A-F]{6}$/i.test(newColor)) {
+                    preview.style.backgroundColor = newColor;
+                    appSettings.updateColorSwatch(index, newColor);
+                }
+            });
+
+            // Click preview to open coloris
+            preview.addEventListener('click', () => {
+                input.click();
+            });
+
+            item.appendChild(preview);
+            item.appendChild(input);
+            grid.appendChild(item);
+        });
+
+        // Re-initialize Coloris for new inputs
+        setTimeout(() => this.initializeColoris(), 50);
+    }
+
+    /**
+     * Save app settings
+     */
+    saveAppSettings() {
+        // Collect all swatch values
+        const inputs = document.querySelectorAll('.color-swatch-input');
+        const swatches = Array.from(inputs).map(input => input.value);
+
+        if (appSettings.setColorSwatches(swatches)) {
+            notification.success('Settings saved!');
+            // Re-initialize Coloris with new swatches
+            this.initializeColoris();
+            this.toggleSettings();
+        } else {
+            notification.error('Failed to save settings');
+        }
+    }
+
+    /**
+     * Export app settings
+     */
+    exportAppSettings() {
+        const data = appSettings.export();
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tt-kinetic-settings-${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        notification.success('Settings exported!');
+    }
+
+    /**
+     * Import app settings
+     */
+    importAppSettings() {
+        const input = document.getElementById('import-settings-file');
+        if (!input) return;
+
+        input.click();
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (appSettings.import(data)) {
+                        notification.success('Settings imported!');
+                        this.renderColorSwatchesGrid();
+                        this.initializeColoris();
+                    } else {
+                        notification.error('Invalid settings file');
+                    }
+                } catch (err) {
+                    notification.error('Failed to import settings');
+                    console.error('Import error:', err);
+                }
+            };
+            reader.readAsText(file);
+
+            // Reset input
+            input.value = '';
+        };
+    }
+
+    /**
      * Close all overlays
      */
     closeOverlays() {
         document.getElementById('help-overlay').style.display = 'none';
+        document.getElementById('settings-overlay').style.display = 'none';
     }
 }
 
