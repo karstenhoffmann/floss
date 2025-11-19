@@ -3,7 +3,7 @@
  * Enables offline functionality and asset caching
  */
 
-const CACHE_VERSION = 'v17-font-urls';
+const CACHE_VERSION = 'v18-ttf-fonts';
 const CACHE_NAME = `floss-${CACHE_VERSION}`;
 
 // Local assets to precache (excluding CDN resources)
@@ -35,11 +35,11 @@ const CDN_RESOURCES = [
   'https://unpkg.com/troika-three-utils@0.52.4?module',
   'https://unpkg.com/bidi-js@1.0.3?module',
   'https://unpkg.com/webgl-sdf-generator@1.1.1?module',
-  // Font files (woff2 from Google Fonts)
-  'https://fonts.gstatic.com/s/poppins/v21/pxiEyp8kv8JHgFVrJJfecg.woff2',
-  'https://fonts.gstatic.com/s/montserrat/v26/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Ew-.woff2',
-  'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff2',
-  'https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2'
+  // Font files (TTF from Google Fonts - troika requires TTF, not WOFF2!)
+  'https://fonts.gstatic.com/s/poppins/v21/pxiByp8kv8JHgFVrLCz7Z1xlFQ.ttf',
+  'https://fonts.gstatic.com/s/montserrat/v26/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.ttf',
+  'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxKKTU1Kg.ttf',
+  'https://fonts.gstatic.com/l/font?kit=UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA&skey=fa4e635f2ef2e2c6&v=v18'
 ];
 
 const PRECACHE_ASSETS = [...LOCAL_ASSETS];

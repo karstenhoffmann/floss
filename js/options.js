@@ -17,7 +17,7 @@ const options = [
       fragment: shaders.fragment.demo1
     },
     font: {
-      url: 'https://fonts.gstatic.com/s/poppins/v21/pxiEyp8kv8JHgFVrJJfecg.woff2'
+      url: 'https://fonts.gstatic.com/s/poppins/v21/pxiByp8kv8JHgFVrLCz7Z1xlFQ.ttf'
     },
     class: 'demo-1'
   },
@@ -37,7 +37,7 @@ const options = [
       fragment: shaders.fragment.demo2
     },
     font: {
-      url: 'https://fonts.gstatic.com/s/montserrat/v26/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Ew-.woff2'
+      url: 'https://fonts.gstatic.com/s/montserrat/v26/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.ttf'
     },
     class: 'demo-2'
   },
@@ -57,7 +57,7 @@ const options = [
       fragment: shaders.fragment.demo3
     },
     font: {
-      url: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff2'
+      url: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxKKTU1Kg.ttf'
     },
     class: 'demo-3'
   },
@@ -77,7 +77,7 @@ const options = [
       fragment: shaders.fragment.demo4
     },
     font: {
-      url: 'https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2'
+      url: 'https://fonts.gstatic.com/l/font?kit=UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA&skey=fa4e635f2ef2e2c6&v=v18'
     },
     class: 'demo-4'
   }
