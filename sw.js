@@ -3,7 +3,7 @@
  * Enables offline functionality and asset caching
  */
 
-const CACHE_VERSION = 'v9-pure-esm';
+const CACHE_VERSION = 'v10-skypack';
 const CACHE_NAME = `floss-${CACHE_VERSION}`;
 
 // Local assets to precache (excluding CDN resources)
@@ -28,15 +28,13 @@ const LOCAL_ASSETS = [
 ];
 
 // CDN resources to cache on first fetch (for offline-first)
+// Using skypack.dev for automatic ESM conversion
 const CDN_RESOURCES = [
   'https://unpkg.com/open-props@1.7.3/open-props.min.css',
   'https://unpkg.com/open-props@1.7.3/normalize.min.css',
-  'https://unpkg.com/open-props@1.7.3/buttons.min.css',
-  'https://cdn.jsdelivr.net/npm/gsap@3.12.4/dist/gsap.min.js',
-  'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js',
-  'https://cdn.jsdelivr.net/npm/load-bmfont@1.4.2/+esm',
-  'https://cdn.jsdelivr.net/npm/three-bmfont-text@3.0.2/+esm',
-  'https://cdn.jsdelivr.net/npm/three-bmfont-text@3.0.2/shaders/msdf.js'
+  'https://unpkg.com/open-props@1.7.3/buttons.min.css'
+  // Note: Skypack URLs are dynamic and include hashes, so we don't precache them
+  // They will be cached on first fetch via the fetch event handler
 ];
 
 const PRECACHE_ASSETS = [...LOCAL_ASSETS];
