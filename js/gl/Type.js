@@ -119,12 +119,27 @@ export default class extends THREE.Object3D {
     // Add text to render target scene
     this.rtScene.add(this.textMesh);
 
-    // DEBUG: Also add to main scene to verify visibility
-    const debugTextMesh = this.textMesh.clone();
-    debugTextMesh.position.set(0, 0, 0); // Center of main scene
-    debugTextMesh.scale.set(10, 10, 1); // Make it MUCH bigger
-    Gl.scene.add(debugTextMesh);
-    console.log('[Type] DEBUG: Added visible text mesh to main scene');
+    console.log('[Type] Render target scene setup:', {
+      rtSceneChildren: this.rtScene.children.length,
+      textMeshPosition: this.textMesh.position.toArray(),
+      textMeshScale: this.textMesh.scale.toArray(),
+      textMeshRotation: this.textMesh.rotation.toArray(),
+      rtCameraPosition: this.rtCamera.position.toArray(),
+      rtSize: { width: this.rt.width, height: this.rt.height }
+    });
+
+    // DEBUG: Create a test mesh that uses the render target texture directly
+    // This will help us verify if the render target is working at all
+    const debugRTMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(15, 15),
+      new THREE.MeshBasicMaterial({
+        map: this.rt.texture,
+        side: THREE.DoubleSide
+      })
+    );
+    debugRTMesh.position.set(-20, 0, 0); // Position it to the left
+    Gl.scene.add(debugRTMesh);
+    console.log('[Type] DEBUG: Added render target preview mesh at x=-20');
   }
 
   createMesh() {
@@ -152,10 +167,20 @@ export default class extends THREE.Object3D {
 
     console.log('[Type] Main mesh created at position:', this.opts.position);
 
+    let renderCount = 0;
     this.mesh.onBeforeRender = (renderer) => {
       renderer.setRenderTarget(this.rt);
       renderer.render(this.rtScene, this.rtCamera);
       renderer.setRenderTarget(null);
+
+      // Log first few renders to verify this is being called
+      if (renderCount < 3) {
+        console.log(`[Type] onBeforeRender called (${renderCount + 1})`, {
+          rtSceneChildren: this.rtScene.children.length,
+          textureNeedsUpdate: this.canvasTexture.needsUpdate
+        });
+        renderCount++;
+      }
     };
 
     this.add(this.mesh);
