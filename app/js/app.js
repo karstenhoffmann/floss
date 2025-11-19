@@ -337,7 +337,7 @@ class App {
         // Note: animationSpeed removed - controlled via Playback Controls panel instead
         const groups = {
             'Typography': ['text', 'fontFamily', 'fontSize', 'letterSpacing', 'repeats'],
-            'Colors': ['textColor', 'surfaceColor', 'backgroundColor']
+            'Colors': ['textColor', 'surfaceColor', 'backgroundColor', 'fogColor']
         };
 
         Object.entries(groups).forEach(([groupName, keys]) => {
