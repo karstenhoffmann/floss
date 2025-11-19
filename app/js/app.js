@@ -33,7 +33,7 @@ class App {
     async init() {
         // App version and build info
         const appVersion = '2.1.2';
-        const buildCommit = 'pending';
+        const buildCommit = '8b214f7';
         const buildDate = '2025-11-19';
 
         console.log(`
