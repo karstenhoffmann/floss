@@ -1,0 +1,19 @@
+{
+  "name": "Kinetic Typography Motion Design",
+  "short_name": "Kinetic Typo",
+  "description": "Professional kinetic typography motion design tool with real-time parameter controls",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#6366f1",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>✨</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["design", "graphics", "productivity"],
+  "screenshots": []
+}
