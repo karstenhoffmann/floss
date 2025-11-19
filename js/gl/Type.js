@@ -77,15 +77,15 @@ export default class extends THREE.Object3D {
       canvasSize: `${canvas.width}x${canvas.height}`
     });
 
-    // Debug: Optionally append canvas to DOM to verify rendering
-    // canvas.style.position = 'fixed';
-    // canvas.style.top = '0';
-    // canvas.style.left = '0';
-    // canvas.style.zIndex = '10000';
-    // canvas.style.border = '2px solid red';
-    // canvas.style.width = '512px';
-    // canvas.style.height = '128px';
-    // document.body.appendChild(canvas);
+    // Debug: Append canvas to DOM to verify rendering
+    canvas.style.position = 'fixed';
+    canvas.style.top = '10px';
+    canvas.style.left = '10px';
+    canvas.style.zIndex = '10000';
+    canvas.style.border = '2px solid red';
+    canvas.style.width = '512px';
+    canvas.style.height = '128px';
+    document.body.appendChild(canvas);
 
     // Create texture from canvas
     this.canvasTexture = new THREE.CanvasTexture(canvas);
