@@ -10,6 +10,7 @@ import effectManager from './core/effect-manager.js';
 import presetManager from './core/preset-manager.js';
 import state from './core/state.js';
 import notification from './ui/notification.js';
+import ICONS from './ui/icons.js';
 
 // Import effects
 import EndlessEffect from './effects/endless.js';
@@ -361,7 +362,7 @@ class App {
         header.className = 'control-group-header';
         header.innerHTML = `
             <h4 class="control-group-title">${groupName}</h4>
-            <span class="control-group-toggle"><ph-caret-down size="16" weight="bold"></ph-caret-down></span>
+            <span class="control-group-toggle">${ICONS.caretDown}</span>
         `;
         group.appendChild(header);
 
@@ -894,11 +895,11 @@ class App {
 
             if (isPaused) {
                 this.renderLoop.stop();
-                playPauseBtn.innerHTML = '<ph-play size="18" weight="fill"></ph-play> Play';
+                playPauseBtn.innerHTML = `${ICONS.play} Play`;
                 playPauseBtn.classList.add('active');
             } else {
                 this.renderLoop.start();
-                playPauseBtn.innerHTML = '<ph-pause size="18" weight="fill"></ph-pause> Pause';
+                playPauseBtn.innerHTML = `${ICONS.pause} Pause`;
                 playPauseBtn.classList.remove('active');
             }
         });

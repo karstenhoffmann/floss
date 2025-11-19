@@ -932,3 +932,33 @@ input[type="range"]::-moz-range-thumb:hover {
 .toggle-switch.active::after {
     transform: translateX(20px);
 }
+
+/* ===== PRESET SELECTOR (Compact, in Toolbar) ===== */
+.preset-selector {
+    min-width: 180px;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--surface-2);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--text-1);
+    font-size: var(--text-sm);
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.preset-selector:hover {
+    border-color: var(--glass-border-hover);
+    background: var(--surface-3);
+}
+
+.preset-selector:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.preset-selector option {
+    background: var(--surface-2);
+    color: var(--text-1);
+}

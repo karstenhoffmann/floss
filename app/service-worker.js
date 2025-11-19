@@ -22,6 +22,7 @@ const ASSETS_TO_CACHE = [
     './js/effects/effect-base.js',
     './js/effects/endless.js',
     './js/ui/notification.js',
+    './js/ui/icons.js',
     './js/utils/storage.js',
     './js/utils/text-texture.js',
     './js/utils/webgl-check.js',
@@ -31,9 +32,7 @@ const ASSETS_TO_CACHE = [
     'https://unpkg.com/three@0.115.0/examples/js/controls/OrbitControls.js',
     // Open Props
     'https://unpkg.com/open-props',
-    'https://unpkg.com/open-props/normalize.min.css',
-    // Phosphor Icons
-    'https://unpkg.com/@phosphor-icons/web@2.1.1'
+    'https://unpkg.com/open-props/normalize.min.css'
 ];
 
 // Install event - cache assets
