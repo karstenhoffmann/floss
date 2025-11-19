@@ -3,7 +3,7 @@
  * Enables offline functionality and asset caching
  */
 
-const CACHE_VERSION = 'v16-latest-2025';
+const CACHE_VERSION = 'v17-font-urls';
 const CACHE_NAME = `floss-${CACHE_VERSION}`;
 
 // Local assets to precache (excluding CDN resources)
@@ -35,7 +35,11 @@ const CDN_RESOURCES = [
   'https://unpkg.com/troika-three-utils@0.52.4?module',
   'https://unpkg.com/bidi-js@1.0.3?module',
   'https://unpkg.com/webgl-sdf-generator@1.1.1?module',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Poppins:wght@700&family=Montserrat:wght@700&family=Roboto:wght@700&display=swap'
+  // Font files (woff2 from Google Fonts)
+  'https://fonts.gstatic.com/s/poppins/v21/pxiEyp8kv8JHgFVrJJfecg.woff2',
+  'https://fonts.gstatic.com/s/montserrat/v26/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Ew-.woff2',
+  'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff2',
+  'https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2'
 ];
 
 const PRECACHE_ASSETS = [...LOCAL_ASSETS];

@@ -15,7 +15,7 @@ export default class extends THREE.Object3D {
       geometry: options.geometry,
       vertex: options.shaders.vertex,
       fragment: options.shaders.fragment,
-      fontFamily: options.font?.family || 'Inter'
+      fontUrl: options.font?.url || 'https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2'
     };
 
     this.createTextMesh();
@@ -31,7 +31,7 @@ export default class extends THREE.Object3D {
     this.textMesh.text = this.opts.word;
     this.textMesh.fontSize = 1;
     this.textMesh.color = this.opts.color;
-    this.textMesh.font = this.opts.fontFamily;
+    this.textMesh.font = this.opts.fontUrl;
     this.textMesh.anchorX = 'center';
     this.textMesh.anchorY = 'middle';
 
