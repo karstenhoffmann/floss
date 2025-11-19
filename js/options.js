@@ -17,7 +17,7 @@ const options = [
       fragment: shaders.fragment.demo1
     },
     font: {
-      family: 'Poppins, sans-serif'
+      family: 'Poppins'
     },
     class: 'demo-1'
   },
@@ -37,7 +37,7 @@ const options = [
       fragment: shaders.fragment.demo2
     },
     font: {
-      family: 'Montserrat, sans-serif'
+      family: 'Montserrat'
     },
     class: 'demo-2'
   },
@@ -57,7 +57,7 @@ const options = [
       fragment: shaders.fragment.demo3
     },
     font: {
-      family: 'Roboto, sans-serif'
+      family: 'Roboto'
     },
     class: 'demo-3'
   },
@@ -77,7 +77,7 @@ const options = [
       fragment: shaders.fragment.demo4
     },
     font: {
-      family: 'Inter, sans-serif'
+      family: 'Inter'
     },
     class: 'demo-4'
   }

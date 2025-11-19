@@ -15,7 +15,7 @@ export default class extends THREE.Object3D {
       geometry: options.geometry,
       vertex: options.shaders.vertex,
       fragment: options.shaders.fragment,
-      fontFamily: options.font?.family || 'Inter, sans-serif'
+      fontFamily: options.font?.family || 'Inter'
     };
 
     this.createTextMesh();
