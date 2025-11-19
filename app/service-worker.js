@@ -3,16 +3,14 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'kinetic-typo-v1';
+const CACHE_NAME = 'kinetic-typo-v2.0.0'; // Updated version to force cache refresh
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
-    './styles/main.css',
-    './styles/controls.css',
-    './styles/preset-panel.css',
-    './styles/settings-panel.css',
+    './styles/theme.css',
+    './styles/main-modern.css',
     './styles/help-overlay.css',
     './styles/notifications.css',
     './js/app.js',
@@ -29,7 +27,13 @@ const ASSETS_TO_CACHE = [
     './js/utils/webgl-check.js',
     './manifest.json',
     // Three.js from CDN
-    'https://cdn.jsdelivr.net/npm/three@0.115.0/build/three.min.js'
+    'https://unpkg.com/three@0.115.0/build/three.min.js',
+    'https://unpkg.com/three@0.115.0/examples/js/controls/OrbitControls.js',
+    // Open Props
+    'https://unpkg.com/open-props',
+    'https://unpkg.com/open-props/normalize.min.css',
+    // Phosphor Icons
+    'https://unpkg.com/@phosphor-icons/web@2.1.1'
 ];
 
 // Install event - cache assets

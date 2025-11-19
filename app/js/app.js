@@ -32,6 +32,21 @@ class App {
     async init() {
         console.log('🚀 Initializing Kinetic Typography App...');
 
+        // Clear old localStorage if needed (one-time migration)
+        const appVersion = '2.0.0';
+        const storedVersion = localStorage.getItem('appVersion');
+        if (storedVersion !== appVersion) {
+            console.log('🔄 Clearing old cache and localStorage...');
+            localStorage.clear();
+            localStorage.setItem('appVersion', appVersion);
+            // Clear service worker cache
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => caches.delete(name));
+                });
+            }
+        }
+
         // Register effects
         this.registerEffects();
 
