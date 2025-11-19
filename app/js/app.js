@@ -77,6 +77,15 @@ class App {
      */
     loadEffect(effectId) {
         try {
+            // Check if effect exists, fallback to 'endless' if not
+            const availableEffects = effectManager.getAll();
+            const effectExists = availableEffects.some(e => e.id === effectId);
+
+            if (!effectExists) {
+                console.warn(`Effect "${effectId}" not found, falling back to "endless"`);
+                effectId = 'endless';
+            }
+
             // Create effect instance
             const effect = effectManager.create(effectId);
             if (!effect) {
