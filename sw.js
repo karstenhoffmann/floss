@@ -3,7 +3,7 @@
  * Enables offline functionality and asset caching
  */
 
-const CACHE_VERSION = 'v12-troika-complete';
+const CACHE_VERSION = 'v13-troika-auto-resolve';
 const CACHE_NAME = `floss-${CACHE_VERSION}`;
 
 // Local assets to precache (excluding CDN resources)
@@ -30,11 +30,11 @@ const CDN_RESOURCES = [
   'https://unpkg.com/open-props@1.7.3/buttons.min.css',
   'https://unpkg.com/three@0.158.0/build/three.module.js',
   'https://unpkg.com/gsap@3.12.4/dist/gsap.min.js',
-  'https://unpkg.com/troika-three-text@0.49.1/dist/troika-three-text.esm.js',
-  'https://unpkg.com/troika-worker-utils@0.49.1/dist/troika-worker-utils.esm.js',
-  'https://unpkg.com/troika-three-utils@0.49.1/dist/troika-three-utils.esm.js',
-  'https://unpkg.com/bidi-js@1.0.3/dist/bidi.esm.js',
-  'https://unpkg.com/webgl-sdf-generator@1.1.1/dist/webgl-sdf-generator.esm.js',
+  'https://unpkg.com/troika-three-text@0.49.1?module',
+  'https://unpkg.com/troika-worker-utils@0.49.1?module',
+  'https://unpkg.com/troika-three-utils@0.49.1?module',
+  'https://unpkg.com/bidi-js@1.0.3?module',
+  'https://unpkg.com/webgl-sdf-generator@1.1.1?module',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Poppins:wght@700&family=Montserrat:wght@700&family=Roboto:wght@700&display=swap'
 ];
 
