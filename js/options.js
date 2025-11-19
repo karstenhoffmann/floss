@@ -85,6 +85,27 @@ const options = [
       atlas: f.atlas.demo4
     },
     class: 'demo-4'
+  },
+
+  {
+    word: 'GLITCH',
+    color: '#00ff88',  // Neon green/cyan
+    fill: '#0a0a1a',   // Very dark blue-ish black
+    geometry: new THREE.PlaneGeometry(25, 25, 48, 48),
+    position: {
+      texture: [-0.925, -0.55, 0],
+      mesh: [0, 0, 0]
+    },
+    scale: [0.0125, 0.045, 1],
+    shaders: {
+      vertex: shaders.vertex.demo5,
+      fragment: shaders.fragment.demo5
+    },
+    font: {
+      file: f.file.demo5,
+      atlas: f.atlas.demo5
+    },
+    class: 'demo-5'
   }
 ];
 

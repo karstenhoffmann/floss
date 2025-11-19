@@ -185,6 +185,90 @@ const planeFragment = /* glsl */ `
   }
 `;
 
+//----------------- GLITCH SHADERS -----------------//
+
+const glitchVertex = /* glsl */ `
+  varying vec2 vUv;
+  varying vec3 vPosition;
+
+  uniform float uTime;
+
+  void main() {
+    vUv = uv;
+    vPosition = position;
+
+    vec3 pos = position;
+
+    // Subtle wave displacement for extra chaos
+    float freq = 2.0;
+    float amp = 0.15;
+    pos.z += sin(pos.y * freq + uTime * 4.0) * amp;
+
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.);
+  }
+`;
+
+const glitchFragment = /* glsl */ `
+  varying vec2 vUv;
+  varying vec3 vPosition;
+
+  uniform float uTime;
+  uniform sampler2D uTexture;
+
+  // Random/Hash function
+  float random(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+  }
+
+  // Noise function
+  float noise(vec2 st) {
+    vec2 i = floor(st);
+    vec2 f = fract(st);
+    float a = random(i);
+    float b = random(i + vec2(1.0, 0.0));
+    float c = random(i + vec2(0.0, 1.0));
+    float d = random(i + vec2(1.0, 1.0));
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+  }
+
+  void main() {
+    vec2 uv = vUv;
+    float time = uTime;
+
+    // Glitch intensity waves (not constant)
+    float glitchStrength = sin(time * 2.0) * 0.5 + 0.5;
+    glitchStrength *= step(0.7, glitchStrength); // Only strong glitches
+
+    // Block displacement (horizontal lines shift)
+    float blockY = floor(uv.y * 20.0);
+    float blockNoise = noise(vec2(blockY, floor(time * 3.0)));
+    float displacement = (blockNoise - 0.5) * 0.1 * glitchStrength;
+    uv.x += displacement;
+
+    // RGB Channel Split (chromatic aberration)
+    float splitAmount = 0.01 * glitchStrength;
+    float r = texture2D(uTexture, uv + vec2(splitAmount, 0.0)).r;
+    float g = texture2D(uTexture, uv).g;
+    float b = texture2D(uTexture, uv - vec2(splitAmount, 0.0)).b;
+    vec3 color = vec3(r, g, b);
+
+    // Scan lines
+    float scanLine = sin(uv.y * 800.0 + time * 10.0) * 0.04;
+    color -= scanLine;
+
+    // Digital noise
+    float noiseAmount = noise(uv * 100.0 + time * 5.0) * 0.1;
+    color += noiseAmount * glitchStrength;
+
+    // Random pixel corruption
+    float corruption = step(0.98, random(uv + time));
+    color = mix(color, vec3(random(uv + time * 2.0)), corruption * glitchStrength);
+
+    gl_FragColor = vec4(color, 1.);
+  }
+`;
+
 //-------------- EXPORT SHADERS -----------------//
 
 export default {
@@ -193,6 +277,7 @@ export default {
     demo2: sphereVertex,
     demo3: boxVertex,
     demo4: planeVertex,
+    demo5: glitchVertex,
   },
 
   fragment: {
@@ -200,5 +285,6 @@ export default {
     demo2: sphereFragment,
     demo3: boxFragment,
     demo4: planeFragment,
+    demo5: glitchFragment,
   },
 };
