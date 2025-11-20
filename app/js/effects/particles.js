@@ -97,6 +97,40 @@ export class ParticlesEffect extends EffectBase {
                 label: 'Rotation Speed',
                 group: 'effect'
             },
+            // Smoke Dissolve Settings
+            dissolveMode: {
+                type: 'boolean',
+                default: true,
+                label: 'Smoke Dissolve Mode',
+                group: 'effect'
+            },
+            dissolveSpeed: {
+                type: 'number',
+                default: 0.8,
+                min: 0.1,
+                max: 3,
+                step: 0.1,
+                label: 'Dissolve Speed',
+                group: 'effect'
+            },
+            vortexStrength: {
+                type: 'number',
+                default: 2.5,
+                min: 0,
+                max: 10,
+                step: 0.5,
+                label: 'Vortex Strength',
+                group: 'effect'
+            },
+            dispersal: {
+                type: 'number',
+                default: 15,
+                min: 5,
+                max: 50,
+                step: 1,
+                label: 'Dispersal Distance',
+                group: 'effect'
+            },
             // Particle Color Settings
             particleColor: {
                 type: 'color',
@@ -136,6 +170,9 @@ export class ParticlesEffect extends EffectBase {
         this.velocities = [];
         this.originalPositions = [];
         this.colors = [];
+        this.particleAges = [];  // Track age for dissolve effect
+        this.particleLifespans = [];  // When particle starts dissolving
+        this.particlePhases = [];  // 0 = forming, 1 = stable, 2 = dissolving
 
         this.createParticleSystem();
     }
@@ -158,6 +195,8 @@ export class ParticlesEffect extends EffectBase {
         const positionArray = new Float32Array(sampledPositions.length * 3);
         const colorArray = new Float32Array(sampledPositions.length * 3);
         const sizeArray = new Float32Array(sampledPositions.length);
+        const ageArray = new Float32Array(sampledPositions.length);
+        const lifespanArray = new Float32Array(sampledPositions.length);
 
         // Initialize particles with random velocities
         for (let i = 0; i < sampledPositions.length; i++) {
@@ -192,11 +231,21 @@ export class ParticlesEffect extends EffectBase {
 
             // Size variation
             sizeArray[i] = this.settings.particleSize * (0.5 + Math.random() * 0.5);
+
+            // Lifecycle for smoke dissolve
+            ageArray[i] = 0;
+            // Staggered lifespan for wave-like dissolve
+            lifespanArray[i] = 2.0 + Math.random() * 3.0 + (i / sampledPositions.length) * 2.0;
+            this.particleAges.push(0);
+            this.particleLifespans.push(lifespanArray[i]);
+            this.particlePhases.push(1);  // Start in stable phase
         }
 
         this.geometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3));
         this.geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
         this.geometry.setAttribute('size', new THREE.BufferAttribute(sizeArray, 1));
+        this.geometry.setAttribute('age', new THREE.BufferAttribute(ageArray, 1));
+        this.geometry.setAttribute('lifespan', new THREE.BufferAttribute(lifespanArray, 1));
 
         // Create shader material with additive blending
         this.material = new THREE.ShaderMaterial({
@@ -272,9 +321,13 @@ export class ParticlesEffect extends EffectBase {
     getVertexShader() {
         return `
             attribute float size;
+            attribute float age;
+            attribute float lifespan;
+
             varying vec3 vColor;
             varying float vDepth;
             varying float vPulse;
+            varying float vDissolve;  // 0 = solid, 1 = fully dissolved
 
             uniform float uTime;
 
@@ -347,6 +400,9 @@ export class ParticlesEffect extends EffectBase {
             void main() {
                 vColor = color;
 
+                // Calculate dissolve progress (0 = solid, 1 = fully dissolved)
+                vDissolve = clamp((age - lifespan) / 2.0, 0.0, 1.0);
+
                 vec3 pos = position;
                 vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
 
@@ -369,8 +425,10 @@ export class ParticlesEffect extends EffectBase {
                 vPulse = globalBreath * (0.7 + combinedPulse * 0.6 + particlePhase * 0.3);
 
                 // Size calculation with depth-based scaling
+                // Size grows during dissolve for smoke effect
                 float depthScale = 1.0 + vDepth * 0.3;
-                gl_PointSize = size * 50.0 * vPulse * depthScale / -mvPosition.z;
+                float dissolveScale = 1.0 + vDissolve * 1.5;  // Grow as it dissolves
+                gl_PointSize = size * 50.0 * vPulse * depthScale * dissolveScale / -mvPosition.z;
 
                 gl_Position = projectionMatrix * mvPosition;
             }
@@ -382,6 +440,7 @@ export class ParticlesEffect extends EffectBase {
             varying vec3 vColor;
             varying float vDepth;
             varying float vPulse;
+            varying float vDissolve;
 
             uniform float uGlowIntensity;
             uniform float uTime;
@@ -391,8 +450,9 @@ export class ParticlesEffect extends EffectBase {
                 vec2 center = gl_PointCoord - vec2(0.5);
                 float dist = length(center) * 2.0;
 
-                // Discard pixels outside circle
-                if (dist > 1.0) {
+                // Softer edges during dissolve (smoke effect)
+                float edgeSoftness = mix(1.0, 1.5, vDissolve);
+                if (dist > edgeSoftness) {
                     discard;
                 }
 
@@ -401,8 +461,9 @@ export class ParticlesEffect extends EffectBase {
                 float core = 1.0 - smoothstep(0.0, 0.3, dist);
                 // Middle - soft falloff
                 float middle = 1.0 - smoothstep(0.2, 0.7, dist);
-                // Outer - wide glow
-                float outer = 1.0 - smoothstep(0.5, 1.0, dist);
+                // Outer - wide glow (expands during dissolve)
+                float outerEdge = mix(1.0, 1.5, vDissolve);
+                float outer = 1.0 - smoothstep(0.5, outerEdge, dist);
 
                 // Combine layers with different intensities
                 float intensity = core * 1.5 + middle * 0.8 + outer * 0.4;
@@ -410,6 +471,10 @@ export class ParticlesEffect extends EffectBase {
                 // Pulsing color shift
                 float colorShift = sin(uTime * 2.0 + vDepth * 10.0) * 0.5 + 0.5;
                 vec3 shiftedColor = mix(vColor, vColor * vec3(1.2, 0.9, 1.1), colorShift * 0.3);
+
+                // Color fade to darker/desaturated during dissolve (smoke effect)
+                vec3 smokeColor = vec3(0.3, 0.3, 0.4);  // Grayish smoke
+                shiftedColor = mix(shiftedColor, smokeColor, vDissolve * 0.6);
 
                 // Add depth-based brightness variation
                 float depthBrightness = 1.0 + vDepth * 0.4;
@@ -420,11 +485,12 @@ export class ParticlesEffect extends EffectBase {
                 // Final color with all effects combined
                 vec3 finalColor = shiftedColor * intensity * uGlowIntensity * depthBrightness * pulseIntensity;
 
-                // Alpha with soft edges
-                float alpha = intensity * (0.6 + pulseIntensity * 0.4);
+                // Alpha fade during dissolve (smoke dissipates)
+                float dissolveFade = 1.0 - pow(vDissolve, 1.5);
+                float alpha = intensity * (0.6 + pulseIntensity * 0.4) * dissolveFade;
 
-                // Add subtle sparkle effect on brightest particles
-                float sparkle = core * (sin(uTime * 15.0 + vDepth * 50.0) * 0.5 + 0.5);
+                // Add subtle sparkle effect on brightest particles (reduced during dissolve)
+                float sparkle = core * (sin(uTime * 15.0 + vDepth * 50.0) * 0.5 + 0.5) * (1.0 - vDissolve);
                 finalColor += vec3(sparkle * 0.3);
 
                 gl_FragColor = vec4(finalColor, alpha);
@@ -460,12 +526,34 @@ export class ParticlesEffect extends EffectBase {
         if (!this.mesh || !this.geometry) return;
 
         const positions = this.geometry.attributes.position.array;
+        const ages = this.geometry.attributes.age.array;
         const time = elapsedTime * 0.001; // Convert to seconds
+
+        const dt = deltaTime * 0.001 * this.settings.dissolveSpeed;
 
         // Update particle physics with advanced motion
         for (let i = 0; i < this.originalPositions.length; i++) {
             const originalPos = this.originalPositions[i];
             const velocity = this.velocities[i];
+
+            // Update particle age
+            if (this.settings.dissolveMode) {
+                this.particleAges[i] += dt;
+                ages[i] = this.particleAges[i];
+
+                // Reset particle when fully dissolved
+                if (this.particleAges[i] > this.particleLifespans[i] + 2.5) {
+                    this.particleAges[i] = 0;
+                    ages[i] = 0;
+
+                    // Reset position and velocity
+                    positions[i * 3] = originalPos.x;
+                    positions[i * 3 + 1] = originalPos.y;
+                    positions[i * 3 + 2] = originalPos.z;
+                    velocity.set(0, 0, 0);
+                    continue;
+                }
+            }
 
             // Current position
             const currentPos = new THREE.Vector3(
@@ -474,58 +562,103 @@ export class ParticlesEffect extends EffectBase {
                 positions[i * 3 + 2]
             );
 
-            // Force towards original position (spring-like attraction)
-            const toOriginal = originalPos.clone().sub(currentPos);
-            const distance = toOriginal.length();
-            const attractionForce = toOriginal.normalize().multiplyScalar(
-                this.settings.attractionForce * deltaTime * distance * 0.1
-            );
+            const age = this.particleAges[i];
+            const lifespan = this.particleLifespans[i];
+            const dissolveProgress = Math.max(0, Math.min(1, (age - lifespan) / 2.0));
 
-            // Smooth Perlin-like noise for organic turbulence
-            const noiseScale = 0.02;
-            const noiseSpeed = time * 0.3;
-            const turbulenceX = this.smoothNoise3D(
-                originalPos.x * noiseScale,
-                originalPos.y * noiseScale,
-                noiseSpeed
-            ) * this.settings.turbulence * deltaTime;
+            // Different behavior based on dissolve mode
+            if (this.settings.dissolveMode && age > lifespan) {
+                // DISSOLVE MODE: Smoke-like dispersion with vortex
 
-            const turbulenceY = this.smoothNoise3D(
-                originalPos.y * noiseScale + 100,
-                originalPos.x * noiseScale,
-                noiseSpeed + 50
-            ) * this.settings.turbulence * deltaTime;
+                // Vortex/swirl force (curl noise simulation)
+                const vortexAngle = time * 2.0 + i * 0.1;
+                const vortexRadius = (age - lifespan) * this.settings.dispersal;
+                const vortexX = Math.cos(vortexAngle) * vortexRadius * 0.1 * this.settings.vortexStrength;
+                const vortexY = Math.sin(vortexAngle) * vortexRadius * 0.1 * this.settings.vortexStrength;
+                const vortexZ = Math.sin(vortexAngle * 0.5) * vortexRadius * 0.05 * this.settings.vortexStrength;
 
-            const turbulenceZ = this.smoothNoise3D(
-                originalPos.z * noiseScale + 200,
-                originalPos.x * noiseScale + originalPos.y * noiseScale,
-                noiseSpeed + 100
-            ) * this.settings.turbulence * deltaTime * 0.5;
+                const vortexForce = new THREE.Vector3(vortexX, vortexY, vortexZ).multiplyScalar(deltaTime * 0.001);
 
-            const turbulenceForce = new THREE.Vector3(turbulenceX, turbulenceY, turbulenceZ);
+                // Upward drift (smoke rises)
+                const upwardDrift = new THREE.Vector3(0, dissolveProgress * 0.15, 0);
 
-            // Wave-based coordinated movement for elegance
-            const wavePhase = time * 0.8;
-            const waveFreq = 0.05;
-            const waveX = Math.sin(originalPos.y * waveFreq + wavePhase) * 0.02;
-            const waveY = Math.cos(originalPos.x * waveFreq + wavePhase) * 0.02;
-            const waveZ = Math.sin((originalPos.x + originalPos.y) * waveFreq * 0.5 + wavePhase) * 0.015;
+                // Dispersal force (outward from origin)
+                const dispersalDir = originalPos.clone().normalize();
+                const dispersalForce = dispersalDir.multiplyScalar(dissolveProgress * this.settings.dispersal * 0.02 * deltaTime * 0.001);
 
-            const waveForce = new THREE.Vector3(waveX, waveY, waveZ);
+                // Strong turbulence during dissolve
+                const turbScale = 0.03;
+                const turbX = this.smoothNoise3D(currentPos.x * turbScale, currentPos.y * turbScale, time * 0.5) * dissolveProgress;
+                const turbY = this.smoothNoise3D(currentPos.y * turbScale + 100, currentPos.x * turbScale, time * 0.5 + 50) * dissolveProgress;
+                const turbZ = this.smoothNoise3D(currentPos.z * turbScale + 200, currentPos.x * turbScale + currentPos.y * turbScale, time * 0.5 + 100) * dissolveProgress * 0.5;
 
-            // Breathing expansion/contraction
-            const breathPhase = Math.sin(time * 0.5) * 0.03;
-            const breathForce = originalPos.clone().normalize().multiplyScalar(breathPhase);
+                const turbulenceForce = new THREE.Vector3(turbX, turbY, turbZ).multiplyScalar(this.settings.turbulence * deltaTime * 0.001);
 
-            // Apply all forces with smooth blending
-            velocity.add(attractionForce);
-            velocity.add(turbulenceForce);
-            velocity.add(waveForce);
-            velocity.add(breathForce);
+                // Apply dissolve forces
+                velocity.add(vortexForce);
+                velocity.add(upwardDrift);
+                velocity.add(dispersalForce);
+                velocity.add(turbulenceForce);
 
-            // Enhanced damping with easing
-            const dampingFactor = this.settings.damping * (0.95 + Math.sin(time * 2.0) * 0.02);
-            velocity.multiplyScalar(dampingFactor);
+                // Reduced damping during dissolve (smoke flows freely)
+                velocity.multiplyScalar(0.98);
+
+            } else {
+                // NORMAL MODE: Attraction to original position
+
+                // Force towards original position (spring-like attraction)
+                const toOriginal = originalPos.clone().sub(currentPos);
+                const distance = toOriginal.length();
+                const attractionForce = toOriginal.normalize().multiplyScalar(
+                    this.settings.attractionForce * deltaTime * distance * 0.0001
+                );
+
+                // Smooth Perlin-like noise for organic turbulence
+                const noiseScale = 0.02;
+                const noiseSpeed = time * 0.3;
+                const turbulenceX = this.smoothNoise3D(
+                    originalPos.x * noiseScale,
+                    originalPos.y * noiseScale,
+                    noiseSpeed
+                ) * this.settings.turbulence * deltaTime * 0.001;
+
+                const turbulenceY = this.smoothNoise3D(
+                    originalPos.y * noiseScale + 100,
+                    originalPos.x * noiseScale,
+                    noiseSpeed + 50
+                ) * this.settings.turbulence * deltaTime * 0.001;
+
+                const turbulenceZ = this.smoothNoise3D(
+                    originalPos.z * noiseScale + 200,
+                    originalPos.x * noiseScale + originalPos.y * noiseScale,
+                    noiseSpeed + 100
+                ) * this.settings.turbulence * deltaTime * 0.001 * 0.5;
+
+                const turbulenceForce = new THREE.Vector3(turbulenceX, turbulenceY, turbulenceZ);
+
+                // Wave-based coordinated movement for elegance
+                const wavePhase = time * 0.8;
+                const waveFreq = 0.05;
+                const waveX = Math.sin(originalPos.y * waveFreq + wavePhase) * 0.02;
+                const waveY = Math.cos(originalPos.x * waveFreq + wavePhase) * 0.02;
+                const waveZ = Math.sin((originalPos.x + originalPos.y) * waveFreq * 0.5 + wavePhase) * 0.015;
+
+                const waveForce = new THREE.Vector3(waveX, waveY, waveZ);
+
+                // Breathing expansion/contraction
+                const breathPhase = Math.sin(time * 0.5) * 0.03;
+                const breathForce = originalPos.clone().normalize().multiplyScalar(breathPhase);
+
+                // Apply all forces with smooth blending
+                velocity.add(attractionForce);
+                velocity.add(turbulenceForce);
+                velocity.add(waveForce);
+                velocity.add(breathForce);
+
+                // Enhanced damping with easing
+                const dampingFactor = this.settings.damping * (0.95 + Math.sin(time * 2.0) * 0.02);
+                velocity.multiplyScalar(dampingFactor);
+            }
 
             // Update position
             currentPos.add(velocity);
@@ -537,6 +670,7 @@ export class ParticlesEffect extends EffectBase {
         }
 
         this.geometry.attributes.position.needsUpdate = true;
+        this.geometry.attributes.age.needsUpdate = true;
 
         // Update material uniforms
         if (this.material.uniforms) {
@@ -547,7 +681,7 @@ export class ParticlesEffect extends EffectBase {
         // Smooth organic rotation with easing
         if (this.mesh) {
             const rotationEase = Math.sin(time * 0.3) * 0.5 + 0.5;
-            this.mesh.rotation.y += deltaTime * this.settings.rotationSpeed * 0.1 * (0.5 + rotationEase * 0.5);
+            this.mesh.rotation.y += deltaTime * this.settings.rotationSpeed * 0.0001 * (0.5 + rotationEase * 0.5);
             this.mesh.rotation.x = Math.sin(time * 0.2) * 0.05;
         }
     }
@@ -630,6 +764,9 @@ export class ParticlesEffect extends EffectBase {
                 this.velocities = [];
                 this.originalPositions = [];
                 this.colors = [];
+                this.particleAges = [];
+                this.particleLifespans = [];
+                this.particlePhases = [];
 
                 this.createParticleSystem();
                 break;
@@ -688,6 +825,9 @@ export class ParticlesEffect extends EffectBase {
         this.velocities = [];
         this.originalPositions = [];
         this.colors = [];
+        this.particleAges = [];
+        this.particleLifespans = [];
+        this.particlePhases = [];
 
         super.destroy();
     }
