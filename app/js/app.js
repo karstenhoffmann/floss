@@ -1,5 +1,5 @@
 /**
- * Kinetic Typography App
+ * Floss - Motion Design
  * Main application entry point
  */
 
@@ -41,7 +41,7 @@ class App {
 
         console.log(`
 ╔════════════════════════════════════════╗
-║   TT K1n3t1c Motion Design             ║
+║   Floss - Motion Design                ║
 ║   Version: ${appVersion}                      ║
 ║   Build: ${buildCommit}                   ║
 ║   Date: ${buildDate}                ║
@@ -875,6 +875,12 @@ class App {
 
         // Update preset selector to show new preset
         this.updatePresetSelector();
+
+        // Select the newly saved preset in the dropdown
+        const selector = document.getElementById('preset-selector');
+        if (selector && preset && preset.id) {
+            selector.value = preset.id;
+        }
     }
 
     /**

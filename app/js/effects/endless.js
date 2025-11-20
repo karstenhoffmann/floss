@@ -24,10 +24,6 @@ export class EndlessEffect extends EffectBase {
                 ...super.getSettingsSchema().text,
                 default: 'ENDLESS'
             },
-            animationSpeed: {
-                ...super.getSettingsSchema().animationSpeed,
-                default: 0.4
-            },
             // Endless-specific settings
             repeats: {
                 type: 'number',
@@ -85,7 +81,7 @@ export class EndlessEffect extends EffectBase {
                 uTime: { value: 0 },
                 uTexture: { value: this.textTextureData.texture },
                 uRepeats: { value: new THREE.Vector2(this.settings.repeats, 3) },
-                uSpeed: { value: this.settings.animationSpeed },
+                uSpeed: { value: 0.4 },  // Fixed speed, controlled by global playback speed
                 uFogColor: { value: fogColor }
             },
             side: THREE.DoubleSide
@@ -183,10 +179,6 @@ export class EndlessEffect extends EffectBase {
 
             case 'repeats':
                 this.material.uniforms.uRepeats.value.set(value, 3);
-                break;
-
-            case 'animationSpeed':
-                this.material.uniforms.uSpeed.value = value;
                 break;
         }
     }

@@ -86,15 +86,6 @@ export class EffectBase {
                 default: '#000000',
                 label: 'Background Color',
                 group: 'colors'
-            },
-            animationSpeed: {
-                type: 'number',
-                default: 1.0,
-                min: 0,
-                max: 5,
-                step: 0.1,
-                label: 'Animation Speed',
-                group: 'animation'
             }
         };
     }

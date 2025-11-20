@@ -1,6 +1,6 @@
 {
-  "name": "Kinetic Typography Motion Design",
-  "short_name": "Kinetic Typo",
+  "name": "Floss - Motion Design",
+  "short_name": "Floss",
   "description": "Professional kinetic typography motion design tool with real-time parameter controls",
   "start_url": "./index.html",
   "display": "standalone",
