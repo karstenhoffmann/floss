@@ -1,29 +1,98 @@
 # Claude Code Project Configuration
+# Last Updated: 2024-11-20
+
+## 🌐 CRITICAL: Claude Code for Web Environment
+
+environment: "Claude Code for Web (NOT CLI)"
+
+## User Testing Limitations
+user_can_access:
+  - Browser chat interface only
+  - GitHub repository
+  - GitHub Pages deployment
+
+user_cannot_access:
+  - Local files created by Claude
+  - Command line on their machine
+  - Files before git push
+
+## 🚨 MANDATORY: Testing Workflow
+
+BEFORE_USER_CAN_TEST:
+  - Code must be committed
+  - Code must be pushed to GitHub
+  - GitHub Pages must be configured for the correct branch
+  - Wait 1-2 minutes for GitHub Pages deployment
+
+ALWAYS_REMIND_USER:
+  - "Update GitHub Pages settings to branch: [current-branch-name]"
+  - "Test at https://karstenhoffmann.github.io/floss/ (wait 1-2 min)"
+  - "Verify you're testing the right branch in GitHub Pages settings"
+
+GITHUB_PAGES_CONFIG:
+  - Location: "Repo Settings → Pages"
+  - Source: "Deploy from branch"
+  - Branch: "[current working branch]"
+  - Folder: "/ (root)" (after restructure)
 
 ## Project Identity
-project_name: "Floss"
+project_name: "Floss - Kinetic Typography Motion Design Tool"
 project_type: "webapp"
 primary_language: "javascript"
+framework: "Vanilla JS ES6 Modules"
+
+## 🚨 CRITICAL: Repository Structure
+# As of Nov 2024, repository was restructured:
+# - Active app is in ROOT directory (index.html, js/, styles/, lib/)
+# - Old tutorial reference files are in /reference/ directory
+# - NO /app/ subdirectory anymore (old structure)
 
 ## Key Files to Read First
 context_files:
-  - CLAUDE.md
-  - README.md
-  - index.html
-  - js/index.js
+  - CLAUDE.md              # Complete project context - READ THIS FIRST
+  - README.md              # Project overview
+  - PLUGIN_SPEC.md         # Effect plugin specification
+  - index.html             # Main app entry point
+  - js/app.js              # Application controller
+
+## Directory Structure
+root_app: true
+reference_only: "reference/"  # DO NOT MODIFY - Original tutorial files
 
 ## Common Commands
 local_server: "python3 -m http.server 8080"
 test_offline: "Open DevTools → Application → Service Workers → Offline checkbox"
+bump_cache: "Edit service-worker.js CACHE_VERSION"
 
 ## Architecture Notes
-- No build step required
-- Hybrid UMD+ESM dependency loading
-- Sequential script loading is critical (see index.html:232-275)
-- Service Worker version bump required for cache invalidation
+- Plugin-based effect system (js/effects/*.js extend EffectBase)
+- No build step required - pure ES6 modules
+- THREE.js r115 for WebGL rendering
+- Canvas 2D text → WebGL texture pipeline
+- Service Worker for offline-first functionality
+- LocalStorage for state persistence
 
 ## Deployment
 platform: "GitHub Pages"
-branch: "master"
+branch: "main"
 url: "https://karstenhoffmann.github.io/floss/"
-deploy_time: "~1 minute after push to master"
+deploy_time: "~1-2 minutes after push to main"
+cache_note: "Bump service-worker.js CACHE_VERSION for breaking changes"
+
+## Development Workflow
+branch_prefix: "claude/"
+base_branch: "main"
+commit_format: "<type>: <description>"
+
+## Prevention Rules
+# To avoid confusion in future sessions:
+NEVER_MODIFY:
+  - /reference/*  # Historical reference only
+ALWAYS_CHECK:
+  - No /app/ directory exists (old structure)
+  - Working in root directory
+  - Branch starts with 'claude/'
+  - Based on 'main' branch
+READ_FIRST:
+  - CLAUDE.md before ANY task
+  - Verify repository structure is correct
