@@ -580,11 +580,22 @@ class App {
         const container = document.createElement('div');
         container.className = 'control-color';
 
+        // Color preview swatch
+        const preview = document.createElement('div');
+        preview.className = 'color-preview';
+        preview.style.backgroundColor = value;
+        preview.title = 'Click to change color';
+
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'coloris'; // Coloris will auto-attach to this
         input.value = value;
         input.dataset.coloris = ''; // Enable Coloris on this input
+
+        // Update preview when color changes
+        const updatePreview = (color) => {
+            preview.style.backgroundColor = color;
+        };
 
         // Eyedropper button (if browser supports it)
         let eyedropperBtn = null;
@@ -602,6 +613,7 @@ class App {
                     const color = result.sRGBHex;
 
                     input.value = color;
+                    updatePreview(color);
                     onChange(color);
 
                     // Trigger Coloris update
@@ -616,6 +628,7 @@ class App {
         // Coloris change event
         input.addEventListener('change', (e) => {
             const color = e.target.value;
+            updatePreview(color);
             onChange(color);
         });
 
@@ -623,10 +636,12 @@ class App {
         input.addEventListener('input', (e) => {
             const color = e.target.value;
             if (/^#[0-9A-F]{6}$/i.test(color)) {
+                updatePreview(color);
                 onChange(color);
             }
         });
 
+        container.appendChild(preview);
         container.appendChild(input);
         if (eyedropperBtn) {
             container.appendChild(eyedropperBtn);
@@ -1064,11 +1079,9 @@ class App {
                 alpha: false,
                 format: 'hex',
                 swatches: swatches,
-                clearButton: {
-                    show: false
-                },
+                clearButton: false,
                 closeButton: true,
-                closeLabel: 'Close',
+                closeLabel: 'OK',
                 selectInput: true,
                 focusInput: false
             });
@@ -1117,6 +1130,7 @@ class App {
             input.className = 'color-swatch-input';
             input.value = color.toUpperCase();
             input.dataset.swatchIndex = index;
+            input.dataset.coloris = ''; // Enable Coloris on this input
             input.placeholder = '#000000';
             input.maxLength = 7;
 
@@ -1138,12 +1152,23 @@ class App {
                 if (/^#[0-9A-F]{6}$/.test(value)) {
                     preview.style.backgroundColor = value;
                     appSettings.updateColorSwatch(index, value);
+                    this.showSaveColorsFeedback();
                 }
             });
 
-            // Click preview to focus input (Coloris will handle the picker)
+            // Coloris change event (when color picked from picker)
+            input.addEventListener('change', (e) => {
+                const value = e.target.value.toUpperCase();
+                if (/^#[0-9A-F]{6}$/.test(value)) {
+                    preview.style.backgroundColor = value;
+                    appSettings.updateColorSwatch(index, value);
+                    this.showSaveColorsFeedback();
+                }
+            });
+
+            // Click preview to open Coloris picker
             preview.addEventListener('click', () => {
-                input.focus();
+                input.click(); // Trigger Coloris
             });
 
             item.appendChild(preview);
@@ -1156,6 +1181,25 @@ class App {
     }
 
     /**
+     * Show save feedback for color changes
+     */
+    showSaveColorsFeedback() {
+        const btn = document.getElementById('save-colors-btn');
+        if (!btn) return;
+
+        // Show "Saved!" feedback
+        const originalText = btn.textContent;
+        btn.textContent = 'Saved!';
+        btn.classList.add('saved');
+
+        // Revert after 2.5 seconds
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.classList.remove('saved');
+        }, 2500);
+    }
+
+    /**
      * Initialize Coloris specifically for color swatch inputs
      */
     initializeColorisForSwatches() {
@@ -1164,44 +1208,22 @@ class App {
             return;
         }
 
-        // Get all swatch inputs
-        const swatchInputs = document.querySelectorAll('.color-swatch-input');
-
-        swatchInputs.forEach(input => {
-            // Add Coloris data attribute
-            input.dataset.coloris = '';
-
-            // Coloris change event
-            input.addEventListener('change', (e) => {
-                const index = parseInt(e.target.dataset.swatchIndex);
-                const newColor = e.target.value.toUpperCase();
-
-                if (/^#[0-9A-F]{6}$/.test(newColor)) {
-                    const preview = e.target.previousElementSibling;
-                    if (preview && preview.classList.contains('color-swatch-preview')) {
-                        preview.style.backgroundColor = newColor;
-                    }
-                    appSettings.updateColorSwatch(index, newColor);
-                }
-            });
-        });
-
         // Reinitialize Coloris with current swatches
         setTimeout(() => {
             const swatches = appSettings.getColorSwatches();
             Coloris({
+                el: '.color-swatch-input',
                 theme: 'pill',
                 themeMode: 'dark',
                 alpha: false,
                 format: 'hex',
                 swatches: swatches,
-                clearButton: { show: false },
+                clearButton: false,
                 closeButton: true,
-                closeLabel: 'Close',
+                closeLabel: 'OK',
                 selectInput: true,
                 focusInput: true
             });
-            Coloris.setInstance('.color-swatch-input');
         }, 100);
     }
 

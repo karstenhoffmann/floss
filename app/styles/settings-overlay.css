@@ -111,6 +111,32 @@
     text-transform: uppercase;
 }
 
+/* Save Colors Button */
+.btn-save-colors {
+    width: 100%;
+    margin-top: var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
+    background: var(--accent-primary);
+    border: 1px solid var(--accent-primary);
+    border-radius: var(--radius-sm);
+    color: white;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.btn-save-colors:hover {
+    background: var(--accent-secondary, var(--accent-primary));
+    border-color: var(--accent-secondary, var(--accent-primary));
+    transform: translateY(-1px);
+}
+
+.btn-save-colors.saved {
+    background: #22c55e;
+    border-color: #22c55e;
+}
+
 /* Settings Actions */
 .settings-actions {
     display: flex;
@@ -146,4 +172,19 @@
 .settings-actions .btn-primary:hover {
     background: var(--accent-secondary);
     border-color: var(--accent-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .color-swatches-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .settings-actions {
+        flex-direction: column;
+    }
+
+    .settings-actions .btn {
+        width: 100%;
+    }
 }
