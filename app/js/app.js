@@ -1192,6 +1192,10 @@ class App {
         btn.textContent = 'Saved!';
         btn.classList.add('saved');
 
+        // Reinitialize Coloris globally with new swatches
+        // This updates ALL color pickers across the app
+        this.initializeColoris();
+
         // Revert after 2.5 seconds
         setTimeout(() => {
             btn.textContent = originalText;
