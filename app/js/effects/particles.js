@@ -159,8 +159,7 @@ export class ParticlesEffect extends EffectBase {
         this.textBounds = { minX: 0, maxX: 0 };  // Text bounding box for wave calculation
 
         // Animation state
-        this.animationStartTime = 0;
-        this.isAnimating = false;
+        this.animationStartTime = null;  // Will be set on first update()
 
         this.createParticleSystem();
     }
@@ -252,10 +251,6 @@ export class ParticlesEffect extends EffectBase {
 
         console.log(`✓ Smoke dissolve system created with ${sampledPositions.length} particles`);
         console.log(`  Text bounds: X [${minX.toFixed(2)}, ${maxX.toFixed(2)}]`);
-
-        // Start animation
-        this.animationStartTime = performance.now() / 1000;
-        this.isAnimating = true;
     }
 
     extractParticlePositionsFromTexture() {
@@ -422,6 +417,12 @@ export class ParticlesEffect extends EffectBase {
         const time = elapsedTime * 0.001;  // Convert to seconds
         const dt = deltaTime * 0.001;
 
+        // Initialize animation start time on first update
+        if (this.animationStartTime === null) {
+            this.animationStartTime = time;
+            console.log('✓ Dissolve animation started at t=' + time.toFixed(2) + 's');
+        }
+
         // Animation time (time since effect started)
         const animTime = time - this.animationStartTime;
 
@@ -561,6 +562,7 @@ export class ParticlesEffect extends EffectBase {
                 this.particleXPositions = [];
 
                 this.createParticleSystem();
+                this.animationStartTime = null;  // Restart animation
                 break;
 
             case 'backgroundColor':
@@ -613,12 +615,13 @@ export class ParticlesEffect extends EffectBase {
                 this.particleXPositions = [];
 
                 this.createParticleSystem();
+                this.animationStartTime = null;  // Restart animation
                 break;
 
             case 'dissolveDirection':
             case 'dissolveDelay':
                 // Restart animation with new direction/delay
-                this.animationStartTime = performance.now() / 1000;
+                this.animationStartTime = null;  // Will restart on next update()
                 break;
 
             // These parameters update in real-time via update()
