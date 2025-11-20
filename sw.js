@@ -3,7 +3,7 @@
  * Enables offline functionality and asset caching
  */
 
-const CACHE_VERSION = 'v6-animation-timing-fix';
+const CACHE_VERSION = 'v7-debug-logs';
 const CACHE_NAME = `floss-${CACHE_VERSION}`;
 
 // Local assets to precache (excluding CDN resources)

@@ -421,6 +421,12 @@ export class ParticlesEffect extends EffectBase {
         if (this.animationStartTime === null) {
             this.animationStartTime = time;
             console.log('✓ Dissolve animation started at t=' + time.toFixed(2) + 's');
+            console.log('  Settings:', {
+                dissolveDelay: this.settings.dissolveDelay,
+                dissolveDirection: this.settings.dissolveDirection,
+                dissolveWaveSpeed: this.settings.dissolveWaveSpeed,
+                dissolveDuration: this.settings.dissolveDuration
+            });
         }
 
         // Animation time (time since effect started)
@@ -428,6 +434,12 @@ export class ParticlesEffect extends EffectBase {
 
         // Calculate dissolve wave position based on direction and time
         const waveProgress = Math.max(0, (animTime - this.settings.dissolveDelay) * this.settings.dissolveWaveSpeed);
+
+        // Debug log every 2 seconds
+        if (Math.floor(animTime) % 2 === 0 && Math.floor(animTime) !== this._lastDebugTime) {
+            this._lastDebugTime = Math.floor(animTime);
+            console.log(`[t=${animTime.toFixed(2)}s] waveProgress=${waveProgress.toFixed(3)}, dissolveAttr[0]=${this.geometry.attributes.dissolve.array[0].toFixed(3)}`);
+        }
 
         const positions = this.geometry.attributes.position.array;
         const dissolveAttr = this.geometry.attributes.dissolve.array;
