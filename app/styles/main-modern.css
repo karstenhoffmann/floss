@@ -48,9 +48,9 @@ body {
 .canvas-container {
     position: absolute;
     top: 0;
-    left: var(--sidebar-width);
-    right: var(--sidebar-width);
-    width: auto;
+    left: 0;
+    right: 0;
+    width: 100%;
     height: 100%;
 }
 
