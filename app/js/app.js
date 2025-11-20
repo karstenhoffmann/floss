@@ -226,6 +226,9 @@ class App {
         // Setup bidirectional camera sync (Mouse → Sidebar)
         this.setupCameraSync();
 
+        // Setup camera settings in App Settings panel
+        this.setupCameraSettings();
+
         // Settings button
         document.getElementById('settings-btn').addEventListener('click', () => {
             this.toggleSettings();
@@ -1219,6 +1222,147 @@ class App {
 
             // Update tracking
             this.cameraRotation.theta = state.theta;
+        }
+    }
+
+    /**
+     * Setup camera settings controls in App Settings overlay
+     */
+    setupCameraSettings() {
+        if (!this.sceneManager.cameraController) return;
+
+        const controller = this.sceneManager.cameraController;
+
+        // Load saved settings or use defaults
+        const savedSettings = localStorage.getItem('cameraSettings');
+        const settings = savedSettings ? JSON.parse(savedSettings) : {
+            panSensitivity: 1.0,
+            rotateSensitivity: 1.0,
+            zoomSensitivity: 1.0,
+            dampingFactor: 0.05
+        };
+
+        // Apply settings to controller
+        controller.updateSettings(settings);
+
+        // Pan Sensitivity
+        const panSensitivitySlider = document.getElementById('camera-pan-sensitivity');
+        const panSensitivityValue = document.getElementById('camera-pan-sensitivity-value');
+
+        if (panSensitivitySlider && panSensitivityValue) {
+            panSensitivitySlider.value = settings.panSensitivity;
+            panSensitivityValue.value = settings.panSensitivity;
+
+            const updatePanSensitivity = (value) => {
+                controller.updateSettings({ panSensitivity: parseFloat(value) });
+            };
+
+            panSensitivitySlider.addEventListener('input', (e) => {
+                const value = e.target.value;
+                panSensitivityValue.value = value;
+                updatePanSensitivity(value);
+            });
+
+            panSensitivityValue.addEventListener('input', (e) => {
+                const value = e.target.value;
+                panSensitivitySlider.value = value;
+                updatePanSensitivity(value);
+            });
+        }
+
+        // Rotate Sensitivity
+        const rotateSensitivitySlider = document.getElementById('camera-rotate-sensitivity');
+        const rotateSensitivityValue = document.getElementById('camera-rotate-sensitivity-value');
+
+        if (rotateSensitivitySlider && rotateSensitivityValue) {
+            rotateSensitivitySlider.value = settings.rotateSensitivity;
+            rotateSensitivityValue.value = settings.rotateSensitivity;
+
+            const updateRotateSensitivity = (value) => {
+                controller.updateSettings({ rotateSensitivity: parseFloat(value) });
+            };
+
+            rotateSensitivitySlider.addEventListener('input', (e) => {
+                const value = e.target.value;
+                rotateSensitivityValue.value = value;
+                updateRotateSensitivity(value);
+            });
+
+            rotateSensitivityValue.addEventListener('input', (e) => {
+                const value = e.target.value;
+                rotateSensitivitySlider.value = value;
+                updateRotateSensitivity(value);
+            });
+        }
+
+        // Zoom Sensitivity
+        const zoomSensitivitySlider = document.getElementById('camera-zoom-sensitivity');
+        const zoomSensitivityValue = document.getElementById('camera-zoom-sensitivity-value');
+
+        if (zoomSensitivitySlider && zoomSensitivityValue) {
+            zoomSensitivitySlider.value = settings.zoomSensitivity;
+            zoomSensitivityValue.value = settings.zoomSensitivity;
+
+            const updateZoomSensitivity = (value) => {
+                controller.updateSettings({ zoomSensitivity: parseFloat(value) });
+            };
+
+            zoomSensitivitySlider.addEventListener('input', (e) => {
+                const value = e.target.value;
+                zoomSensitivityValue.value = value;
+                updateZoomSensitivity(value);
+            });
+
+            zoomSensitivityValue.addEventListener('input', (e) => {
+                const value = e.target.value;
+                zoomSensitivitySlider.value = value;
+                updateZoomSensitivity(value);
+            });
+        }
+
+        // Damping Factor
+        const dampingFactorSlider = document.getElementById('camera-damping-factor');
+        const dampingFactorValue = document.getElementById('camera-damping-factor-value');
+
+        if (dampingFactorSlider && dampingFactorValue) {
+            dampingFactorSlider.value = settings.dampingFactor;
+            dampingFactorValue.value = settings.dampingFactor;
+
+            const updateDampingFactor = (value) => {
+                controller.updateSettings({ dampingFactor: parseFloat(value) });
+            };
+
+            dampingFactorSlider.addEventListener('input', (e) => {
+                const value = e.target.value;
+                dampingFactorValue.value = value;
+                updateDampingFactor(value);
+            });
+
+            dampingFactorValue.addEventListener('input', (e) => {
+                const value = e.target.value;
+                dampingFactorSlider.value = value;
+                updateDampingFactor(value);
+            });
+        }
+
+        // Save Settings button
+        const saveSettingsBtn = document.getElementById('save-app-settings-btn');
+        if (saveSettingsBtn) {
+            saveSettingsBtn.addEventListener('click', () => {
+                // Get current settings from controller
+                const currentSettings = {
+                    panSensitivity: controller.settings.panSensitivity,
+                    rotateSensitivity: controller.settings.rotateSensitivity,
+                    zoomSensitivity: controller.settings.zoomSensitivity,
+                    dampingFactor: controller.settings.dampingFactor
+                };
+
+                // Save to localStorage
+                localStorage.setItem('cameraSettings', JSON.stringify(currentSettings));
+
+                // Show notification
+                notification.success('Camera settings saved');
+            });
         }
     }
 
