@@ -31,7 +31,8 @@ export class ParticlesEffect extends EffectBase {
                 min: 100,
                 max: 15000,
                 step: 100,
-                label: 'Particle Count'
+                label: 'Particle Count',
+                group: 'effect'
             },
             particleSize: {
                 type: 'number',
@@ -39,7 +40,8 @@ export class ParticlesEffect extends EffectBase {
                 min: 0.01,
                 max: 0.5,
                 step: 0.01,
-                label: 'Particle Size'
+                label: 'Particle Size',
+                group: 'effect'
             },
             explosionStrength: {
                 type: 'number',
@@ -47,7 +49,8 @@ export class ParticlesEffect extends EffectBase {
                 min: 0,
                 max: 20,
                 step: 0.5,
-                label: 'Explosion Strength'
+                label: 'Explosion Strength',
+                group: 'effect'
             },
             attractionForce: {
                 type: 'number',
@@ -55,7 +58,8 @@ export class ParticlesEffect extends EffectBase {
                 min: 0,
                 max: 10,
                 step: 0.1,
-                label: 'Attraction Force'
+                label: 'Attraction Force',
+                group: 'effect'
             },
             turbulence: {
                 type: 'number',
@@ -63,7 +67,8 @@ export class ParticlesEffect extends EffectBase {
                 min: 0,
                 max: 5,
                 step: 0.1,
-                label: 'Turbulence'
+                label: 'Turbulence',
+                group: 'effect'
             },
             damping: {
                 type: 'number',
@@ -71,7 +76,8 @@ export class ParticlesEffect extends EffectBase {
                 min: 0.8,
                 max: 0.99,
                 step: 0.01,
-                label: 'Damping'
+                label: 'Damping',
+                group: 'effect'
             },
             glowIntensity: {
                 type: 'number',
@@ -79,7 +85,8 @@ export class ParticlesEffect extends EffectBase {
                 min: 0.5,
                 max: 3,
                 step: 0.1,
-                label: 'Glow Intensity'
+                label: 'Glow Intensity',
+                group: 'effect'
             },
             rotationSpeed: {
                 type: 'number',
@@ -87,18 +94,21 @@ export class ParticlesEffect extends EffectBase {
                 min: 0,
                 max: 2,
                 step: 0.1,
-                label: 'Rotation Speed'
+                label: 'Rotation Speed',
+                group: 'effect'
             },
-            // Color Settings
+            // Particle Color Settings
             particleColor: {
                 type: 'color',
                 default: '#00ffff',
-                label: 'Particle Color'
+                label: 'Particle Color',
+                group: 'colors'
             },
             particleColor2: {
                 type: 'color',
                 default: '#ff00ff',
-                label: 'Secondary Color'
+                label: 'Secondary Color',
+                group: 'colors'
             }
         };
     }

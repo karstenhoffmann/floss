@@ -31,73 +31,61 @@ export class EffectBase {
 
     /**
      * Settings schema (must be overridden by subclass)
+     * Note: Use 'group' property to organize settings in UI
+     * Groups: 'text', 'colors', 'effect' (or custom)
      */
     getSettingsSchema() {
         return {
-            // Core settings (every effect should have these)
+            // Universal Text Settings (every effect should have these)
             text: {
                 type: 'string',
                 default: 'TERRITORY',
                 label: 'Text',
-                emoji: true
+                emoji: true,
+                group: 'text'
             },
             fontSize: {
                 type: 'number',
                 default: 120,
                 min: 20,
                 max: 500,
-                label: 'Font Size'
+                label: 'Font Size',
+                group: 'text'
             },
             fontFamily: {
                 type: 'font',
                 default: 'Arial',
-                label: 'Font'
+                label: 'Font',
+                group: 'text'
             },
             letterSpacing: {
                 type: 'number',
                 default: 0,
                 min: -50,
                 max: 200,
-                label: 'Letter Spacing'
+                label: 'Letter Spacing',
+                group: 'text'
             },
             padding: {
                 type: 'number',
                 default: 20,
                 min: 0,
                 max: 100,
-                label: 'Padding'
+                label: 'Padding',
+                group: 'text'
             },
             fitToTile: {
                 type: 'boolean',
                 default: false,
-                label: 'Fit to Tile'
+                label: 'Fit to Tile',
+                group: 'text'
             },
-            repeats: {
-                type: 'number',
-                default: 3,
-                min: 1,
-                max: 20,
-                label: 'Tile Repeats'
-            },
-            textColor: {
-                type: 'color',
-                default: '#ffffff',
-                label: 'Text Color'
-            },
-            surfaceColor: {
-                type: 'color',
-                default: '#1a1a1a',
-                label: 'Surface Color'
-            },
+            // Universal Color Settings
             backgroundColor: {
                 type: 'color',
                 default: '#000000',
-                label: 'Background Color'
-            },
-            fogColor: {
-                type: 'color',
-                default: '#000000',
-                label: 'Shadow/Fade Color'
+                label: 'Background Color',
+                group: 'colors'
             },
             animationSpeed: {
                 type: 'number',
@@ -105,7 +93,8 @@ export class EffectBase {
                 min: 0,
                 max: 5,
                 step: 0.1,
-                label: 'Animation Speed'
+                label: 'Animation Speed',
+                group: 'animation'
             }
         };
     }

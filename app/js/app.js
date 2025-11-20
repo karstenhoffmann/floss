@@ -390,18 +390,34 @@ class App {
 
         console.log('✓ Updating settings panel, schema keys:', Object.keys(schema).length);
 
-        // Group settings (order matters for display)
-        // Note: animationSpeed removed - controlled via Playback Controls panel instead
-        const groups = {
-            'Typography': ['text', 'fontFamily', 'fontSize', 'letterSpacing', 'repeats'],
-            'Colors': ['textColor', 'surfaceColor', 'backgroundColor', 'fogColor']
+        // Dynamically group settings based on 'group' property in schema
+        const groupedSettings = {};
+        const groupOrder = ['text', 'colors', 'effect', 'animation']; // Display order
+        const groupTitles = {
+            'text': 'Typography',
+            'colors': 'Colors',
+            'effect': 'Effect',
+            'animation': 'Animation'
         };
 
-        Object.entries(groups).forEach(([groupName, keys]) => {
-            const group = this.createControlGroup(groupName, keys, schema, settings, effect);
-            if (group && group.children.length > 1) {
-                settingsContent.appendChild(group);
-                console.log(`✓ Added ${groupName} group`);
+        // Organize settings by group
+        Object.entries(schema).forEach(([key, config]) => {
+            const groupKey = config.group || 'effect'; // Default to 'effect' if no group
+            if (!groupedSettings[groupKey]) {
+                groupedSettings[groupKey] = [];
+            }
+            groupedSettings[groupKey].push(key);
+        });
+
+        // Render groups in order
+        groupOrder.forEach(groupKey => {
+            if (groupedSettings[groupKey] && groupedSettings[groupKey].length > 0) {
+                const groupName = groupTitles[groupKey] || groupKey.charAt(0).toUpperCase() + groupKey.slice(1);
+                const group = this.createControlGroup(groupName, groupedSettings[groupKey], schema, settings, effect);
+                if (group && group.children.length > 1) {
+                    settingsContent.appendChild(group);
+                    console.log(`✓ Added ${groupName} group with ${groupedSettings[groupKey].length} settings`);
+                }
             }
         });
 

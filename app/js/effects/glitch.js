@@ -25,6 +25,19 @@ export class GlitchEffect extends EffectBase {
                 ...super.getSettingsSchema().text,
                 default: 'GLITCH'
             },
+            // Glitch colors
+            textColor: {
+                type: 'color',
+                default: '#ffffff',
+                label: 'Text Color',
+                group: 'colors'
+            },
+            surfaceColor: {
+                type: 'color',
+                default: '#1a1a1a',
+                label: 'Surface Color',
+                group: 'colors'
+            },
             // Glitch-specific settings
             glitchIntensity: {
                 type: 'number',
@@ -32,7 +45,8 @@ export class GlitchEffect extends EffectBase {
                 min: 0,
                 max: 1,
                 step: 0.01,
-                label: 'Glitch Intensity'
+                label: 'Glitch Intensity',
+                group: 'effect'
             },
             rgbShift: {
                 type: 'number',
@@ -40,7 +54,8 @@ export class GlitchEffect extends EffectBase {
                 min: 0,
                 max: 0.02,
                 step: 0.001,
-                label: 'RGB Shift'
+                label: 'RGB Shift',
+                group: 'effect'
             },
             scanlines: {
                 type: 'number',
@@ -48,7 +63,8 @@ export class GlitchEffect extends EffectBase {
                 min: 0,
                 max: 2,
                 step: 0.1,
-                label: 'Scanlines'
+                label: 'Scanlines',
+                group: 'effect'
             },
             noiseIntensity: {
                 type: 'number',
@@ -56,7 +72,8 @@ export class GlitchEffect extends EffectBase {
                 min: 0,
                 max: 0.5,
                 step: 0.01,
-                label: 'Noise Intensity'
+                label: 'Noise Intensity',
+                group: 'effect'
             },
             blockSize: {
                 type: 'number',
@@ -64,7 +81,8 @@ export class GlitchEffect extends EffectBase {
                 min: 0.01,
                 max: 0.2,
                 step: 0.01,
-                label: 'Block Size'
+                label: 'Block Size',
+                group: 'effect'
             },
             distortion: {
                 type: 'number',
@@ -72,7 +90,8 @@ export class GlitchEffect extends EffectBase {
                 min: 0,
                 max: 0.5,
                 step: 0.01,
-                label: 'Distortion'
+                label: 'Distortion',
+                group: 'effect'
             },
             rotationSpeed: {
                 type: 'number',
@@ -80,7 +99,8 @@ export class GlitchEffect extends EffectBase {
                 min: 0,
                 max: 2,
                 step: 0.1,
-                label: 'Rotation Speed'
+                label: 'Rotation Speed',
+                group: 'effect'
             }
         };
     }

@@ -24,13 +24,36 @@ export class EndlessEffect extends EffectBase {
                 ...super.getSettingsSchema().text,
                 default: 'ENDLESS'
             },
-            repeats: {
-                ...super.getSettingsSchema().repeats,
-                default: 12
-            },
             animationSpeed: {
                 ...super.getSettingsSchema().animationSpeed,
                 default: 0.4
+            },
+            // Endless-specific settings
+            repeats: {
+                type: 'number',
+                default: 12,
+                min: 1,
+                max: 20,
+                label: 'Tile Repeats',
+                group: 'effect'
+            },
+            textColor: {
+                type: 'color',
+                default: '#ffffff',
+                label: 'Text Color',
+                group: 'colors'
+            },
+            surfaceColor: {
+                type: 'color',
+                default: '#000000',
+                label: 'Surface Color',
+                group: 'colors'
+            },
+            fogColor: {
+                type: 'color',
+                default: '#000000',
+                label: 'Fog Color',
+                group: 'colors'
             }
         };
     }
