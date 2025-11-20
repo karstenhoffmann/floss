@@ -62,37 +62,16 @@ export class CameraController {
         this.controls.minDistance = this.settings.minDistance;
         this.controls.maxDistance = this.settings.maxDistance;
 
-        // Enhanced pan with distance scaling
-        this.enhancePan();
+        // Set pan speed (OrbitControls uses panSpeed property)
+        this.controls.panSpeed = this.settings.panSensitivity;
+        this.controls.rotateSpeed = this.settings.rotateSensitivity;
+        this.controls.zoomSpeed = this.settings.zoomSensitivity;
 
         // Listen to control changes
         this.controls.addEventListener('change', () => this.onControlsChange());
         this.controls.addEventListener('end', () => this.onControlsEnd());
 
         console.log('✓ Enhanced CameraController initialized');
-    }
-
-    /**
-     * Enhance pan behavior with distance-based scaling
-     */
-    enhancePan() {
-        if (!this.controls) return;
-
-        // Store original pan method
-        const originalPan = this.controls.pan.bind(this.controls);
-
-        // Override with distance-scaled version
-        this.controls.pan = (deltaX, deltaY) => {
-            // Calculate distance from camera to target
-            const distance = this.camera.position.distanceTo(this.controls.target);
-
-            // Scale factor: larger distance = faster pan
-            // Formula: scale = distance * sensitivity * base_factor
-            const scale = distance * this.settings.panSensitivity * 0.001;
-
-            // Apply scaled pan
-            originalPan(deltaX * scale, deltaY * scale);
-        };
     }
 
     /**
@@ -323,6 +302,9 @@ export class CameraController {
             this.controls.dampingFactor = this.settings.dampingFactor;
             this.controls.minDistance = this.settings.minDistance;
             this.controls.maxDistance = this.settings.maxDistance;
+            this.controls.panSpeed = this.settings.panSensitivity;
+            this.controls.rotateSpeed = this.settings.rotateSensitivity;
+            this.controls.zoomSpeed = this.settings.zoomSensitivity;
         }
     }
 
