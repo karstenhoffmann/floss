@@ -74,8 +74,12 @@ export class RenderLoop {
             this.updateFPSDisplay();
         }
 
-        // Update scene
-        this.sceneManager.update();
+        // Apply global animation speed multiplier
+        const animationSpeed = state.get('animationSpeed') || 1.0;
+        const scaledDeltaTime = deltaTime * animationSpeed;
+
+        // Update scene with scaled deltaTime
+        this.sceneManager.update(scaledDeltaTime);
 
         // Render scene
         this.sceneManager.render();

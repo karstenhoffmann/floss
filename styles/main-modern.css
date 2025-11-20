@@ -1,5 +1,5 @@
 /**
- * TT K1n3t1c - Modern Glassmorphic UI
+ * Floss - Modern Glassmorphic UI
  * Canvas-first floating layout with ultra-dark theme
  */
 
@@ -49,6 +49,7 @@ body {
     position: absolute;
     top: 0;
     left: 0;
+    right: 0;
     width: 100%;
     height: 100%;
 }
@@ -196,7 +197,7 @@ body {
     box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
 }
 
-/* ===== SETTINGS SIDEBAR (Glassmorphic, Left) ===== */
+/* ===== SETTINGS SIDEBAR (Glassmorphic, Left & Right) ===== */
 .settings-sidebar {
     position: fixed;
     left: 0;
@@ -216,6 +217,14 @@ body {
 
     transition: transform var(--duration-normal) var(--ease-spring),
                 opacity var(--duration-normal) var(--ease-out);
+}
+
+/* Right Sidebar (Inspector Panel) */
+.settings-sidebar--right {
+    left: auto;
+    right: 0;
+    border-right: none;
+    border-left: 1px solid var(--glass-border);
 }
 
 .settings-sidebar__header {
@@ -244,11 +253,11 @@ body {
     padding: var(--space-md);
 }
 
-/* ===== CONTROLS PANEL (Bottom, Glassmorphic) ===== */
+/* ===== CONTROLS PANEL (Bottom, Glassmorphic, Inset between sidebars) ===== */
 .controls-panel {
     position: fixed;
     left: var(--sidebar-width);
-    right: 0;
+    right: var(--sidebar-width);
     bottom: 0;
     z-index: var(--z-panels);
 
@@ -258,7 +267,7 @@ body {
     border-top: 1px solid var(--glass-border);
     box-shadow: var(--shadow-lg);
 
-    padding: var(--space-lg) var(--space-xl);
+    padding: var(--space-lg) var(--space-xl) calc(var(--space-2xl) * 2.5) var(--space-xl);
     display: flex;
     gap: var(--space-2xl);
     align-items: flex-start;
@@ -602,6 +611,10 @@ input[type="range"]::-moz-range-thumb:hover {
     transform: translateX(-100%);
 }
 
+.app.ui-hidden .settings-sidebar--right {
+    transform: translateX(100%);
+}
+
 .app.ui-hidden .controls-panel {
     transform: translateY(100%);
 }
@@ -874,6 +887,7 @@ input[type="range"]::-moz-range-thumb:hover {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-md) !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+    z-index: 10001 !important; /* Above settings overlay (10000) */
 }
 
 .clr-gradient,

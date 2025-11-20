@@ -11,6 +11,7 @@ export class AppState {
             currentSettings: {},
             uiHidden: false,
             showFPS: false,
+            animationSpeed: 1.0,  // Global animation speed multiplier
             settingsPanelCollapsed: false,
             presetPanelOpen: false,
             userPreferences: {
@@ -130,6 +131,7 @@ export class AppState {
             currentSettings: {},
             uiHidden: false,
             showFPS: false,
+            animationSpeed: 1.0,
             settingsPanelCollapsed: false,
             presetPanelOpen: false,
             userPreferences: {

@@ -24,13 +24,32 @@ export class EndlessEffect extends EffectBase {
                 ...super.getSettingsSchema().text,
                 default: 'ENDLESS'
             },
+            // Endless-specific settings
             repeats: {
-                ...super.getSettingsSchema().repeats,
-                default: 12
+                type: 'number',
+                default: 12,
+                min: 1,
+                max: 20,
+                label: 'Tile Repeats',
+                group: 'effect'
             },
-            animationSpeed: {
-                ...super.getSettingsSchema().animationSpeed,
-                default: 0.4
+            textColor: {
+                type: 'color',
+                default: '#ffffff',
+                label: 'Text Color',
+                group: 'colors'
+            },
+            surfaceColor: {
+                type: 'color',
+                default: '#000000',
+                label: 'Surface Color',
+                group: 'colors'
+            },
+            fogColor: {
+                type: 'color',
+                default: '#000000',
+                label: 'Fog Color',
+                group: 'colors'
             }
         };
     }
@@ -62,7 +81,7 @@ export class EndlessEffect extends EffectBase {
                 uTime: { value: 0 },
                 uTexture: { value: this.textTextureData.texture },
                 uRepeats: { value: new THREE.Vector2(this.settings.repeats, 3) },
-                uSpeed: { value: this.settings.animationSpeed },
+                uSpeed: { value: 0.4 },  // Fixed speed, controlled by global playback speed
                 uFogColor: { value: fogColor }
             },
             side: THREE.DoubleSide
@@ -161,11 +180,22 @@ export class EndlessEffect extends EffectBase {
             case 'repeats':
                 this.material.uniforms.uRepeats.value.set(value, 3);
                 break;
-
-            case 'animationSpeed':
-                this.material.uniforms.uSpeed.value = value;
-                break;
         }
+    }
+
+    /**
+     * Get visual center of endless tunnel effect
+     * Used by CameraController for rotation pivot
+     */
+    getVisualCenter() {
+        // Endless effect uses a tunnel, so mesh provides good bounding box
+        if (this.mesh) {
+            const box = new THREE.Box3().setFromObject(this.mesh);
+            if (!box.isEmpty()) {
+                return box.getCenter(new THREE.Vector3());
+            }
+        }
+        return new THREE.Vector3(0, 0, 0);
     }
 
     resize(width, height) {

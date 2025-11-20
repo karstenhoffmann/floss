@@ -13,6 +13,7 @@ export class EffectBase {
         this.material = null;
         this.geometry = null;
         this.renderTarget = null;
+        this.composer = null; // For post-processing effects
         this.initialized = false;
     }
 
@@ -30,81 +31,61 @@ export class EffectBase {
 
     /**
      * Settings schema (must be overridden by subclass)
+     * Note: Use 'group' property to organize settings in UI
+     * Groups: 'text', 'colors', 'effect' (or custom)
      */
     getSettingsSchema() {
         return {
-            // Core settings (every effect should have these)
+            // Universal Text Settings (every effect should have these)
             text: {
                 type: 'string',
                 default: 'TERRITORY',
                 label: 'Text',
-                emoji: true
+                emoji: true,
+                group: 'text'
             },
             fontSize: {
                 type: 'number',
                 default: 120,
                 min: 20,
                 max: 500,
-                label: 'Font Size'
+                label: 'Font Size',
+                group: 'text'
             },
             fontFamily: {
                 type: 'font',
                 default: 'Arial',
-                label: 'Font'
+                label: 'Font',
+                group: 'text'
             },
             letterSpacing: {
                 type: 'number',
                 default: 0,
                 min: -50,
                 max: 200,
-                label: 'Letter Spacing'
+                label: 'Letter Spacing',
+                group: 'text'
             },
             padding: {
                 type: 'number',
                 default: 20,
                 min: 0,
                 max: 100,
-                label: 'Padding'
+                label: 'Padding',
+                group: 'text'
             },
             fitToTile: {
                 type: 'boolean',
                 default: false,
-                label: 'Fit to Tile'
+                label: 'Fit to Tile',
+                group: 'text'
             },
-            repeats: {
-                type: 'number',
-                default: 3,
-                min: 1,
-                max: 20,
-                label: 'Tile Repeats'
-            },
-            textColor: {
-                type: 'color',
-                default: '#ffffff',
-                label: 'Text Color'
-            },
-            surfaceColor: {
-                type: 'color',
-                default: '#1a1a1a',
-                label: 'Surface Color'
-            },
+            // Universal Color Settings
             backgroundColor: {
                 type: 'color',
                 default: '#000000',
-                label: 'Background Color'
-            },
-            fogColor: {
-                type: 'color',
-                default: '#000000',
-                label: 'Shadow/Fade Color'
-            },
-            animationSpeed: {
-                type: 'number',
-                default: 1.0,
-                min: 0,
-                max: 5,
-                step: 0.1,
-                label: 'Animation Speed'
+                label: 'Background Color',
+                group: 'colors'
             }
         };
     }
@@ -191,6 +172,28 @@ export class EffectBase {
     }
 
     /**
+     * Check if effect uses post-processing (override in subclass)
+     */
+    usesPostProcessing() {
+        return false;
+    }
+
+    /**
+     * Get composer for post-processing effects (override in subclass)
+     */
+    getComposer() {
+        return this.composer;
+    }
+
+    /**
+     * Render method (can be overridden for custom rendering)
+     */
+    render() {
+        // Default: no custom rendering (uses scene manager's render)
+        // Override this in effects that use post-processing
+    }
+
+    /**
      * Cleanup resources (must be overridden by subclass)
      */
     destroy() {
@@ -209,6 +212,11 @@ export class EffectBase {
 
         if (this.renderTarget) {
             this.renderTarget.dispose();
+        }
+
+        if (this.composer) {
+            // Composer cleanup will be handled by SceneManager
+            this.composer = null;
         }
 
         this.initialized = false;

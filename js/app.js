@@ -1,5 +1,5 @@
 /**
- * Kinetic Typography App
+ * Floss - Motion Design
  * Main application entry point
  */
 
@@ -15,6 +15,8 @@ import ICONS from './ui/icons.js';
 
 // Import effects
 import EndlessEffect from './effects/endless.js';
+import GlitchEffect from './effects/glitch.js';
+import ParticlesEffect from './effects/particles.js';
 
 class App {
     constructor() {
@@ -33,13 +35,13 @@ class App {
 
     async init() {
         // App version and build info
-        const appVersion = '2.2.0';
-        const buildCommit = 'b0a3e6a';
-        const buildDate = '2025-11-19';
+        const appVersion = '2.3.0';
+        const buildCommit = 'e6c3364';
+        const buildDate = '2025-11-20';
 
         console.log(`
 ╔════════════════════════════════════════╗
-║   TT K1n3t1c Motion Design             ║
+║   Floss - Motion Design                ║
 ║   Version: ${appVersion}                      ║
 ║   Build: ${buildCommit}                   ║
 ║   Date: ${buildDate}                ║
@@ -102,6 +104,8 @@ class App {
      */
     registerEffects() {
         effectManager.register(EndlessEffect);
+        effectManager.register(GlitchEffect);
+        effectManager.register(ParticlesEffect);
         // More effects will be added here
     }
 
@@ -213,11 +217,17 @@ class App {
         // Update preset selector with saved presets
         this.updatePresetSelector();
 
-        // Camera controls
+        // Camera controls (must be after scene is initialized)
         this.setupCameraControls();
 
         // Playback controls
         this.setupPlaybackControls();
+
+        // Setup bidirectional camera sync (Mouse → Sidebar)
+        this.setupCameraSync();
+
+        // Setup camera settings in App Settings panel
+        this.setupCameraSettings();
 
         // Settings button
         document.getElementById('settings-btn').addEventListener('click', () => {
@@ -386,22 +396,103 @@ class App {
 
         console.log('✓ Updating settings panel, schema keys:', Object.keys(schema).length);
 
-        // Group settings (order matters for display)
-        // Note: animationSpeed removed - controlled via Playback Controls panel instead
-        const groups = {
-            'Typography': ['text', 'fontFamily', 'fontSize', 'letterSpacing', 'repeats'],
-            'Colors': ['textColor', 'surfaceColor', 'backgroundColor', 'fogColor']
+        // Dynamically group settings based on 'group' property in schema
+        const groupedSettings = {};
+        const groupOrder = ['text', 'colors', 'effect', 'animation']; // Display order
+        const groupTitles = {
+            'text': 'Typography',
+            'colors': 'Colors',
+            'effect': 'Effect',
+            'animation': 'Animation'
         };
 
-        Object.entries(groups).forEach(([groupName, keys]) => {
-            const group = this.createControlGroup(groupName, keys, schema, settings, effect);
-            if (group && group.children.length > 1) {
-                settingsContent.appendChild(group);
-                console.log(`✓ Added ${groupName} group`);
+        // Organize settings by group, but separate colors
+        const colorKeys = [];
+        Object.entries(schema).forEach(([key, config]) => {
+            if (config.type === 'color') {
+                // Collect color settings separately for bottom panel
+                colorKeys.push(key);
+            } else {
+                const groupKey = config.group || 'effect'; // Default to 'effect' if no group
+                if (!groupedSettings[groupKey]) {
+                    groupedSettings[groupKey] = [];
+                }
+                groupedSettings[groupKey].push(key);
+            }
+        });
+
+        // Render non-color groups in left sidebar (exclude 'colors' group)
+        groupOrder.forEach(groupKey => {
+            if (groupKey === 'colors') return; // Skip colors, they go in bottom panel
+            if (groupedSettings[groupKey] && groupedSettings[groupKey].length > 0) {
+                const groupName = groupTitles[groupKey] || groupKey.charAt(0).toUpperCase() + groupKey.slice(1);
+                const group = this.createControlGroup(groupName, groupedSettings[groupKey], schema, settings, effect);
+                if (group && group.children.length > 1) {
+                    settingsContent.appendChild(group);
+                    console.log(`✓ Added ${groupName} group with ${groupedSettings[groupKey].length} settings`);
+                }
             }
         });
 
         console.log('✓ Settings panel updated, total groups:', settingsContent.children.length);
+
+        // Update colors panel at the bottom
+        this.updateColorsPanel(colorKeys, schema, settings, effect);
+    }
+
+    /**
+     * Update colors panel (bottom panel between sidebars)
+     */
+    updateColorsPanel(colorKeys, schema, settings, effect) {
+        const colorsContainer = document.getElementById('colors-controls-container');
+        if (!colorsContainer) {
+            console.error('❌ Colors controls container not found!');
+            return;
+        }
+
+        colorsContainer.innerHTML = '';
+
+        if (colorKeys.length === 0) {
+            colorsContainer.innerHTML = '<p style="color: var(--text-3); text-align: center; padding: var(--space-md);">No color controls available for this effect</p>';
+            return;
+        }
+
+        // Display all color controls in a row
+        const colorsRow = document.createElement('div');
+        colorsRow.style.display = 'flex';
+        colorsRow.style.gap = 'var(--space-xl)';
+        colorsRow.style.flexWrap = 'wrap';
+        colorsRow.style.alignItems = 'center';
+
+        colorKeys.forEach(key => {
+            const config = schema[key];
+            const value = settings[key];
+
+            const colorControl = document.createElement('div');
+            colorControl.style.display = 'flex';
+            colorControl.style.alignItems = 'center';
+            colorControl.style.gap = 'var(--space-sm)';
+
+            const label = document.createElement('label');
+            label.textContent = config.label;
+            label.style.color = 'var(--text-2)';
+            label.style.fontSize = '13px';
+            label.style.fontWeight = '500';
+            label.style.minWidth = '100px';
+
+            const input = this.createColorInput(value, (newValue) => {
+                effect.updateSetting(key, newValue);
+                state.set('currentSettings', effect.settings);
+            });
+
+            colorControl.appendChild(label);
+            colorControl.appendChild(input);
+            colorsRow.appendChild(colorControl);
+        });
+
+        colorsContainer.appendChild(colorsRow);
+
+        console.log(`✓ Colors panel updated with ${colorKeys.length} color controls`);
     }
 
     /**
@@ -560,11 +651,22 @@ class App {
         const container = document.createElement('div');
         container.className = 'control-color';
 
+        // Color preview swatch
+        const preview = document.createElement('div');
+        preview.className = 'color-preview';
+        preview.style.backgroundColor = value;
+        preview.title = 'Click to change color';
+
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'coloris'; // Coloris will auto-attach to this
         input.value = value;
         input.dataset.coloris = ''; // Enable Coloris on this input
+
+        // Update preview when color changes
+        const updatePreview = (color) => {
+            preview.style.backgroundColor = color;
+        };
 
         // Eyedropper button (if browser supports it)
         let eyedropperBtn = null;
@@ -582,6 +684,7 @@ class App {
                     const color = result.sRGBHex;
 
                     input.value = color;
+                    updatePreview(color);
                     onChange(color);
 
                     // Trigger Coloris update
@@ -596,17 +699,32 @@ class App {
         // Coloris change event
         input.addEventListener('change', (e) => {
             const color = e.target.value;
+            updatePreview(color);
             onChange(color);
+
+            // Track recently used colors
+            if (/^#[0-9A-F]{6}$/i.test(color)) {
+                appSettings.addRecentColor(color);
+                // Reinitialize Coloris with updated recent colors
+                this.initializeColoris();
+            }
         });
 
         // Manual text input (for typing HEX values)
         input.addEventListener('input', (e) => {
             const color = e.target.value;
             if (/^#[0-9A-F]{6}$/i.test(color)) {
+                updatePreview(color);
                 onChange(color);
+
+                // Track recently used colors
+                appSettings.addRecentColor(color);
+                // Reinitialize Coloris with updated recent colors
+                this.initializeColoris();
             }
         });
 
+        container.appendChild(preview);
         container.appendChild(input);
         if (eyedropperBtn) {
             container.appendChild(eyedropperBtn);
@@ -757,6 +875,12 @@ class App {
 
         // Update preset selector to show new preset
         this.updatePresetSelector();
+
+        // Select the newly saved preset in the dropdown
+        const selector = document.getElementById('preset-selector');
+        if (selector && preset && preset.id) {
+            selector.value = preset.id;
+        }
     }
 
     /**
@@ -874,7 +998,7 @@ class App {
     }
 
     /**
-     * Setup camera controls
+     * Setup camera controls (Sidebar → Camera)
      */
     setupCameraControls() {
         const zoomSlider = document.getElementById('camera-zoom');
@@ -884,72 +1008,346 @@ class App {
         const rotateYSlider = document.getElementById('camera-rotate-y');
         const resetBtn = document.getElementById('camera-reset-btn');
 
-        if (!zoomSlider || !this.sceneManager.controls) return;
+        const zoomValue = document.getElementById('camera-zoom-value');
+        const panXValue = document.getElementById('camera-pan-x-value');
+        const panYValue = document.getElementById('camera-pan-y-value');
+        const rotateXValue = document.getElementById('camera-rotate-x-value');
+        const rotateYValue = document.getElementById('camera-rotate-y-value');
 
-        // Zoom
+        if (!zoomSlider || !this.sceneManager.cameraController) return;
+
+        const controller = this.sceneManager.cameraController;
+
+        // Track current rotation state (in degrees)
+        this.cameraRotation = { theta: 0, phi: 90 }; // Start at equator
+
+        // Zoom - slider/input to camera
+        const updateZoom = (value) => {
+            controller.setState({ zoom: value });
+        };
+
         zoomSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
-            this.sceneManager.camera.position.z = value;
-            document.getElementById('camera-zoom-value').textContent = value;
+            if (zoomValue) zoomValue.value = value;
+            updateZoom(value);
         });
 
-        // Pan X
+        if (zoomValue) {
+            zoomValue.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                zoomSlider.value = value;
+                updateZoom(value);
+            });
+        }
+
+        // Pan X - slider/input to camera
+        const updatePanX = (value) => {
+            controller.setState({ panX: value });
+        };
+
         panXSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
-            this.sceneManager.controls.target.x = value;
-            document.getElementById('camera-pan-x-value').textContent = value;
+            if (panXValue) panXValue.value = value;
+            updatePanX(value);
         });
 
-        // Pan Y
+        if (panXValue) {
+            panXValue.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                panXSlider.value = value;
+                updatePanX(value);
+            });
+        }
+
+        // Pan Y - slider/input to camera
+        const updatePanY = (value) => {
+            controller.setState({ panY: value });
+        };
+
         panYSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
-            this.sceneManager.controls.target.y = value;
-            document.getElementById('camera-pan-y-value').textContent = value;
+            if (panYValue) panYValue.value = value;
+            updatePanY(value);
         });
 
-        // Rotate X
+        if (panYValue) {
+            panYValue.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                panYSlider.value = value;
+                updatePanY(value);
+            });
+        }
+
+        // Rotate X (Phi - vertical angle)
+        const updateRotateX = (value) => {
+            this.cameraRotation.phi = 90 - value; // Convert X rotation to phi
+            controller.setOrbitRotation(this.cameraRotation.theta, this.cameraRotation.phi);
+        };
+
         rotateXSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
-            const radians = (value * Math.PI) / 180;
-            if (this.currentEffect && this.currentEffect.mesh) {
-                this.currentEffect.mesh.rotation.x = radians;
-            }
-            document.getElementById('camera-rotate-x-value').textContent = value + '°';
+            if (rotateXValue) rotateXValue.value = value;
+            updateRotateX(value);
         });
 
-        // Rotate Y
+        if (rotateXValue) {
+            rotateXValue.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                rotateXSlider.value = value;
+                updateRotateX(value);
+            });
+        }
+
+        // Rotate Y (Theta - horizontal angle)
+        const updateRotateY = (value) => {
+            this.cameraRotation.theta = value;
+            controller.setOrbitRotation(this.cameraRotation.theta, this.cameraRotation.phi);
+        };
+
         rotateYSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
-            const radians = (value * Math.PI) / 180;
-            if (this.currentEffect && this.currentEffect.mesh) {
-                this.currentEffect.mesh.rotation.y = radians;
-            }
-            document.getElementById('camera-rotate-y-value').textContent = value + '°';
+            if (rotateYValue) rotateYValue.value = value;
+            updateRotateY(value);
         });
+
+        if (rotateYValue) {
+            rotateYValue.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                rotateYSlider.value = value;
+                updateRotateY(value);
+            });
+        }
 
         // Reset camera
         if (resetBtn) {
             resetBtn.addEventListener('click', () => {
-                this.sceneManager.camera.position.set(0, 0, 50);
-                this.sceneManager.controls.target.set(0, 0, 0);
+                controller.reset();
 
-                if (this.currentEffect && this.currentEffect.mesh) {
-                    this.currentEffect.mesh.rotation.set(0, 0, 0);
-                }
+                // Reset rotation tracking
+                this.cameraRotation = { theta: 0, phi: 90 };
 
+                // Update UI
                 zoomSlider.value = 50;
                 panXSlider.value = 0;
                 panYSlider.value = 0;
                 rotateXSlider.value = 0;
                 rotateYSlider.value = 0;
 
-                document.getElementById('camera-zoom-value').textContent = '50';
-                document.getElementById('camera-pan-x-value').textContent = '0';
-                document.getElementById('camera-pan-y-value').textContent = '0';
-                document.getElementById('camera-rotate-x-value').textContent = '0°';
-                document.getElementById('camera-rotate-y-value').textContent = '0°';
+                if (zoomValue) zoomValue.value = 50;
+                if (panXValue) panXValue.value = 0;
+                if (panYValue) panYValue.value = 0;
+                if (rotateXValue) rotateXValue.value = 0;
+                if (rotateYValue) rotateYValue.value = 0;
 
                 notification.success('Camera reset');
+            });
+        }
+    }
+
+    /**
+     * Setup bidirectional camera sync (Mouse → Sidebar)
+     */
+    setupCameraSync() {
+        if (!this.sceneManager.cameraController) return;
+
+        const controller = this.sceneManager.cameraController;
+
+        // Register sync callback
+        controller.onSync((state) => {
+            // Update sidebar values when mouse interaction ends
+            this.updateCameraSidebarValues(state);
+        });
+    }
+
+    /**
+     * Update sidebar camera values from camera state
+     * @param {Object} state - Camera state from CameraController
+     */
+    updateCameraSidebarValues(state) {
+        // Zoom
+        const zoomSlider = document.getElementById('camera-zoom');
+        const zoomValue = document.getElementById('camera-zoom-value');
+        if (zoomSlider && state.zoom !== undefined) {
+            zoomSlider.value = state.zoom;
+            if (zoomValue) zoomValue.value = Math.round(state.zoom);
+        }
+
+        // Pan
+        const panXSlider = document.getElementById('camera-pan-x');
+        const panXValue = document.getElementById('camera-pan-x-value');
+        if (panXSlider && state.panX !== undefined) {
+            panXSlider.value = state.panX;
+            if (panXValue) panXValue.value = Math.round(state.panX);
+        }
+
+        const panYSlider = document.getElementById('camera-pan-y');
+        const panYValue = document.getElementById('camera-pan-y-value');
+        if (panYSlider && state.panY !== undefined) {
+            panYSlider.value = state.panY;
+            if (panYValue) panYValue.value = Math.round(state.panY);
+        }
+
+        // Rotation (convert spherical to Euler-like for UI)
+        const rotateXSlider = document.getElementById('camera-rotate-x');
+        const rotateXValue = document.getElementById('camera-rotate-x-value');
+        if (rotateXSlider && state.phi !== undefined) {
+            // Convert phi to X rotation (vertical)
+            const xRotation = 90 - state.phi;
+            rotateXSlider.value = xRotation;
+            if (rotateXValue) rotateXValue.value = Math.round(xRotation);
+
+            // Update tracking
+            this.cameraRotation.phi = state.phi;
+        }
+
+        const rotateYSlider = document.getElementById('camera-rotate-y');
+        const rotateYValue = document.getElementById('camera-rotate-y-value');
+        if (rotateYSlider && state.theta !== undefined) {
+            rotateYSlider.value = state.theta;
+            if (rotateYValue) rotateYValue.value = Math.round(state.theta);
+
+            // Update tracking
+            this.cameraRotation.theta = state.theta;
+        }
+    }
+
+    /**
+     * Setup camera settings controls in App Settings overlay
+     */
+    setupCameraSettings() {
+        if (!this.sceneManager.cameraController) return;
+
+        const controller = this.sceneManager.cameraController;
+
+        // Load saved settings or use defaults
+        const savedSettings = localStorage.getItem('cameraSettings');
+        const settings = savedSettings ? JSON.parse(savedSettings) : {
+            panSensitivity: 1.0,
+            rotateSensitivity: 1.0,
+            zoomSensitivity: 1.0,
+            dampingFactor: 0.05
+        };
+
+        // Apply settings to controller
+        controller.updateSettings(settings);
+
+        // Pan Sensitivity
+        const panSensitivitySlider = document.getElementById('camera-pan-sensitivity');
+        const panSensitivityValue = document.getElementById('camera-pan-sensitivity-value');
+
+        if (panSensitivitySlider && panSensitivityValue) {
+            panSensitivitySlider.value = settings.panSensitivity;
+            panSensitivityValue.value = settings.panSensitivity;
+
+            const updatePanSensitivity = (value) => {
+                controller.updateSettings({ panSensitivity: parseFloat(value) });
+            };
+
+            panSensitivitySlider.addEventListener('input', (e) => {
+                const value = e.target.value;
+                panSensitivityValue.value = value;
+                updatePanSensitivity(value);
+            });
+
+            panSensitivityValue.addEventListener('input', (e) => {
+                const value = e.target.value;
+                panSensitivitySlider.value = value;
+                updatePanSensitivity(value);
+            });
+        }
+
+        // Rotate Sensitivity
+        const rotateSensitivitySlider = document.getElementById('camera-rotate-sensitivity');
+        const rotateSensitivityValue = document.getElementById('camera-rotate-sensitivity-value');
+
+        if (rotateSensitivitySlider && rotateSensitivityValue) {
+            rotateSensitivitySlider.value = settings.rotateSensitivity;
+            rotateSensitivityValue.value = settings.rotateSensitivity;
+
+            const updateRotateSensitivity = (value) => {
+                controller.updateSettings({ rotateSensitivity: parseFloat(value) });
+            };
+
+            rotateSensitivitySlider.addEventListener('input', (e) => {
+                const value = e.target.value;
+                rotateSensitivityValue.value = value;
+                updateRotateSensitivity(value);
+            });
+
+            rotateSensitivityValue.addEventListener('input', (e) => {
+                const value = e.target.value;
+                rotateSensitivitySlider.value = value;
+                updateRotateSensitivity(value);
+            });
+        }
+
+        // Zoom Sensitivity
+        const zoomSensitivitySlider = document.getElementById('camera-zoom-sensitivity');
+        const zoomSensitivityValue = document.getElementById('camera-zoom-sensitivity-value');
+
+        if (zoomSensitivitySlider && zoomSensitivityValue) {
+            zoomSensitivitySlider.value = settings.zoomSensitivity;
+            zoomSensitivityValue.value = settings.zoomSensitivity;
+
+            const updateZoomSensitivity = (value) => {
+                controller.updateSettings({ zoomSensitivity: parseFloat(value) });
+            };
+
+            zoomSensitivitySlider.addEventListener('input', (e) => {
+                const value = e.target.value;
+                zoomSensitivityValue.value = value;
+                updateZoomSensitivity(value);
+            });
+
+            zoomSensitivityValue.addEventListener('input', (e) => {
+                const value = e.target.value;
+                zoomSensitivitySlider.value = value;
+                updateZoomSensitivity(value);
+            });
+        }
+
+        // Damping Factor
+        const dampingFactorSlider = document.getElementById('camera-damping-factor');
+        const dampingFactorValue = document.getElementById('camera-damping-factor-value');
+
+        if (dampingFactorSlider && dampingFactorValue) {
+            dampingFactorSlider.value = settings.dampingFactor;
+            dampingFactorValue.value = settings.dampingFactor;
+
+            const updateDampingFactor = (value) => {
+                controller.updateSettings({ dampingFactor: parseFloat(value) });
+            };
+
+            dampingFactorSlider.addEventListener('input', (e) => {
+                const value = e.target.value;
+                dampingFactorValue.value = value;
+                updateDampingFactor(value);
+            });
+
+            dampingFactorValue.addEventListener('input', (e) => {
+                const value = e.target.value;
+                dampingFactorSlider.value = value;
+                updateDampingFactor(value);
+            });
+        }
+
+        // Save Settings button
+        const saveSettingsBtn = document.getElementById('save-app-settings-btn');
+        if (saveSettingsBtn) {
+            saveSettingsBtn.addEventListener('click', () => {
+                // Get current settings from controller
+                const currentSettings = {
+                    panSensitivity: controller.settings.panSensitivity,
+                    rotateSensitivity: controller.settings.rotateSensitivity,
+                    zoomSensitivity: controller.settings.zoomSensitivity,
+                    dampingFactor: controller.settings.dampingFactor
+                };
+
+                // Save to localStorage
+                localStorage.setItem('cameraSettings', JSON.stringify(currentSettings));
+
+                // Show notification
+                notification.success('Camera settings saved');
             });
         }
     }
@@ -960,6 +1358,7 @@ class App {
     setupPlaybackControls() {
         const playPauseBtn = document.getElementById('play-pause-btn');
         const speedSlider = document.getElementById('speed-slider');
+        const speedValueInput = document.getElementById('speed-value-input');
 
         if (!playPauseBtn) return;
 
@@ -979,17 +1378,26 @@ class App {
             }
         });
 
-        if (speedSlider) {
+        if (speedSlider && speedValueInput) {
+            // Initialize with current speed from state
+            const initialSpeed = state.get('animationSpeed') || 1.0;
+            speedSlider.value = initialSpeed;
+            speedValueInput.value = initialSpeed.toFixed(1);
+
+            // Sync slider with number input
             speedSlider.addEventListener('input', (e) => {
                 const speed = parseFloat(e.target.value);
-                document.getElementById('speed-value').textContent = speed.toFixed(1) + 'x';
+                speedValueInput.value = speed.toFixed(1);
+                // Update global animation speed
+                state.set('animationSpeed', speed);
+            });
 
-                if (this.currentEffect && this.currentEffect.settings) {
-                    // Update animation speed if effect has this setting
-                    if ('animationSpeed' in this.currentEffect.settings) {
-                        this.currentEffect.updateSetting('animationSpeed', speed);
-                    }
-                }
+            // Sync number input with slider
+            speedValueInput.addEventListener('input', (e) => {
+                const speed = parseFloat(e.target.value);
+                speedSlider.value = speed;
+                // Update global animation speed
+                state.set('animationSpeed', speed);
             });
         }
     }
@@ -1021,23 +1429,29 @@ class App {
                 return;
             }
 
-            const swatches = appSettings.getColorSwatches();
+            // Combine default swatches (10) with recent colors (up to 5)
+            const defaultSwatches = appSettings.getColorSwatches();
+            const recentColors = appSettings.getRecentColors();
+
+            // Coloris displays swatches in rows of 5
+            // Row 1-2: Default swatches (10 colors)
+            // Row 3: Recent colors (up to 5 colors)
+            const allSwatches = [...defaultSwatches, ...recentColors];
 
             Coloris({
                 theme: 'pill',
                 themeMode: 'dark',
                 alpha: false,
                 format: 'hex',
-                swatches: swatches,
-                clearButton: {
-                    show: false
-                },
+                swatches: allSwatches,
+                clearButton: false,
                 closeButton: true,
-                closeLabel: 'Close',
+                closeLabel: 'OK',
                 selectInput: true,
                 focusInput: false
             });
-            console.log('✓ Coloris initialized with custom swatches');
+
+            console.log(`✓ Coloris initialized (${defaultSwatches.length} default + ${recentColors.length} recent)`);
         } catch (err) {
             console.warn('⚠️ Coloris initialization failed:', err);
         }
@@ -1075,27 +1489,64 @@ class App {
             const preview = document.createElement('div');
             preview.className = 'color-swatch-preview';
             preview.style.backgroundColor = color;
-            preview.title = `Click to change color ${index + 1}`;
+            preview.title = `Click to edit color ${index + 1}`;
 
             const input = document.createElement('input');
             input.type = 'text';
-            input.className = 'color-swatch-input coloris';
-            input.value = color;
-            input.dataset.coloris = '';
+            input.className = 'color-swatch-input';
+            input.value = color.toUpperCase();
             input.dataset.swatchIndex = index;
+            input.dataset.coloris = ''; // Enable Coloris on this input
+            input.placeholder = '#000000';
+            input.maxLength = 7;
 
-            // Update preview when input changes
-            input.addEventListener('change', (e) => {
-                const newColor = e.target.value;
-                if (/^#[0-9A-F]{6}$/i.test(newColor)) {
-                    preview.style.backgroundColor = newColor;
-                    appSettings.updateColorSwatch(index, newColor);
+            // Manual hex validation (for direct typing only)
+            input.addEventListener('input', (e) => {
+                let value = e.target.value.toUpperCase();
+
+                // Ensure it starts with #
+                if (!value.startsWith('#')) {
+                    value = '#' + value;
+                }
+
+                // Only allow valid hex characters
+                value = value.replace(/[^#0-9A-F]/g, '');
+
+                e.target.value = value;
+
+                // Only update preview, don't save yet
+                if (/^#[0-9A-F]{6}$/.test(value)) {
+                    preview.style.backgroundColor = value;
                 }
             });
 
-            // Click preview to open coloris
-            preview.addEventListener('click', () => {
-                input.click();
+            // Coloris change event (fires when user clicks OK or when typing is complete)
+            input.addEventListener('change', (e) => {
+                const value = e.target.value.toUpperCase();
+                if (/^#[0-9A-F]{6}$/.test(value)) {
+                    preview.style.backgroundColor = value;
+                    appSettings.updateColorSwatch(index, value);
+                    appSettings.addRecentColor(value); // Track as recent color
+                    this.showSaveColorsFeedback();
+                }
+            });
+
+            // Handle blur (when user tabs away after manual typing)
+            input.addEventListener('blur', (e) => {
+                const value = e.target.value.toUpperCase();
+                if (/^#[0-9A-F]{6}$/.test(value)) {
+                    appSettings.updateColorSwatch(index, value);
+                    appSettings.addRecentColor(value); // Track as recent color
+                    this.showSaveColorsFeedback();
+                }
+            });
+
+            // Click preview to open Coloris picker
+            preview.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // Just focus the input - Coloris will handle the rest
+                input.focus();
             });
 
             item.appendChild(preview);
@@ -1103,8 +1554,59 @@ class App {
             grid.appendChild(item);
         });
 
-        // Re-initialize Coloris for new inputs
-        setTimeout(() => this.initializeColoris(), 50);
+        // Initialize Coloris on the new inputs
+        this.initializeColorisForSwatches();
+    }
+
+    /**
+     * Show save feedback for color changes
+     */
+    showSaveColorsFeedback() {
+        const btn = document.getElementById('save-colors-btn');
+        if (!btn) return;
+
+        // Show "Saved!" feedback
+        const originalText = btn.textContent;
+        btn.textContent = 'Saved!';
+        btn.classList.add('saved');
+
+        // Reinitialize Coloris globally with new swatches
+        // This updates ALL color pickers across the app
+        this.initializeColoris();
+
+        // Revert after 2.5 seconds
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.classList.remove('saved');
+        }, 2500);
+    }
+
+    /**
+     * Initialize Coloris specifically for color swatch inputs
+     */
+    initializeColorisForSwatches() {
+        if (!window.Coloris) {
+            console.warn('⚠️ Coloris not loaded for swatches');
+            return;
+        }
+
+        // Reinitialize Coloris with current swatches
+        setTimeout(() => {
+            const swatches = appSettings.getColorSwatches();
+            Coloris({
+                el: '.color-swatch-input',
+                theme: 'pill',
+                themeMode: 'dark',
+                alpha: false,
+                format: 'hex',
+                swatches: swatches,
+                clearButton: false,
+                closeButton: true,
+                closeLabel: 'OK',
+                selectInput: true,
+                focusInput: true
+            });
+        }, 100);
     }
 
     /**
