@@ -300,6 +300,21 @@ export class GlitchEffect extends EffectBase {
         }
     }
 
+    /**
+     * Get visual center of glitch effect
+     * Used by CameraController for rotation pivot
+     */
+    getVisualCenter() {
+        // Glitch effect uses mesh geometry
+        if (this.mesh) {
+            const box = new THREE.Box3().setFromObject(this.mesh);
+            if (!box.isEmpty()) {
+                return box.getCenter(new THREE.Vector3());
+            }
+        }
+        return new THREE.Vector3(0, 0, 0);
+    }
+
     resize(width, height) {
         if (this.composer) {
             this.composer.setSize(width, height);

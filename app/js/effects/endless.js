@@ -191,6 +191,21 @@ export class EndlessEffect extends EffectBase {
         }
     }
 
+    /**
+     * Get visual center of endless tunnel effect
+     * Used by CameraController for rotation pivot
+     */
+    getVisualCenter() {
+        // Endless effect uses a tunnel, so mesh provides good bounding box
+        if (this.mesh) {
+            const box = new THREE.Box3().setFromObject(this.mesh);
+            if (!box.isEmpty()) {
+                return box.getCenter(new THREE.Vector3());
+            }
+        }
+        return new THREE.Vector3(0, 0, 0);
+    }
+
     resize(width, height) {
         // No special resize handling needed
     }

@@ -471,6 +471,36 @@ export class ParticlesEffect extends EffectBase {
         }
     }
 
+    /**
+     * Get visual center of particle system
+     * Used by CameraController for rotation pivot
+     */
+    getVisualCenter() {
+        if (!this.originalPositions || this.originalPositions.length === 0) {
+            return new THREE.Vector3(0, 0, 0);
+        }
+
+        // Calculate bounding box from original particle positions
+        const min = new THREE.Vector3(Infinity, Infinity, Infinity);
+        const max = new THREE.Vector3(-Infinity, -Infinity, -Infinity);
+
+        this.originalPositions.forEach(pos => {
+            min.x = Math.min(min.x, pos.x);
+            min.y = Math.min(min.y, pos.y);
+            min.z = Math.min(min.z, pos.z);
+            max.x = Math.max(max.x, pos.x);
+            max.y = Math.max(max.y, pos.y);
+            max.z = Math.max(max.z, pos.z);
+        });
+
+        // Return center of bounding box
+        return new THREE.Vector3(
+            (min.x + max.x) / 2,
+            (min.y + max.y) / 2,
+            (min.z + max.z) / 2
+        );
+    }
+
     resize(width, height) {
         // No special handling needed
     }
