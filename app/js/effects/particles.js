@@ -412,7 +412,12 @@ export class ParticlesEffect extends EffectBase {
     }
 
     update(deltaTime, elapsedTime) {
-        if (!this.mesh || !this.geometry) return;
+        console.log('>>> update() called, deltaTime=' + deltaTime.toFixed(2) + ', elapsedTime=' + elapsedTime.toFixed(2));
+
+        if (!this.mesh || !this.geometry) {
+            console.error('>>> update() early return: mesh=' + !!this.mesh + ', geometry=' + !!this.geometry);
+            return;
+        }
 
         const time = elapsedTime * 0.001;  // Convert to seconds
         const dt = deltaTime * 0.001;
