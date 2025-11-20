@@ -51,9 +51,12 @@ export class CameraController {
         this.controls.enablePan = true;
         this.controls.enableRotate = true;
 
+        // CRITICAL: Enable screen space panning for proper vertical pan
+        this.controls.screenSpacePanning = true;
+
         // Mouse button mapping
         this.controls.mouseButtons = {
-            LEFT: THREE.MOUSE.PAN,      // LMB = Camera Pan
+            LEFT: THREE.MOUSE.PAN,      // LMB = Camera Pan (both horizontal AND vertical)
             MIDDLE: THREE.MOUSE.DOLLY,  // MMB = Zoom
             RIGHT: THREE.MOUSE.ROTATE   // RMB = Orbit around target
         };
