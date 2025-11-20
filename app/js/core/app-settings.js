@@ -20,7 +20,8 @@ class AppSettings {
                 '#3b82f6', // Blue
                 '#ef4444', // Red
                 '#8b5cf6'  // Violet (10th color)
-            ]
+            ],
+            recentColors: [] // Recently used colors (max 5)
         };
 
         this.settings = { ...this.defaults };
@@ -71,6 +72,46 @@ class AppSettings {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Add a color to recent colors (max 5, most recent first)
+     */
+    addRecentColor(color) {
+        if (!color || !/^#[0-9A-F]{6}$/i.test(color)) {
+            return false;
+        }
+
+        const colorUpper = color.toUpperCase();
+
+        // Initialize recentColors if it doesn't exist
+        if (!this.settings.recentColors) {
+            this.settings.recentColors = [];
+        }
+
+        // Remove if already exists (to move to front)
+        const index = this.settings.recentColors.indexOf(colorUpper);
+        if (index > -1) {
+            this.settings.recentColors.splice(index, 1);
+        }
+
+        // Add to front
+        this.settings.recentColors.unshift(colorUpper);
+
+        // Keep only 5 most recent
+        if (this.settings.recentColors.length > 5) {
+            this.settings.recentColors = this.settings.recentColors.slice(0, 5);
+        }
+
+        this.save();
+        return true;
+    }
+
+    /**
+     * Get recent colors
+     */
+    getRecentColors() {
+        return this.settings.recentColors ? [...this.settings.recentColors] : [];
     }
 
     /**

@@ -630,6 +630,13 @@ class App {
             const color = e.target.value;
             updatePreview(color);
             onChange(color);
+
+            // Track recently used colors
+            if (/^#[0-9A-F]{6}$/i.test(color)) {
+                appSettings.addRecentColor(color);
+                // Reinitialize Coloris with updated recent colors
+                this.initializeColoris();
+            }
         });
 
         // Manual text input (for typing HEX values)
@@ -638,6 +645,11 @@ class App {
             if (/^#[0-9A-F]{6}$/i.test(color)) {
                 updatePreview(color);
                 onChange(color);
+
+                // Track recently used colors
+                appSettings.addRecentColor(color);
+                // Reinitialize Coloris with updated recent colors
+                this.initializeColoris();
             }
         });
 
@@ -1071,21 +1083,29 @@ class App {
                 return;
             }
 
-            const swatches = appSettings.getColorSwatches();
+            // Combine default swatches (10) with recent colors (up to 5)
+            const defaultSwatches = appSettings.getColorSwatches();
+            const recentColors = appSettings.getRecentColors();
+
+            // Coloris displays swatches in rows of 5
+            // Row 1-2: Default swatches (10 colors)
+            // Row 3: Recent colors (up to 5 colors)
+            const allSwatches = [...defaultSwatches, ...recentColors];
 
             Coloris({
                 theme: 'pill',
                 themeMode: 'dark',
                 alpha: false,
                 format: 'hex',
-                swatches: swatches,
+                swatches: allSwatches,
                 clearButton: false,
                 closeButton: true,
                 closeLabel: 'OK',
                 selectInput: true,
                 focusInput: false
             });
-            console.log('✓ Coloris initialized with custom swatches');
+
+            console.log(`✓ Coloris initialized (${defaultSwatches.length} default + ${recentColors.length} recent)`);
         } catch (err) {
             console.warn('⚠️ Coloris initialization failed:', err);
         }
@@ -1160,6 +1180,7 @@ class App {
                 if (/^#[0-9A-F]{6}$/.test(value)) {
                     preview.style.backgroundColor = value;
                     appSettings.updateColorSwatch(index, value);
+                    appSettings.addRecentColor(value); // Track as recent color
                     this.showSaveColorsFeedback();
                 }
             });
@@ -1169,6 +1190,7 @@ class App {
                 const value = e.target.value.toUpperCase();
                 if (/^#[0-9A-F]{6}$/.test(value)) {
                     appSettings.updateColorSwatch(index, value);
+                    appSettings.addRecentColor(value); // Track as recent color
                     this.showSaveColorsFeedback();
                 }
             });
