@@ -400,17 +400,24 @@ class App {
             'animation': 'Animation'
         };
 
-        // Organize settings by group
+        // Organize settings by group, but separate colors
+        const colorKeys = [];
         Object.entries(schema).forEach(([key, config]) => {
-            const groupKey = config.group || 'effect'; // Default to 'effect' if no group
-            if (!groupedSettings[groupKey]) {
-                groupedSettings[groupKey] = [];
+            if (config.type === 'color') {
+                // Collect color settings separately for bottom panel
+                colorKeys.push(key);
+            } else {
+                const groupKey = config.group || 'effect'; // Default to 'effect' if no group
+                if (!groupedSettings[groupKey]) {
+                    groupedSettings[groupKey] = [];
+                }
+                groupedSettings[groupKey].push(key);
             }
-            groupedSettings[groupKey].push(key);
         });
 
-        // Render groups in order
+        // Render non-color groups in left sidebar (exclude 'colors' group)
         groupOrder.forEach(groupKey => {
+            if (groupKey === 'colors') return; // Skip colors, they go in bottom panel
             if (groupedSettings[groupKey] && groupedSettings[groupKey].length > 0) {
                 const groupName = groupTitles[groupKey] || groupKey.charAt(0).toUpperCase() + groupKey.slice(1);
                 const group = this.createControlGroup(groupName, groupedSettings[groupKey], schema, settings, effect);
@@ -422,6 +429,64 @@ class App {
         });
 
         console.log('✓ Settings panel updated, total groups:', settingsContent.children.length);
+
+        // Update colors panel at the bottom
+        this.updateColorsPanel(colorKeys, schema, settings, effect);
+    }
+
+    /**
+     * Update colors panel (bottom panel between sidebars)
+     */
+    updateColorsPanel(colorKeys, schema, settings, effect) {
+        const colorsContainer = document.getElementById('colors-controls-container');
+        if (!colorsContainer) {
+            console.error('❌ Colors controls container not found!');
+            return;
+        }
+
+        colorsContainer.innerHTML = '';
+
+        if (colorKeys.length === 0) {
+            colorsContainer.innerHTML = '<p style="color: var(--text-3); text-align: center; padding: var(--space-md);">No color controls available for this effect</p>';
+            return;
+        }
+
+        // Display all color controls in a row
+        const colorsRow = document.createElement('div');
+        colorsRow.style.display = 'flex';
+        colorsRow.style.gap = 'var(--space-xl)';
+        colorsRow.style.flexWrap = 'wrap';
+        colorsRow.style.alignItems = 'center';
+
+        colorKeys.forEach(key => {
+            const config = schema[key];
+            const value = settings[key];
+
+            const colorControl = document.createElement('div');
+            colorControl.style.display = 'flex';
+            colorControl.style.alignItems = 'center';
+            colorControl.style.gap = 'var(--space-sm)';
+
+            const label = document.createElement('label');
+            label.textContent = config.label;
+            label.style.color = 'var(--text-2)';
+            label.style.fontSize = '13px';
+            label.style.fontWeight = '500';
+            label.style.minWidth = '100px';
+
+            const input = this.createColorInput(value, (newValue) => {
+                effect.updateSetting(key, newValue);
+                state.set('currentSettings', effect.settings);
+            });
+
+            colorControl.appendChild(label);
+            colorControl.appendChild(input);
+            colorsRow.appendChild(colorControl);
+        });
+
+        colorsContainer.appendChild(colorsRow);
+
+        console.log(`✓ Colors panel updated with ${colorKeys.length} color controls`);
     }
 
     /**
@@ -932,50 +997,100 @@ class App {
         const rotateZSlider = document.getElementById('camera-rotate-z');
         const resetBtn = document.getElementById('camera-reset-btn');
 
+        const zoomValue = document.getElementById('camera-zoom-value');
+        const panXValue = document.getElementById('camera-pan-x-value');
+        const panYValue = document.getElementById('camera-pan-y-value');
+        const rotateXValue = document.getElementById('camera-rotate-x-value');
+        const rotateYValue = document.getElementById('camera-rotate-y-value');
+        const rotateZValue = document.getElementById('camera-rotate-z-value');
+
         if (!zoomSlider || !this.sceneManager.controls) return;
 
-        // Zoom
+        // Zoom - slider to input
         zoomSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
             this.sceneManager.camera.position.z = value;
-            document.getElementById('camera-zoom-value').textContent = value;
+            if (zoomValue) zoomValue.value = value;
         });
 
-        // Pan X
+        // Zoom - input to slider
+        if (zoomValue) {
+            zoomValue.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                this.sceneManager.camera.position.z = value;
+                zoomSlider.value = value;
+            });
+        }
+
+        // Pan X - slider to input
         panXSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
             this.sceneManager.controls.target.x = value;
-            document.getElementById('camera-pan-x-value').textContent = value;
+            if (panXValue) panXValue.value = value;
         });
+        if (panXValue) {
+            panXValue.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                this.sceneManager.controls.target.x = value;
+                panXSlider.value = value;
+            });
+        }
 
-        // Pan Y
+        // Pan Y - slider to input
         panYSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
             this.sceneManager.controls.target.y = value;
-            document.getElementById('camera-pan-y-value').textContent = value;
+            if (panYValue) panYValue.value = value;
         });
+        if (panYValue) {
+            panYValue.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                this.sceneManager.controls.target.y = value;
+                panYSlider.value = value;
+            });
+        }
 
-        // Rotate X
+        // Rotate X - slider to input
         rotateXSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
             const radians = (value * Math.PI) / 180;
             if (this.currentEffect && this.currentEffect.mesh) {
                 this.currentEffect.mesh.rotation.x = radians;
             }
-            document.getElementById('camera-rotate-x-value').textContent = value + '°';
+            if (rotateXValue) rotateXValue.value = value;
         });
+        if (rotateXValue) {
+            rotateXValue.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                const radians = (value * Math.PI) / 180;
+                if (this.currentEffect && this.currentEffect.mesh) {
+                    this.currentEffect.mesh.rotation.x = radians;
+                }
+                rotateXSlider.value = value;
+            });
+        }
 
-        // Rotate Y
+        // Rotate Y - slider to input
         rotateYSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
             const radians = (value * Math.PI) / 180;
             if (this.currentEffect && this.currentEffect.mesh) {
                 this.currentEffect.mesh.rotation.y = radians;
             }
-            document.getElementById('camera-rotate-y-value').textContent = value + '°';
+            if (rotateYValue) rotateYValue.value = value;
         });
+        if (rotateYValue) {
+            rotateYValue.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                const radians = (value * Math.PI) / 180;
+                if (this.currentEffect && this.currentEffect.mesh) {
+                    this.currentEffect.mesh.rotation.y = radians;
+                }
+                rotateYSlider.value = value;
+            });
+        }
 
-        // Rotate Z
+        // Rotate Z - slider to input
         if (rotateZSlider) {
             rotateZSlider.addEventListener('input', (e) => {
                 const value = parseFloat(e.target.value);
@@ -983,7 +1098,17 @@ class App {
                 if (this.currentEffect && this.currentEffect.mesh) {
                     this.currentEffect.mesh.rotation.z = radians;
                 }
-                document.getElementById('camera-rotate-z-value').textContent = value + '°';
+                if (rotateZValue) rotateZValue.value = value;
+            });
+        }
+        if (rotateZValue) {
+            rotateZValue.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                const radians = (value * Math.PI) / 180;
+                if (this.currentEffect && this.currentEffect.mesh) {
+                    this.currentEffect.mesh.rotation.z = radians;
+                }
+                if (rotateZSlider) rotateZSlider.value = value;
             });
         }
 
@@ -1004,12 +1129,12 @@ class App {
                 rotateYSlider.value = 0;
                 if (rotateZSlider) rotateZSlider.value = 0;
 
-                document.getElementById('camera-zoom-value').textContent = '50';
-                document.getElementById('camera-pan-x-value').textContent = '0';
-                document.getElementById('camera-pan-y-value').textContent = '0';
-                document.getElementById('camera-rotate-x-value').textContent = '0°';
-                document.getElementById('camera-rotate-y-value').textContent = '0°';
-                if (rotateZSlider) document.getElementById('camera-rotate-z-value').textContent = '0°';
+                if (zoomValue) zoomValue.value = 50;
+                if (panXValue) panXValue.value = 0;
+                if (panYValue) panYValue.value = 0;
+                if (rotateXValue) rotateXValue.value = 0;
+                if (rotateYValue) rotateYValue.value = 0;
+                if (rotateZValue) rotateZValue.value = 0;
 
                 notification.success('Camera reset');
             });
@@ -1022,6 +1147,7 @@ class App {
     setupPlaybackControls() {
         const playPauseBtn = document.getElementById('play-pause-btn');
         const speedSlider = document.getElementById('speed-slider');
+        const speedValueInput = document.getElementById('speed-value-input');
 
         if (!playPauseBtn) return;
 
@@ -1041,10 +1167,24 @@ class App {
             }
         });
 
-        if (speedSlider) {
+        if (speedSlider && speedValueInput) {
+            // Sync slider with number input
             speedSlider.addEventListener('input', (e) => {
                 const speed = parseFloat(e.target.value);
-                document.getElementById('speed-value').textContent = speed.toFixed(1) + 'x';
+                speedValueInput.value = speed.toFixed(1);
+
+                if (this.currentEffect && this.currentEffect.settings) {
+                    // Update animation speed if effect has this setting
+                    if ('animationSpeed' in this.currentEffect.settings) {
+                        this.currentEffect.updateSetting('animationSpeed', speed);
+                    }
+                }
+            });
+
+            // Sync number input with slider
+            speedValueInput.addEventListener('input', (e) => {
+                const speed = parseFloat(e.target.value);
+                speedSlider.value = speed;
 
                 if (this.currentEffect && this.currentEffect.settings) {
                     // Update animation speed if effect has this setting
