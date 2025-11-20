@@ -36,7 +36,7 @@ export class ParticlesEffect extends EffectBase {
             },
             particleSize: {
                 type: 'number',
-                default: 2.5,
+                default: 10.0,
                 min: 0.1,
                 max: 10.0,
                 step: 0.1,
