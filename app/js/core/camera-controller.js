@@ -63,7 +63,8 @@ export class CameraController {
         this.controls.maxDistance = this.settings.maxDistance;
 
         // Set pan speed (OrbitControls uses panSpeed property)
-        this.controls.panSpeed = this.settings.panSensitivity;
+        // Increase default pan speed for more responsive feel
+        this.controls.panSpeed = this.settings.panSensitivity * 3.0;
         this.controls.rotateSpeed = this.settings.rotateSensitivity;
         this.controls.zoomSpeed = this.settings.zoomSensitivity;
 
@@ -127,8 +128,21 @@ export class CameraController {
     onControlsChange() {
         if (this.isProgrammaticUpdate) return;
 
-        // Don't sync on every frame (performance)
-        // Sync happens on 'end' event instead
+        // Real-time sync during pan for more direct feel
+        // Throttle to every 3rd frame for performance
+        if (!this._changeFrameCount) this._changeFrameCount = 0;
+        this._changeFrameCount++;
+
+        if (this._changeFrameCount % 3 === 0) {
+            const state = this.getState();
+            this.syncCallbacks.forEach(callback => {
+                try {
+                    callback(state);
+                } catch (err) {
+                    console.error('Error in sync callback:', err);
+                }
+            });
+        }
     }
 
     /**
@@ -302,7 +316,7 @@ export class CameraController {
             this.controls.dampingFactor = this.settings.dampingFactor;
             this.controls.minDistance = this.settings.minDistance;
             this.controls.maxDistance = this.settings.maxDistance;
-            this.controls.panSpeed = this.settings.panSensitivity;
+            this.controls.panSpeed = this.settings.panSensitivity * 3.0;  // Apply 3x multiplier
             this.controls.rotateSpeed = this.settings.rotateSensitivity;
             this.controls.zoomSpeed = this.settings.zoomSensitivity;
         }

@@ -1006,7 +1006,6 @@ class App {
         const panYSlider = document.getElementById('camera-pan-y');
         const rotateXSlider = document.getElementById('camera-rotate-x');
         const rotateYSlider = document.getElementById('camera-rotate-y');
-        const rotateZSlider = document.getElementById('camera-rotate-z');
         const resetBtn = document.getElementById('camera-reset-btn');
 
         const zoomValue = document.getElementById('camera-zoom-value');
@@ -1014,7 +1013,6 @@ class App {
         const panYValue = document.getElementById('camera-pan-y-value');
         const rotateXValue = document.getElementById('camera-rotate-x-value');
         const rotateYValue = document.getElementById('camera-rotate-y-value');
-        const rotateZValue = document.getElementById('camera-rotate-z-value');
 
         if (!zoomSlider || !this.sceneManager.cameraController) return;
 
@@ -1120,22 +1118,6 @@ class App {
             });
         }
 
-        // Rotate Z - Currently not mapped (orbit doesn't have roll)
-        // Keep UI for consistency but log warning
-        if (rotateZSlider) {
-            rotateZSlider.addEventListener('input', (e) => {
-                const value = parseFloat(e.target.value);
-                if (rotateZValue) rotateZValue.value = value;
-                // Note: Z rotation (roll) not applicable to orbit camera
-            });
-        }
-        if (rotateZValue) {
-            rotateZValue.addEventListener('input', (e) => {
-                const value = parseFloat(e.target.value);
-                if (rotateZSlider) rotateZSlider.value = value;
-            });
-        }
-
         // Reset camera
         if (resetBtn) {
             resetBtn.addEventListener('click', () => {
@@ -1150,14 +1132,12 @@ class App {
                 panYSlider.value = 0;
                 rotateXSlider.value = 0;
                 rotateYSlider.value = 0;
-                if (rotateZSlider) rotateZSlider.value = 0;
 
                 if (zoomValue) zoomValue.value = 50;
                 if (panXValue) panXValue.value = 0;
                 if (panYValue) panYValue.value = 0;
                 if (rotateXValue) rotateXValue.value = 0;
                 if (rotateYValue) rotateYValue.value = 0;
-                if (rotateZValue) rotateZValue.value = 0;
 
                 notification.success('Camera reset');
             });
