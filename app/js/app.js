@@ -217,11 +217,14 @@ class App {
         // Update preset selector with saved presets
         this.updatePresetSelector();
 
-        // Camera controls
+        // Camera controls (must be after scene is initialized)
         this.setupCameraControls();
 
         // Playback controls
         this.setupPlaybackControls();
+
+        // Setup bidirectional camera sync (Mouse → Sidebar)
+        this.setupCameraSync();
 
         // Settings button
         document.getElementById('settings-btn').addEventListener('click', () => {
@@ -986,7 +989,7 @@ class App {
     }
 
     /**
-     * Setup camera controls
+     * Setup camera controls (Sidebar → Camera)
      */
     setupCameraControls() {
         const zoomSlider = document.getElementById('camera-zoom');
@@ -1004,110 +1007,122 @@ class App {
         const rotateYValue = document.getElementById('camera-rotate-y-value');
         const rotateZValue = document.getElementById('camera-rotate-z-value');
 
-        if (!zoomSlider || !this.sceneManager.controls) return;
+        if (!zoomSlider || !this.sceneManager.cameraController) return;
 
-        // Zoom - slider to input
+        const controller = this.sceneManager.cameraController;
+
+        // Track current rotation state (in degrees)
+        this.cameraRotation = { theta: 0, phi: 90 }; // Start at equator
+
+        // Zoom - slider/input to camera
+        const updateZoom = (value) => {
+            controller.setState({ zoom: value });
+        };
+
         zoomSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
-            this.sceneManager.camera.position.z = value;
             if (zoomValue) zoomValue.value = value;
+            updateZoom(value);
         });
 
-        // Zoom - input to slider
         if (zoomValue) {
             zoomValue.addEventListener('input', (e) => {
                 const value = parseFloat(e.target.value);
-                this.sceneManager.camera.position.z = value;
                 zoomSlider.value = value;
+                updateZoom(value);
             });
         }
 
-        // Pan X - slider to input
+        // Pan X - slider/input to camera
+        const updatePanX = (value) => {
+            controller.setState({ panX: value });
+        };
+
         panXSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
-            this.sceneManager.controls.target.x = value;
             if (panXValue) panXValue.value = value;
+            updatePanX(value);
         });
+
         if (panXValue) {
             panXValue.addEventListener('input', (e) => {
                 const value = parseFloat(e.target.value);
-                this.sceneManager.controls.target.x = value;
                 panXSlider.value = value;
+                updatePanX(value);
             });
         }
 
-        // Pan Y - slider to input
+        // Pan Y - slider/input to camera
+        const updatePanY = (value) => {
+            controller.setState({ panY: value });
+        };
+
         panYSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
-            this.sceneManager.controls.target.y = value;
             if (panYValue) panYValue.value = value;
+            updatePanY(value);
         });
+
         if (panYValue) {
             panYValue.addEventListener('input', (e) => {
                 const value = parseFloat(e.target.value);
-                this.sceneManager.controls.target.y = value;
                 panYSlider.value = value;
+                updatePanY(value);
             });
         }
 
-        // Rotate X - slider to input
+        // Rotate X (Phi - vertical angle)
+        const updateRotateX = (value) => {
+            this.cameraRotation.phi = 90 - value; // Convert X rotation to phi
+            controller.setOrbitRotation(this.cameraRotation.theta, this.cameraRotation.phi);
+        };
+
         rotateXSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
-            const radians = (value * Math.PI) / 180;
-            if (this.currentEffect && this.currentEffect.mesh) {
-                this.currentEffect.mesh.rotation.x = radians;
-            }
             if (rotateXValue) rotateXValue.value = value;
+            updateRotateX(value);
         });
+
         if (rotateXValue) {
             rotateXValue.addEventListener('input', (e) => {
                 const value = parseFloat(e.target.value);
-                const radians = (value * Math.PI) / 180;
-                if (this.currentEffect && this.currentEffect.mesh) {
-                    this.currentEffect.mesh.rotation.x = radians;
-                }
                 rotateXSlider.value = value;
+                updateRotateX(value);
             });
         }
 
-        // Rotate Y - slider to input
+        // Rotate Y (Theta - horizontal angle)
+        const updateRotateY = (value) => {
+            this.cameraRotation.theta = value;
+            controller.setOrbitRotation(this.cameraRotation.theta, this.cameraRotation.phi);
+        };
+
         rotateYSlider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
-            const radians = (value * Math.PI) / 180;
-            if (this.currentEffect && this.currentEffect.mesh) {
-                this.currentEffect.mesh.rotation.y = radians;
-            }
             if (rotateYValue) rotateYValue.value = value;
+            updateRotateY(value);
         });
+
         if (rotateYValue) {
             rotateYValue.addEventListener('input', (e) => {
                 const value = parseFloat(e.target.value);
-                const radians = (value * Math.PI) / 180;
-                if (this.currentEffect && this.currentEffect.mesh) {
-                    this.currentEffect.mesh.rotation.y = radians;
-                }
                 rotateYSlider.value = value;
+                updateRotateY(value);
             });
         }
 
-        // Rotate Z - slider to input
+        // Rotate Z - Currently not mapped (orbit doesn't have roll)
+        // Keep UI for consistency but log warning
         if (rotateZSlider) {
             rotateZSlider.addEventListener('input', (e) => {
                 const value = parseFloat(e.target.value);
-                const radians = (value * Math.PI) / 180;
-                if (this.currentEffect && this.currentEffect.mesh) {
-                    this.currentEffect.mesh.rotation.z = radians;
-                }
                 if (rotateZValue) rotateZValue.value = value;
+                // Note: Z rotation (roll) not applicable to orbit camera
             });
         }
         if (rotateZValue) {
             rotateZValue.addEventListener('input', (e) => {
                 const value = parseFloat(e.target.value);
-                const radians = (value * Math.PI) / 180;
-                if (this.currentEffect && this.currentEffect.mesh) {
-                    this.currentEffect.mesh.rotation.z = radians;
-                }
                 if (rotateZSlider) rotateZSlider.value = value;
             });
         }
@@ -1115,13 +1130,12 @@ class App {
         // Reset camera
         if (resetBtn) {
             resetBtn.addEventListener('click', () => {
-                this.sceneManager.camera.position.set(0, 0, 50);
-                this.sceneManager.controls.target.set(0, 0, 0);
+                controller.reset();
 
-                if (this.currentEffect && this.currentEffect.mesh) {
-                    this.currentEffect.mesh.rotation.set(0, 0, 0);
-                }
+                // Reset rotation tracking
+                this.cameraRotation = { theta: 0, phi: 90 };
 
+                // Update UI
                 zoomSlider.value = 50;
                 panXSlider.value = 0;
                 panYSlider.value = 0;
@@ -1138,6 +1152,73 @@ class App {
 
                 notification.success('Camera reset');
             });
+        }
+    }
+
+    /**
+     * Setup bidirectional camera sync (Mouse → Sidebar)
+     */
+    setupCameraSync() {
+        if (!this.sceneManager.cameraController) return;
+
+        const controller = this.sceneManager.cameraController;
+
+        // Register sync callback
+        controller.onSync((state) => {
+            // Update sidebar values when mouse interaction ends
+            this.updateCameraSidebarValues(state);
+        });
+    }
+
+    /**
+     * Update sidebar camera values from camera state
+     * @param {Object} state - Camera state from CameraController
+     */
+    updateCameraSidebarValues(state) {
+        // Zoom
+        const zoomSlider = document.getElementById('camera-zoom');
+        const zoomValue = document.getElementById('camera-zoom-value');
+        if (zoomSlider && state.zoom !== undefined) {
+            zoomSlider.value = state.zoom;
+            if (zoomValue) zoomValue.value = Math.round(state.zoom);
+        }
+
+        // Pan
+        const panXSlider = document.getElementById('camera-pan-x');
+        const panXValue = document.getElementById('camera-pan-x-value');
+        if (panXSlider && state.panX !== undefined) {
+            panXSlider.value = state.panX;
+            if (panXValue) panXValue.value = Math.round(state.panX);
+        }
+
+        const panYSlider = document.getElementById('camera-pan-y');
+        const panYValue = document.getElementById('camera-pan-y-value');
+        if (panYSlider && state.panY !== undefined) {
+            panYSlider.value = state.panY;
+            if (panYValue) panYValue.value = Math.round(state.panY);
+        }
+
+        // Rotation (convert spherical to Euler-like for UI)
+        const rotateXSlider = document.getElementById('camera-rotate-x');
+        const rotateXValue = document.getElementById('camera-rotate-x-value');
+        if (rotateXSlider && state.phi !== undefined) {
+            // Convert phi to X rotation (vertical)
+            const xRotation = 90 - state.phi;
+            rotateXSlider.value = xRotation;
+            if (rotateXValue) rotateXValue.value = Math.round(xRotation);
+
+            // Update tracking
+            this.cameraRotation.phi = state.phi;
+        }
+
+        const rotateYSlider = document.getElementById('camera-rotate-y');
+        const rotateYValue = document.getElementById('camera-rotate-y-value');
+        if (rotateYSlider && state.theta !== undefined) {
+            rotateYSlider.value = state.theta;
+            if (rotateYValue) rotateYValue.value = Math.round(state.theta);
+
+            // Update tracking
+            this.cameraRotation.theta = state.theta;
         }
     }
 

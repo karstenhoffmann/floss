@@ -3,6 +3,8 @@
  * Sets up and manages the Three.js scene
  */
 
+import CameraController from './camera-controller.js';
+
 export class SceneManager {
     constructor(container) {
         this.container = container;
@@ -11,6 +13,7 @@ export class SceneManager {
         this.scene = null;
         this.clock = null;
         this.activeEffect = null;
+        this.cameraController = null;
 
         this.init();
     }
@@ -43,28 +46,20 @@ export class SceneManager {
         // Add canvas to DOM
         this.container.appendChild(this.renderer.domElement);
 
-        // OrbitControls for camera interaction
-        if (typeof THREE.OrbitControls !== 'undefined') {
-            this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-            this.controls.enableDamping = true;
-            this.controls.dampingFactor = 0.05;
-            this.controls.enableZoom = true;
-            this.controls.enablePan = true;
-            this.controls.enableRotate = true;
-            this.controls.mouseButtons = {
-                LEFT: THREE.MOUSE.PAN,
-                MIDDLE: THREE.MOUSE.DOLLY,
-                RIGHT: THREE.MOUSE.ROTATE
-            };
-        } else {
-            console.warn('OrbitControls not available');
-            this.controls = null;
-        }
+        // Enhanced Camera Controller (replaces direct OrbitControls)
+        this.cameraController = new CameraController(
+            this.camera,
+            this.renderer.domElement,
+            this
+        );
+
+        // Expose controls for backward compatibility
+        this.controls = this.cameraController.controls;
 
         // Event listeners
         window.addEventListener('resize', this.resize.bind(this));
 
-        console.log('✓ Three.js scene initialized');
+        console.log('✓ Three.js scene initialized with enhanced camera controller');
     }
 
     /**
@@ -84,6 +79,11 @@ export class SceneManager {
 
         if (this.activeEffect) {
             this.activeEffect.init(this.scene, this.camera, this.renderer);
+
+            // Update camera pivot to visual center of new effect
+            if (this.cameraController) {
+                this.cameraController.updatePivot();
+            }
         }
     }
 
@@ -94,9 +94,9 @@ export class SceneManager {
         const deltaTime = this.clock.getDelta();
         const elapsedTime = this.clock.getElapsedTime();
 
-        // Update controls
-        if (this.controls) {
-            this.controls.update();
+        // Update camera controller
+        if (this.cameraController) {
+            this.cameraController.update();
         }
 
         if (this.activeEffect) {
