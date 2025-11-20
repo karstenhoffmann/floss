@@ -5,6 +5,7 @@
 
 import Gl from './gl/index.js';
 import Type from './gl/Type.js';
+import ParticleEffect from './gl/ParticleEffect.js';
 import options from './options.js';
 import ui from './ui.js';
 
@@ -13,7 +14,7 @@ class App {
     this.prev = 0;
     this.current = 0;
     this.turn = 0;
-    this.types = []; // Store references to Type instances
+    this.types = []; // Store references to Type/ParticleEffect instances
 
     this.init();
   }
@@ -37,10 +38,17 @@ class App {
       let z = radius * Math.sin(angle);
       options[i].position.mesh = [x, 0, z];
 
-      // Create kinetic type
-      let type = new Type();
-      type.init(options[i]);
-      this.types.push(type);
+      // Create kinetic type or particle effect
+      let effect;
+      if (options[i].useParticles) {
+        effect = new ParticleEffect();
+        effect.init(options[i]);
+        Gl.scene.add(effect);
+      } else {
+        effect = new Type();
+        effect.init(options[i]);
+      }
+      this.types.push(effect);
     }
   }
 
@@ -55,10 +63,59 @@ class App {
       this.reset();
     });
 
+    // Listen to stop from UI
+    window.addEventListener('stop', () => {
+      this.stop();
+    });
+
+    // Listen to restart from UI
+    window.addEventListener('restart', () => {
+      this.restart();
+    });
+
+    // Listen to playback toggle from UI
+    window.addEventListener('playbackToggle', (e) => {
+      this.togglePlayback(e.detail.isPlaying);
+    });
+
     // Listen to speed change from UI
     window.addEventListener('speedChange', (e) => {
       // TODO: Implement time scaling
       console.log('Speed changed to:', e.detail.speed);
+    });
+  }
+
+  togglePlayback(isPlaying) {
+    // Toggle play/pause for all effects
+    this.types.forEach(effect => {
+      if (effect.play && effect.pause) {
+        if (isPlaying) {
+          effect.play();
+        } else {
+          effect.pause();
+        }
+      }
+    });
+  }
+
+  stop() {
+    // Stop all effects
+    this.types.forEach(effect => {
+      if (effect.stop) {
+        effect.stop();
+      }
+    });
+  }
+
+  restart() {
+    // Restart all effects
+    this.types.forEach(effect => {
+      if (effect.restart) {
+        effect.restart();
+      } else if (effect.stop && effect.play) {
+        effect.stop();
+        effect.play();
+      }
     });
   }
 

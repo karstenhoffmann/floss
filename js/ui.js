@@ -29,6 +29,7 @@ class UIManager {
       playBtn: document.getElementById('playBtn'),
       playIcon: document.getElementById('playIcon'),
       pauseIcon: document.getElementById('pauseIcon'),
+      stopBtn: document.getElementById('stopBtn'),
       resetBtn: document.getElementById('resetBtn'),
       exportBtn: document.getElementById('exportBtn'),
       speedSlider: document.getElementById('speedSlider'),
@@ -45,7 +46,8 @@ class UIManager {
       { name: 'Endless', index: 0 },
       { name: 'Swirl', index: 1 },
       { name: 'Twisted', index: 2 },
-      { name: 'Relax', index: 3 }
+      { name: 'Relax', index: 3 },
+      { name: 'Smoke', index: 4 }
     ];
 
     this.init();
@@ -78,7 +80,8 @@ class UIManager {
 
     // Playback Controls
     this.elements.playBtn?.addEventListener('click', () => this.togglePlayPause());
-    this.elements.resetBtn?.addEventListener('click', () => this.reset());
+    this.elements.stopBtn?.addEventListener('click', () => this.stop());
+    this.elements.resetBtn?.addEventListener('click', () => this.restart());
     this.elements.exportBtn?.addEventListener('click', () => this.export());
     this.elements.speedSlider?.addEventListener('input', (e) => this.updateSpeed(e.target.value));
 
@@ -178,6 +181,20 @@ class UIManager {
       this.elements.playIcon.hidden = false;
       this.elements.pauseIcon.hidden = true;
     }
+  }
+
+  stop() {
+    console.log('Stop triggered');
+    this.state.isPlaying = false;
+    this.updatePlayPauseIcon();
+    window.dispatchEvent(new CustomEvent('stop'));
+  }
+
+  restart() {
+    console.log('Restart triggered');
+    this.state.isPlaying = true;
+    this.updatePlayPauseIcon();
+    window.dispatchEvent(new CustomEvent('restart'));
   }
 
   reset() {

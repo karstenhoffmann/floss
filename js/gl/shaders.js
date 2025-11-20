@@ -185,6 +185,30 @@ const planeFragment = /* glsl */ `
   }
 `;
 
+//----------------- PARTICLE PLANE SHADERS -----------------//
+
+const particlePlaneVertex = /* glsl */ `
+  varying vec2 vUv;
+  uniform float uTime;
+
+  void main() {
+    vUv = uv;
+    vec3 pos = position;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.);
+  }
+`;
+
+const particlePlaneFragment = /* glsl */ `
+  varying vec2 vUv;
+  uniform float uTime;
+  uniform sampler2D uTexture;
+
+  void main() {
+    vec3 texture = texture2D(uTexture, vUv).rgb;
+    gl_FragColor = vec4(texture, 1.);
+  }
+`;
+
 //-------------- EXPORT SHADERS -----------------//
 
 export default {
@@ -193,6 +217,7 @@ export default {
     demo2: sphereVertex,
     demo3: boxVertex,
     demo4: planeVertex,
+    demo5: particlePlaneVertex,
   },
 
   fragment: {
@@ -200,5 +225,6 @@ export default {
     demo2: sphereFragment,
     demo3: boxFragment,
     demo4: planeFragment,
+    demo5: particlePlaneFragment,
   },
 };

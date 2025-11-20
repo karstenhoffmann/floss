@@ -106,4 +106,24 @@ export default class extends THREE.Object3D {
       this.material.uniforms.uTime.value = time;
     }
   }
+
+  // Playback control methods (for compatibility with ParticleEffect)
+  play() {
+    // Type effects don't have play/pause state, but we implement these for consistency
+  }
+
+  pause() {
+    // Type effects don't have play/pause state, but we implement these for consistency
+  }
+
+  stop() {
+    // Reset time to 0
+    if (this.material) {
+      this.material.uniforms.uTime.value = 0;
+    }
+  }
+
+  restart() {
+    this.stop();
+  }
 }
