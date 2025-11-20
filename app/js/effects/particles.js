@@ -419,8 +419,9 @@ export class ParticlesEffect extends EffectBase {
             return;
         }
 
-        const time = elapsedTime * 0.001;  // Convert to seconds
-        const dt = deltaTime * 0.001;
+        // elapsedTime is ALREADY in seconds, don't convert again!
+        const time = elapsedTime;
+        const dt = deltaTime;
 
         // Initialize animation start time on first update
         if (this.animationStartTime === null) {
