@@ -1134,7 +1134,7 @@ class App {
             input.placeholder = '#000000';
             input.maxLength = 7;
 
-            // Manual hex validation and color update
+            // Manual hex validation (for direct typing only)
             input.addEventListener('input', (e) => {
                 let value = e.target.value.toUpperCase();
 
@@ -1148,15 +1148,13 @@ class App {
 
                 e.target.value = value;
 
-                // Update if valid 6-char hex (only for manual typing, not Coloris)
-                if (/^#[0-9A-F]{6}$/.test(value) && !input.classList.contains('clr-field')) {
+                // Only update preview, don't save yet
+                if (/^#[0-9A-F]{6}$/.test(value)) {
                     preview.style.backgroundColor = value;
-                    appSettings.updateColorSwatch(index, value);
-                    this.showSaveColorsFeedback();
                 }
             });
 
-            // Coloris change event (when user clicks OK in picker)
+            // Coloris change event (fires when user clicks OK or when typing is complete)
             input.addEventListener('change', (e) => {
                 const value = e.target.value.toUpperCase();
                 if (/^#[0-9A-F]{6}$/.test(value)) {
@@ -1166,24 +1164,21 @@ class App {
                 }
             });
 
+            // Handle blur (when user tabs away after manual typing)
+            input.addEventListener('blur', (e) => {
+                const value = e.target.value.toUpperCase();
+                if (/^#[0-9A-F]{6}$/.test(value)) {
+                    appSettings.updateColorSwatch(index, value);
+                    this.showSaveColorsFeedback();
+                }
+            });
+
             // Click preview to open Coloris picker
             preview.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                // Focus the input to trigger Coloris
+                // Just focus the input - Coloris will handle the rest
                 input.focus();
-                // Small delay to ensure Coloris attaches properly
-                setTimeout(() => {
-                    if (window.Coloris) {
-                        // Manually trigger Coloris if it doesn't open automatically
-                        const event = new MouseEvent('click', {
-                            bubbles: true,
-                            cancelable: true,
-                            view: window
-                        });
-                        input.dispatchEvent(event);
-                    }
-                }, 50);
             });
 
             item.appendChild(preview);
