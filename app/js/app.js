@@ -902,6 +902,7 @@ class App {
         const panYSlider = document.getElementById('camera-pan-y');
         const rotateXSlider = document.getElementById('camera-rotate-x');
         const rotateYSlider = document.getElementById('camera-rotate-y');
+        const rotateZSlider = document.getElementById('camera-rotate-z');
         const resetBtn = document.getElementById('camera-reset-btn');
 
         if (!zoomSlider || !this.sceneManager.controls) return;
@@ -947,6 +948,18 @@ class App {
             document.getElementById('camera-rotate-y-value').textContent = value + '°';
         });
 
+        // Rotate Z
+        if (rotateZSlider) {
+            rotateZSlider.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                const radians = (value * Math.PI) / 180;
+                if (this.currentEffect && this.currentEffect.mesh) {
+                    this.currentEffect.mesh.rotation.z = radians;
+                }
+                document.getElementById('camera-rotate-z-value').textContent = value + '°';
+            });
+        }
+
         // Reset camera
         if (resetBtn) {
             resetBtn.addEventListener('click', () => {
@@ -962,12 +975,14 @@ class App {
                 panYSlider.value = 0;
                 rotateXSlider.value = 0;
                 rotateYSlider.value = 0;
+                if (rotateZSlider) rotateZSlider.value = 0;
 
                 document.getElementById('camera-zoom-value').textContent = '50';
                 document.getElementById('camera-pan-x-value').textContent = '0';
                 document.getElementById('camera-pan-y-value').textContent = '0';
                 document.getElementById('camera-rotate-x-value').textContent = '0°';
                 document.getElementById('camera-rotate-y-value').textContent = '0°';
+                if (rotateZSlider) document.getElementById('camera-rotate-z-value').textContent = '0°';
 
                 notification.success('Camera reset');
             });
@@ -1095,27 +1110,40 @@ class App {
             const preview = document.createElement('div');
             preview.className = 'color-swatch-preview';
             preview.style.backgroundColor = color;
-            preview.title = `Click to change color ${index + 1}`;
+            preview.title = `Click to edit color ${index + 1}`;
 
             const input = document.createElement('input');
             input.type = 'text';
-            input.className = 'color-swatch-input coloris';
-            input.value = color;
-            input.dataset.coloris = '';
+            input.className = 'color-swatch-input';
+            input.value = color.toUpperCase();
             input.dataset.swatchIndex = index;
+            input.placeholder = '#000000';
+            input.maxLength = 7;
 
-            // Update preview when input changes
-            input.addEventListener('change', (e) => {
-                const newColor = e.target.value;
-                if (/^#[0-9A-F]{6}$/i.test(newColor)) {
-                    preview.style.backgroundColor = newColor;
-                    appSettings.updateColorSwatch(index, newColor);
+            // Manual hex validation and color update
+            input.addEventListener('input', (e) => {
+                let value = e.target.value.toUpperCase();
+
+                // Ensure it starts with #
+                if (!value.startsWith('#')) {
+                    value = '#' + value;
+                }
+
+                // Only allow valid hex characters
+                value = value.replace(/[^#0-9A-F]/g, '');
+
+                e.target.value = value;
+
+                // Update if valid 6-char hex
+                if (/^#[0-9A-F]{6}$/.test(value)) {
+                    preview.style.backgroundColor = value;
+                    appSettings.updateColorSwatch(index, value);
                 }
             });
 
-            // Click preview to open coloris
+            // Click preview to focus input (Coloris will handle the picker)
             preview.addEventListener('click', () => {
-                input.click();
+                input.focus();
             });
 
             item.appendChild(preview);
@@ -1123,8 +1151,58 @@ class App {
             grid.appendChild(item);
         });
 
-        // Re-initialize Coloris for new inputs
-        setTimeout(() => this.initializeColoris(), 50);
+        // Initialize Coloris on the new inputs
+        this.initializeColorisForSwatches();
+    }
+
+    /**
+     * Initialize Coloris specifically for color swatch inputs
+     */
+    initializeColorisForSwatches() {
+        if (!window.Coloris) {
+            console.warn('⚠️ Coloris not loaded for swatches');
+            return;
+        }
+
+        // Get all swatch inputs
+        const swatchInputs = document.querySelectorAll('.color-swatch-input');
+
+        swatchInputs.forEach(input => {
+            // Add Coloris data attribute
+            input.dataset.coloris = '';
+
+            // Coloris change event
+            input.addEventListener('change', (e) => {
+                const index = parseInt(e.target.dataset.swatchIndex);
+                const newColor = e.target.value.toUpperCase();
+
+                if (/^#[0-9A-F]{6}$/.test(newColor)) {
+                    const preview = e.target.previousElementSibling;
+                    if (preview && preview.classList.contains('color-swatch-preview')) {
+                        preview.style.backgroundColor = newColor;
+                    }
+                    appSettings.updateColorSwatch(index, newColor);
+                }
+            });
+        });
+
+        // Reinitialize Coloris with current swatches
+        setTimeout(() => {
+            const swatches = appSettings.getColorSwatches();
+            Coloris({
+                theme: 'pill',
+                themeMode: 'dark',
+                alpha: false,
+                format: 'hex',
+                swatches: swatches,
+                clearButton: { show: false },
+                closeButton: true,
+                closeLabel: 'Close',
+                selectInput: true,
+                focusInput: true
+            });
+            Coloris.setInstance('.color-swatch-input');
+        }, 100);
     }
 
     /**

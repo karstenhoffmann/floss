@@ -222,6 +222,79 @@
     text-align: right;
 }
 
+/* === CAMERA CONTROLS (Grid Layout) === */
+.camera-controls-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.camera-row-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+    align-items: flex-start;
+}
+
+.camera-control {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.camera-control label {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+}
+
+.camera-control input[type="range"] {
+    width: 100%;
+    height: 5px;
+    background: var(--color-bg-tertiary);
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.camera-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: var(--color-accent-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform var(--transition-fast);
+}
+
+.camera-control input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.camera-control input[type="range"]::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: var(--color-accent-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: transform var(--transition-fast);
+}
+
+.camera-control input[type="range"]::-moz-range-thumb:hover {
+    transform: scale(1.2);
+}
+
+.camera-control span {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    font-family: 'Courier New', monospace;
+    text-align: center;
+}
+
 .btn-text-small {
     padding: var(--spacing-xs) var(--spacing-sm);
     background: transparent;
@@ -253,5 +326,28 @@
 
     .camera-controls {
         grid-template-columns: 1fr 1fr;
+    }
+
+    /* Stack camera controls vertically on mobile */
+    .camera-row-3 {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+
+    .camera-control {
+        width: 100%;
+    }
+}
+
+/* === TABLET RESPONSIVE === */
+@media (max-width: 1024px) and (min-width: 769px) {
+    /* Use 2 columns on tablets for better space usage */
+    .camera-row-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Reset button on its own row */
+    .camera-controls-grid .btn-text-small {
+        grid-column: 1 / -1;
     }
 }
