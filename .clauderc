@@ -1,6 +1,40 @@
 # Claude Code Project Configuration
 # Last Updated: 2024-11-20
 
+## 🌐 CRITICAL: Claude Code for Web Environment
+
+environment: "Claude Code for Web (NOT CLI)"
+
+## User Testing Limitations
+user_can_access:
+  - Browser chat interface only
+  - GitHub repository
+  - GitHub Pages deployment
+
+user_cannot_access:
+  - Local files created by Claude
+  - Command line on their machine
+  - Files before git push
+
+## 🚨 MANDATORY: Testing Workflow
+
+BEFORE_USER_CAN_TEST:
+  - Code must be committed
+  - Code must be pushed to GitHub
+  - GitHub Pages must be configured for the correct branch
+  - Wait 1-2 minutes for GitHub Pages deployment
+
+ALWAYS_REMIND_USER:
+  - "Update GitHub Pages settings to branch: [current-branch-name]"
+  - "Test at https://karstenhoffmann.github.io/floss/ (wait 1-2 min)"
+  - "Verify you're testing the right branch in GitHub Pages settings"
+
+GITHUB_PAGES_CONFIG:
+  - Location: "Repo Settings → Pages"
+  - Source: "Deploy from branch"
+  - Branch: "[current working branch]"
+  - Folder: "/ (root)" (after restructure)
+
 ## Project Identity
 project_name: "Floss - Kinetic Typography Motion Design Tool"
 project_type: "webapp"

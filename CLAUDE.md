@@ -9,6 +9,47 @@
 
 ## ⚠️ CRITICAL: Always Read This First
 
+### 🌐 Claude Code for Web - Testing Requirements
+
+**THIS PROJECT USES CLAUDE CODE FOR WEB (not CLI)**
+
+This means:
+- ✅ User has NO local file access - only browser and GitHub
+- ✅ User can ONLY test via GitHub Pages deployment
+- ✅ **Claude MUST tell user to update GitHub Pages settings when switching branches**
+- ✅ **Testing requires GitHub Pages to be configured for the current working branch**
+
+**MANDATORY WORKFLOW:**
+
+1. **When starting work on a branch:**
+   ```
+   🚨 TELL USER: "Please update GitHub Pages settings to deploy from branch: [branch-name]"
+   ```
+
+2. **After pushing commits:**
+   ```
+   🚨 REMIND USER: "Test at https://karstenhoffmann.github.io/floss/ (wait 1-2 min for deployment)"
+   ```
+
+3. **When creating a new branch:**
+   ```
+   🚨 TELL USER: "Update GitHub Pages: Settings → Pages → Branch: [new-branch-name] → Save"
+   ```
+
+**Why this matters:**
+- User cannot run `python3 -m http.server` locally
+- User cannot access files directly
+- GitHub Pages is the ONLY way to test changes
+- Wrong branch = user tests old code = wasted time
+
+**GitHub Pages Configuration:**
+- Location: Repo Settings → Pages
+- Source: Deploy from branch
+- Branch: **[current working branch]** ← CRITICAL TO UPDATE
+- Folder: **`/ (root)`** after restructure
+
+---
+
 ### Repository Structure (Updated Nov 2024)
 
 ```
@@ -204,17 +245,58 @@ python3 -m http.server 8080
 
 ### Deploying to GitHub Pages
 
-1. Push changes to your branch
-2. Merge to `main` branch when ready
-3. GitHub Pages auto-deploys from `main` root
-4. Wait ~1 minute for deployment
-5. Clear browser cache if needed (Service Worker!)
-6. Test at: https://karstenhoffmann.github.io/floss/
+**⚠️ CRITICAL FOR CLAUDE CODE WEB:**
+
+User can ONLY test via GitHub Pages. **Always remind them to update settings!**
+
+**Step-by-step deployment:**
+
+1. **Commit and push changes:**
+   ```bash
+   git add .
+   git commit -m "feat: your changes"
+   git push -u origin claude/your-branch-name-[session-id]
+   ```
+
+2. **🚨 TELL USER to update GitHub Pages settings:**
+   ```
+   Go to: https://github.com/karstenhoffmann/floss/settings/pages
+
+   Settings to verify/update:
+   - Source: "Deploy from a branch"
+   - Branch: [your current working branch] ← SELECT CORRECT BRANCH!
+   - Folder: "/ (root)"
+   - Click "Save"
+   ```
+
+3. **Wait for deployment:**
+   - GitHub Actions will deploy automatically
+   - Wait ~1-2 minutes
+   - Check deployment status: https://github.com/karstenhoffmann/floss/actions
+
+4. **🚨 REMIND USER to test:**
+   ```
+   Test at: https://karstenhoffmann.github.io/floss/
+
+   Verify you're testing the CORRECT branch:
+   - Check GitHub Pages settings shows your branch
+   - Hard refresh browser (Ctrl+Shift+R / Cmd+Shift+R)
+   - Check DevTools → Network to see fresh requests
+   ```
+
+5. **Clear cache if needed:**
+   - Hard refresh: `Ctrl+Shift+R` (Windows) / `Cmd+Shift+R` (Mac)
+   - Or: DevTools → Application → Clear Storage
 
 **Service Worker Cache:**
 - Bump `CACHE_VERSION` in `service-worker.js` when making breaking changes
 - Example: `v1.0.0` → `v1.0.1`
 - Forces clients to re-download assets
+
+**Common Issues:**
+- ❌ Testing wrong branch: Check GitHub Pages settings
+- ❌ Seeing old code: Wait longer or hard refresh
+- ❌ 404 errors: Verify folder is set to `/ (root)` not `/app`
 
 ### Adding a New Effect
 
@@ -304,10 +386,20 @@ Changes:
 
 Before starting work:
 - [ ] Read this CLAUDE.md file completely
-- [ ] Check current branch
+- [ ] Check current branch (`git branch --show-current`)
+- [ ] 🚨 **TELL USER to update GitHub Pages settings to current branch**
 - [ ] Verify repository structure (no `/app/` directory)
 - [ ] Understand the effect system architecture
 - [ ] Review any open issues or TODOs
+
+### After Making Changes Checklist
+
+Before user can test:
+- [ ] Commit changes with clear message
+- [ ] Push to branch with correct session ID
+- [ ] 🚨 **REMIND USER: "Update GitHub Pages to branch [branch-name] if not already done"**
+- [ ] 🚨 **REMIND USER: "Wait 1-2 minutes, then test at https://karstenhoffmann.github.io/floss/"**
+- [ ] 🚨 **REMIND USER: "Verify you're testing the correct branch"**
 
 ---
 
@@ -489,3 +581,54 @@ See `CHANGELOG.md` for detailed version history.
 **Current Version:** 2.2.0
 **Architecture:** Post-restructure (app in root, reference isolated)
 **Last Major Change:** Repository restructure (Nov 2024)
+
+---
+
+## 🚀 QUICK REFERENCE FOR CLAUDE
+
+### Critical Reminders (Execute Every Session)
+
+**1. At Session Start:**
+```
+🚨 Current branch: [check with git branch --show-current]
+🚨 TELL USER: "Please update GitHub Pages to branch: [branch-name]"
+🚨 URL: https://github.com/karstenhoffmann/floss/settings/pages
+```
+
+**2. After Every Push:**
+```
+🚨 REMIND USER: "I've pushed to [branch-name]"
+🚨 REMIND USER: "Update GitHub Pages settings if you haven't already"
+🚨 REMIND USER: "Wait 1-2 min, then test at https://karstenhoffmann.github.io/floss/"
+🚨 REMIND USER: "Verify you're testing the correct branch"
+```
+
+**3. When Creating New Branch:**
+```
+🚨 Branch must end with session ID: claude/feature-name-[SESSION_ID]
+🚨 TELL USER: "Update GitHub Pages: Settings → Pages → Branch: [new-branch]"
+```
+
+**4. Before User Tests:**
+```
+Checklist:
+✅ Changes committed
+✅ Changes pushed to correct branch (with session ID)
+✅ User reminded to update GitHub Pages
+✅ User reminded to wait 1-2 minutes
+✅ User reminded which URL to test
+```
+
+### Why This Matters
+
+- User has **NO local file access** (Claude Code for Web)
+- User can **ONLY test via GitHub Pages**
+- Wrong branch in GitHub Pages = user tests **old code**
+- Wasted time if user isn't reminded to update settings
+
+### Common Mistakes to Avoid
+
+❌ Don't assume user can test locally
+❌ Don't forget to remind about GitHub Pages settings
+❌ Don't push without telling user which branch
+❌ Don't forget the session ID in branch name
