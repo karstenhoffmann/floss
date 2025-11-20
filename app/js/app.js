@@ -1399,30 +1399,25 @@ class App {
         });
 
         if (speedSlider && speedValueInput) {
+            // Initialize with current speed from state
+            const initialSpeed = state.get('animationSpeed') || 1.0;
+            speedSlider.value = initialSpeed;
+            speedValueInput.value = initialSpeed.toFixed(1);
+
             // Sync slider with number input
             speedSlider.addEventListener('input', (e) => {
                 const speed = parseFloat(e.target.value);
                 speedValueInput.value = speed.toFixed(1);
-
-                if (this.currentEffect && this.currentEffect.settings) {
-                    // Update animation speed if effect has this setting
-                    if ('animationSpeed' in this.currentEffect.settings) {
-                        this.currentEffect.updateSetting('animationSpeed', speed);
-                    }
-                }
+                // Update global animation speed
+                state.set('animationSpeed', speed);
             });
 
             // Sync number input with slider
             speedValueInput.addEventListener('input', (e) => {
                 const speed = parseFloat(e.target.value);
                 speedSlider.value = speed;
-
-                if (this.currentEffect && this.currentEffect.settings) {
-                    // Update animation speed if effect has this setting
-                    if ('animationSpeed' in this.currentEffect.settings) {
-                        this.currentEffect.updateSetting('animationSpeed', speed);
-                    }
-                }
+                // Update global animation speed
+                state.set('animationSpeed', speed);
             });
         }
     }

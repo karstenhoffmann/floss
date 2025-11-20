@@ -272,21 +272,106 @@ export class ParticlesEffect extends EffectBase {
     getVertexShader() {
         return `
             attribute float size;
-            // Note: 'color' attribute is automatically added by THREE.js when vertexColors: true
-
             varying vec3 vColor;
+            varying float vDepth;
+            varying float vPulse;
 
             uniform float uTime;
+
+            // 3D Simplex noise function for smooth organic movement
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+            vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+
+            float snoise(vec3 v) {
+                const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+                const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+
+                vec3 i  = floor(v + dot(v, C.yyy));
+                vec3 x0 = v - i + dot(i, C.xxx);
+
+                vec3 g = step(x0.yzx, x0.xyz);
+                vec3 l = 1.0 - g;
+                vec3 i1 = min(g.xyz, l.zxy);
+                vec3 i2 = max(g.xyz, l.zxy);
+
+                vec3 x1 = x0 - i1 + C.xxx;
+                vec3 x2 = x0 - i2 + C.yyy;
+                vec3 x3 = x0 - D.yyy;
+
+                i = mod289(i);
+                vec4 p = permute(permute(permute(
+                    i.z + vec4(0.0, i1.z, i2.z, 1.0))
+                    + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+                    + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+
+                float n_ = 0.142857142857;
+                vec3 ns = n_ * D.wyz - D.xzx;
+
+                vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+
+                vec4 x_ = floor(j * ns.z);
+                vec4 y_ = floor(j - 7.0 * x_);
+
+                vec4 x = x_ *ns.x + ns.yyyy;
+                vec4 y = y_ *ns.x + ns.yyyy;
+                vec4 h = 1.0 - abs(x) - abs(y);
+
+                vec4 b0 = vec4(x.xy, y.xy);
+                vec4 b1 = vec4(x.zw, y.zw);
+
+                vec4 s0 = floor(b0)*2.0 + 1.0;
+                vec4 s1 = floor(b1)*2.0 + 1.0;
+                vec4 sh = -step(h, vec4(0.0));
+
+                vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+                vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+
+                vec3 p0 = vec3(a0.xy, h.x);
+                vec3 p1 = vec3(a0.zw, h.y);
+                vec3 p2 = vec3(a1.xy, h.z);
+                vec3 p3 = vec3(a1.zw, h.w);
+
+                vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+                p0 *= norm.x;
+                p1 *= norm.y;
+                p2 *= norm.z;
+                p3 *= norm.w;
+
+                vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+                m = m * m;
+                return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+            }
 
             void main() {
                 vColor = color;
 
-                vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                vec3 pos = position;
+                vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
 
-                // Pulsing size based on time
-                float pulse = 1.0 + sin(uTime * 3.0 + position.x * 10.0) * 0.2;
+                // Calculate depth for visual effects
+                vDepth = -mvPosition.z / 100.0;
 
-                gl_PointSize = size * 50.0 * pulse / -mvPosition.z;
+                // Multi-layered pulsing with different frequencies for organic feel
+                float slowPulse = sin(uTime * 0.8 + position.x * 3.0) * 0.5 + 0.5;
+                float fastPulse = sin(uTime * 4.0 + position.y * 7.0) * 0.5 + 0.5;
+                float combinedPulse = mix(slowPulse, fastPulse, 0.4);
+
+                // Breathing effect (entire system)
+                float globalBreath = sin(uTime * 0.5) * 0.15 + 1.0;
+
+                // Individual particle variation
+                float particleId = position.x + position.y * 100.0;
+                float particlePhase = fract(particleId * 0.1);
+
+                // Final pulse with easing
+                vPulse = globalBreath * (0.7 + combinedPulse * 0.6 + particlePhase * 0.3);
+
+                // Size calculation with depth-based scaling
+                float depthScale = 1.0 + vDepth * 0.3;
+                gl_PointSize = size * 50.0 * vPulse * depthScale / -mvPosition.z;
+
                 gl_Position = projectionMatrix * mvPosition;
             }
         `;
@@ -295,35 +380,89 @@ export class ParticlesEffect extends EffectBase {
     getFragmentShader() {
         return `
             varying vec3 vColor;
+            varying float vDepth;
+            varying float vPulse;
 
             uniform float uGlowIntensity;
+            uniform float uTime;
 
             void main() {
-                // Circular particle shape with smooth falloff
+                // Calculate distance from center
                 vec2 center = gl_PointCoord - vec2(0.5);
-                float dist = length(center);
+                float dist = length(center) * 2.0;
 
-                if (dist > 0.5) {
+                // Discard pixels outside circle
+                if (dist > 1.0) {
                     discard;
                 }
 
-                // Soft glow falloff
-                float alpha = smoothstep(0.5, 0.0, dist);
+                // Multi-layered glow with different falloff curves
+                // Core - bright center
+                float core = 1.0 - smoothstep(0.0, 0.3, dist);
+                // Middle - soft falloff
+                float middle = 1.0 - smoothstep(0.2, 0.7, dist);
+                // Outer - wide glow
+                float outer = 1.0 - smoothstep(0.5, 1.0, dist);
 
-                // Additive glow
-                vec3 glow = vColor * uGlowIntensity * alpha;
+                // Combine layers with different intensities
+                float intensity = core * 1.5 + middle * 0.8 + outer * 0.4;
 
-                gl_FragColor = vec4(glow, alpha);
+                // Pulsing color shift
+                float colorShift = sin(uTime * 2.0 + vDepth * 10.0) * 0.5 + 0.5;
+                vec3 shiftedColor = mix(vColor, vColor * vec3(1.2, 0.9, 1.1), colorShift * 0.3);
+
+                // Add depth-based brightness variation
+                float depthBrightness = 1.0 + vDepth * 0.4;
+
+                // Pulse-based intensity modulation
+                float pulseIntensity = vPulse * 0.8 + 0.4;
+
+                // Final color with all effects combined
+                vec3 finalColor = shiftedColor * intensity * uGlowIntensity * depthBrightness * pulseIntensity;
+
+                // Alpha with soft edges
+                float alpha = intensity * (0.6 + pulseIntensity * 0.4);
+
+                // Add subtle sparkle effect on brightest particles
+                float sparkle = core * (sin(uTime * 15.0 + vDepth * 50.0) * 0.5 + 0.5);
+                finalColor += vec3(sparkle * 0.3);
+
+                gl_FragColor = vec4(finalColor, alpha);
             }
         `;
+    }
+
+    // Simple 3D Perlin-like noise (faster than full simplex in JS)
+    noise3D(x, y, z) {
+        // Simple hash-based noise for smooth organic movement
+        const n = Math.sin(x * 12.9898 + y * 78.233 + z * 45.164) * 43758.5453;
+        return (n - Math.floor(n)) * 2.0 - 1.0;
+    }
+
+    smoothNoise3D(x, y, z) {
+        // Sample multiple octaves for smoother noise
+        let total = 0;
+        let frequency = 1.0;
+        let amplitude = 1.0;
+        let maxValue = 0;
+
+        for (let i = 0; i < 3; i++) {
+            total += this.noise3D(x * frequency, y * frequency, z * frequency) * amplitude;
+            maxValue += amplitude;
+            amplitude *= 0.5;
+            frequency *= 2.0;
+        }
+
+        return total / maxValue;
     }
 
     update(deltaTime, elapsedTime) {
         if (!this.mesh || !this.geometry) return;
 
         const positions = this.geometry.attributes.position.array;
+        const time = elapsedTime * 0.001; // Convert to seconds
 
-        // Update particle physics
+        // Update particle physics with advanced motion
         for (let i = 0; i < this.originalPositions.length; i++) {
             const originalPos = this.originalPositions[i];
             const velocity = this.velocities[i];
@@ -335,26 +474,58 @@ export class ParticlesEffect extends EffectBase {
                 positions[i * 3 + 2]
             );
 
-            // Force towards original position (attraction)
+            // Force towards original position (spring-like attraction)
             const toOriginal = originalPos.clone().sub(currentPos);
             const distance = toOriginal.length();
             const attractionForce = toOriginal.normalize().multiplyScalar(
                 this.settings.attractionForce * deltaTime * distance * 0.1
             );
 
-            // Turbulence (noise)
-            const turbulenceForce = new THREE.Vector3(
-                (Math.random() - 0.5) * this.settings.turbulence * deltaTime,
-                (Math.random() - 0.5) * this.settings.turbulence * deltaTime,
-                (Math.random() - 0.5) * this.settings.turbulence * deltaTime
-            );
+            // Smooth Perlin-like noise for organic turbulence
+            const noiseScale = 0.02;
+            const noiseSpeed = time * 0.3;
+            const turbulenceX = this.smoothNoise3D(
+                originalPos.x * noiseScale,
+                originalPos.y * noiseScale,
+                noiseSpeed
+            ) * this.settings.turbulence * deltaTime;
 
-            // Apply forces
+            const turbulenceY = this.smoothNoise3D(
+                originalPos.y * noiseScale + 100,
+                originalPos.x * noiseScale,
+                noiseSpeed + 50
+            ) * this.settings.turbulence * deltaTime;
+
+            const turbulenceZ = this.smoothNoise3D(
+                originalPos.z * noiseScale + 200,
+                originalPos.x * noiseScale + originalPos.y * noiseScale,
+                noiseSpeed + 100
+            ) * this.settings.turbulence * deltaTime * 0.5;
+
+            const turbulenceForce = new THREE.Vector3(turbulenceX, turbulenceY, turbulenceZ);
+
+            // Wave-based coordinated movement for elegance
+            const wavePhase = time * 0.8;
+            const waveFreq = 0.05;
+            const waveX = Math.sin(originalPos.y * waveFreq + wavePhase) * 0.02;
+            const waveY = Math.cos(originalPos.x * waveFreq + wavePhase) * 0.02;
+            const waveZ = Math.sin((originalPos.x + originalPos.y) * waveFreq * 0.5 + wavePhase) * 0.015;
+
+            const waveForce = new THREE.Vector3(waveX, waveY, waveZ);
+
+            // Breathing expansion/contraction
+            const breathPhase = Math.sin(time * 0.5) * 0.03;
+            const breathForce = originalPos.clone().normalize().multiplyScalar(breathPhase);
+
+            // Apply all forces with smooth blending
             velocity.add(attractionForce);
             velocity.add(turbulenceForce);
+            velocity.add(waveForce);
+            velocity.add(breathForce);
 
-            // Damping
-            velocity.multiplyScalar(this.settings.damping);
+            // Enhanced damping with easing
+            const dampingFactor = this.settings.damping * (0.95 + Math.sin(time * 2.0) * 0.02);
+            velocity.multiplyScalar(dampingFactor);
 
             // Update position
             currentPos.add(velocity);
@@ -369,13 +540,15 @@ export class ParticlesEffect extends EffectBase {
 
         // Update material uniforms
         if (this.material.uniforms) {
-            this.material.uniforms.uTime.value = elapsedTime;
+            this.material.uniforms.uTime.value = elapsedTime * 0.001;
             this.material.uniforms.uGlowIntensity.value = this.settings.glowIntensity;
         }
 
-        // Gentle rotation
+        // Smooth organic rotation with easing
         if (this.mesh) {
-            this.mesh.rotation.y += deltaTime * this.settings.rotationSpeed * 0.1;
+            const rotationEase = Math.sin(time * 0.3) * 0.5 + 0.5;
+            this.mesh.rotation.y += deltaTime * this.settings.rotationSpeed * 0.1 * (0.5 + rotationEase * 0.5);
+            this.mesh.rotation.x = Math.sin(time * 0.2) * 0.05;
         }
     }
 
