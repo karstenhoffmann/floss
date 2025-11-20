@@ -1,8 +1,54 @@
 # Claude Code Session Context
 
-**Last Updated:** 2025-11-18
+**Last Updated:** 2025-11-20
 **Project:** Floss - Professional Kinetic Typography Tool
 **Repository:** https://github.com/karstenhoffmann/floss
+**Working Directory:** `/app/` (⚠️ IMPORTANT: The actual app is in the `app/` subdirectory!)
+**Current Branch:** `claude/kinetic-typography-analysis-01Hpzj9zDGZXR4Dpt1GwKCYq`
+**Last Working Commit:** `20c13a7` (Smoke dissolve effect fully functional)
+
+---
+
+## 🚨 CRITICAL INFO FOR NEW SESSIONS
+
+### Repository Structure
+```
+/home/user/floss/
+├── app/                    ← ⚠️ THE ACTUAL FLOSS APP IS HERE!
+│   ├── index.html         ← Main entry point
+│   ├── js/                ← All JavaScript
+│   ├── css/               ← Styles
+│   └── assets/            ← Fonts, images
+│
+├── archive/               ← Old Codrops tutorial (ignore)
+├── CLAUDE.md             ← This file
+└── sw.js                 ← Service Worker (in root for GitHub Pages)
+```
+
+**⚠️ Always work in `/home/user/floss/app/` directory!**
+
+### Current Status (2025-11-20)
+
+**✅ What Works:**
+- ✓ Smoke Dissolve Particle Effect (fully functional!)
+- ✓ Progressive wave dissolve (left→right, right→left, center→out)
+- ✓ Particles rise as smoke with swirl/vortex
+- ✓ Glitter sparkles on solid particles
+- ✓ Camera controls (pan, rotate, zoom) working correctly
+- ✓ Settings panel with all dissolve parameters
+
+**🔧 What Was Just Fixed:**
+- Animation timing bug (was 1000x too slow)
+- Camera vertical pan (screenSpacePanning enabled)
+- Service Worker caching (v9-timing-fix-final)
+
+**📝 Known Issues:**
+- None currently! Effect is working as designed.
+
+**🎯 Next Steps / TODO:**
+1. Clean up debug console.log statements
+2. Consider adding "Typography Roller" effect (mentioned by user)
+3. Repository cleanup (see "Repository Cleanup Plan" below)
 
 ---
 
@@ -227,6 +273,118 @@ All cached by Service Worker for offline use.
 - [ ] Responsive mobile layout
 - [ ] Keyboard shortcut customization
 - [ ] Multi-text layer support
+
+---
+
+## 🔄 Session Continuity Workflow
+
+### For Claude Code for Web Sessions
+
+**What Claude Reads Automatically:**
+1. ✓ `CLAUDE.md` (this file) - Read first!
+2. ✓ `README.md` - Project overview
+3. ✓ `.claude/` directory - Hooks and custom commands (if exists)
+4. ✓ Git status - Current branch, recent commits
+
+**Before Ending a Session:**
+1. ✅ Update `CLAUDE.md` with:
+   - Current date
+   - Last working commit hash
+   - What was completed
+   - Known issues
+   - Next steps
+2. ✅ Commit all changes with descriptive messages
+3. ✅ Push to current branch
+4. ⚠️ If work is stable: Merge to `main` (see below)
+
+**Starting a New Session:**
+1. Claude automatically reads `CLAUDE.md`
+2. Claude sees: Current branch, working directory, last commit
+3. Continue work seamlessly!
+
+**📌 Branch Strategy:**
+- `claude/*` branches are **temporary** (session-specific)
+- Merge to `main` when feature is complete and working
+- Delete `claude/*` branch after merge
+
+---
+
+## 🧹 Repository Cleanup Plan
+
+### Current Problem
+- ❌ App is in `app/` subdirectory (confusing)
+- ❌ Old tutorial files in root (from Codrops demo)
+- ❌ Changes are on temporary `claude/*` branch
+
+### Cleanup Steps (Priority Order)
+
+**Phase 1: Merge Current Work (DO THIS SOON!)**
+```bash
+# 1. Ensure current branch is working
+cd /home/user/floss
+git checkout claude/kinetic-typography-analysis-01Hpzj9zDGZXR4Dpt1GwKCYq
+
+# 2. Remove debug logs (clean code)
+# Edit app/js/effects/particles.js - remove console.log('>>> update()...')
+
+# 3. Commit cleanup
+git add -A
+git commit -m "chore: Remove debug console logs"
+git push
+
+# 4. Merge to main
+git checkout main
+git pull origin main
+git merge claude/kinetic-typography-analysis-01Hpzj9zDGZXR4Dpt1GwKCYq
+git push origin main
+
+# 5. Delete temporary branch (optional)
+git branch -d claude/kinetic-typography-analysis-01Hpzj9zDGZXR4Dpt1GwKCYq
+git push origin --delete claude/kinetic-typography-analysis-01Hpzj9zDGZXR4Dpt1GwKCYq
+```
+
+**Phase 2: Restructure Repository (Future)**
+```bash
+# Option A: Keep app/ structure (document it clearly)
+# - Update CLAUDE.md with clear "Working Directory: app/" note ✓ DONE
+# - Add README.md in root pointing to app/
+# - Keep old files in archive/
+
+# Option B: Move app to root (cleaner but more work)
+# - Move all files from app/ to root
+# - Update all paths in index.html, sw.js, etc.
+# - Delete old tutorial files
+# - Update GitHub Pages deployment
+```
+
+**Recommendation:** Stick with **Option A** for now (app/ subdirectory is documented).
+
+**Phase 3: Documentation (Ongoing)**
+- [ ] Add README.md in root: "See app/ for Floss app"
+- [ ] Update CLAUDE.md before each session end
+- [ ] Keep commit messages clear and descriptive
+
+---
+
+## 📝 Template: End-of-Session Update
+
+```markdown
+**Last Updated:** YYYY-MM-DD
+**Current Branch:** branch-name
+**Last Working Commit:** commit-hash (description)
+
+**✅ Completed This Session:**
+- Item 1
+- Item 2
+
+**🐛 Known Issues:**
+- Issue 1
+- Issue 2
+
+**🎯 Next Steps:**
+1. Next task
+2. Next task
+```
 
 ---
 

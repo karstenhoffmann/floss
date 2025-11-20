@@ -4,18 +4,22 @@
 
 Ultra-modern, Rive-inspired interface with offline-first PWA functionality.
 
+> **⚠️ IMPORTANT:** The Floss application is located in the `/app/` directory!
+>
+> For detailed developer documentation, see [`CLAUDE.md`](./CLAUDE.md)
+
 ---
 
 ## ✨ Features
 
 - 🌑 **Ultra-Dark UI**: Glassmorphism with violet/blue gradients
-- 🎨 **4 Kinetic Effects**: Endless, Swirl, Twisted, Relax
+- 🎨 **Kinetic Effects**: Particles (Smoke Dissolve), Endless, Glitch
 - ⚡ **Zero Build-Step**: Pure ES Modules, no compilation needed
 - 📴 **Offline-First**: Service Worker with intelligent caching
-- 🎯 **Canvas-First**: Full viewport WebGL rendering
-- ⌨️ **Keyboard Shortcuts**: Space, Esc, 1-4
+- 🎯 **Canvas-First**: Full viewport WebGL rendering with THREE.js
 - 💾 **State Persistence**: LocalStorage saves preferences
 - 📱 **PWA-Ready**: Installable on desktop and mobile
+- 🎭 **Professional Smoke Dissolve**: Progressive wave dissolve with swirl effects
 
 ---
 
@@ -24,6 +28,8 @@ Ultra-modern, Rive-inspired interface with offline-first PWA functionality.
 ### No build required! Just serve the files:
 
 ```bash
+cd /path/to/floss
+
 # Python
 python -m http.server 8000
 
@@ -34,7 +40,9 @@ npx http-server -p 8000
 php -S localhost:8000
 ```
 
-Then visit: `http://localhost:8000`
+Then visit: `http://localhost:8000/app/`
+
+**Note:** The app entry point is `/app/index.html`
 
 ### Requirements
 - Modern browser (Chrome 89+, Safari 16.4+, Firefox 108+)
@@ -65,21 +73,27 @@ Then visit: `http://localhost:8000`
 
 ```
 floss/
-├── assets/           # Font files (BMFONT MSDF)
-├── css/
-│   ├── design-tokens.css  # Rive-inspired design system
-│   ├── base.css           # Foundation styles
-│   ├── components.css     # UI components
-│   └── animations.css     # Micro-interactions
-├── js/
-│   ├── index.js      # App entry point
-│   ├── ui.js         # UI state management
-│   ├── options.js    # Effect configurations
-│   └── gl/           # WebGL renderer
-├── index.html        # Main app
-├── manifest.json     # PWA manifest
-└── sw.js             # Service worker
+├── app/                      ← ⚠️ THE FLOSS APP IS HERE!
+│   ├── index.html           # Main entry point
+│   ├── manifest.json        # PWA manifest
+│   ├── js/
+│   │   ├── core/            # Core systems (renderer, camera, scene)
+│   │   ├── effects/         # Effect implementations
+│   │   ├── ui/              # UI components and state
+│   │   └── utils/           # Utilities
+│   ├── css/
+│   │   ├── base.css         # Foundation styles
+│   │   ├── components.css   # UI components (glassmorphism)
+│   │   └── theme.css        # Design tokens
+│   └── assets/              # Fonts, images
+│
+├── archive/                 # Old Codrops demo (for reference)
+├── CLAUDE.md                # Developer documentation (READ THIS!)
+├── README.md                # This file
+└── sw.js                    # Service Worker (root level for GitHub Pages)
 ```
+
+**Important:** Always work in the `/app/` directory!
 
 ---
 
