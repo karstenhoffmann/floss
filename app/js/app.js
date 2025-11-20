@@ -1148,15 +1148,15 @@ class App {
 
                 e.target.value = value;
 
-                // Update if valid 6-char hex
-                if (/^#[0-9A-F]{6}$/.test(value)) {
+                // Update if valid 6-char hex (only for manual typing, not Coloris)
+                if (/^#[0-9A-F]{6}$/.test(value) && !input.classList.contains('clr-field')) {
                     preview.style.backgroundColor = value;
                     appSettings.updateColorSwatch(index, value);
                     this.showSaveColorsFeedback();
                 }
             });
 
-            // Coloris change event (when color picked from picker)
+            // Coloris change event (when user clicks OK in picker)
             input.addEventListener('change', (e) => {
                 const value = e.target.value.toUpperCase();
                 if (/^#[0-9A-F]{6}$/.test(value)) {
@@ -1167,8 +1167,23 @@ class App {
             });
 
             // Click preview to open Coloris picker
-            preview.addEventListener('click', () => {
-                input.click(); // Trigger Coloris
+            preview.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // Focus the input to trigger Coloris
+                input.focus();
+                // Small delay to ensure Coloris attaches properly
+                setTimeout(() => {
+                    if (window.Coloris) {
+                        // Manually trigger Coloris if it doesn't open automatically
+                        const event = new MouseEvent('click', {
+                            bubbles: true,
+                            cancelable: true,
+                            view: window
+                        });
+                        input.dispatchEvent(event);
+                    }
+                }, 50);
             });
 
             item.appendChild(preview);
