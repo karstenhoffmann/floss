@@ -36,10 +36,10 @@ export class ParticlesEffect extends EffectBase {
             },
             particleSize: {
                 type: 'number',
-                default: 0.08,
-                min: 0.01,
-                max: 0.5,
-                step: 0.01,
+                default: 2.5,
+                min: 0.1,
+                max: 10.0,
+                step: 0.1,
                 label: 'Particle Size',
                 group: 'effect'
             },
@@ -286,7 +286,7 @@ export class ParticlesEffect extends EffectBase {
                 // Pulsing size based on time
                 float pulse = 1.0 + sin(uTime * 3.0 + position.x * 10.0) * 0.2;
 
-                gl_PointSize = size * 100.0 * pulse / -mvPosition.z;
+                gl_PointSize = size * 50.0 * pulse / -mvPosition.z;
                 gl_Position = projectionMatrix * mvPosition;
             }
         `;
