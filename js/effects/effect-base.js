@@ -30,6 +30,20 @@ export class EffectBase {
     }
 
     /**
+     * Export configuration (should be overridden by subclass)
+     * Defines how this effect behaves during video export
+     */
+    static get exportDefaults() {
+        return {
+            type: 'loop',              // 'loop' | 'oneshot' | 'manual'
+            recommendedDuration: 5,    // Default duration in seconds
+            minDuration: 1,            // Minimum allowed duration
+            maxDuration: 30,           // Maximum allowed duration
+            seamlessLoop: false        // Whether effect loops seamlessly
+        };
+    }
+
+    /**
      * Settings schema (must be overridden by subclass)
      * Note: Use 'group' property to organize settings in UI
      * Groups: 'text', 'colors', 'effect' (or custom)
@@ -150,6 +164,32 @@ export class EffectBase {
      */
     onSettingChanged(key, value) {
         // Override in subclass for reactive updates
+    }
+
+    /**
+     * Calculate smart export suggestion based on CURRENT settings
+     * Should be overridden by subclass to provide effect-specific logic
+     * @returns {Object} Export suggestion with duration, loopPoint, etc.
+     */
+    calculateExportSuggestion() {
+        const defaults = this.constructor.exportDefaults;
+
+        return {
+            duration: defaults.recommendedDuration,     // Suggested duration in seconds
+            loopPoint: null,                            // Where loop restarts (null = same as duration)
+            isSeamless: defaults.seamlessLoop,          // Will it loop perfectly?
+            confidence: 'low',                          // 'high' | 'medium' | 'low'
+            explanation: `Standard duration for ${this.constructor.metadata.name}`
+        };
+    }
+
+    /**
+     * Reset animation to initial state (t=0)
+     * Override in subclass if effect needs to reset for export
+     */
+    reset() {
+        // Override in subclass if needed
+        // Example: Reset mesh positions, rotations, etc.
     }
 
     /**

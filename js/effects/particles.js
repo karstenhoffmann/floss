@@ -17,6 +17,16 @@ export class ParticlesEffect extends EffectBase {
         };
     }
 
+    static get exportDefaults() {
+        return {
+            type: 'loop',
+            recommendedDuration: 5,    // Default: delay + dissolve + buffer
+            minDuration: 1,
+            maxDuration: 20,
+            seamlessLoop: false        // Dissolve effect doesn't loop seamlessly by default
+        };
+    }
+
     getSettingsSchema() {
         return {
             ...super.getSettingsSchema(),
@@ -680,6 +690,52 @@ export class ParticlesEffect extends EffectBase {
             (min.y + max.y) / 2,
             (min.z + max.z) / 2
         );
+    }
+
+    /**
+     * Calculate export duration based on dissolve settings
+     */
+    calculateExportSuggestion() {
+        const delay = this.settings.dissolveDelay || 1.0;
+        const duration = this.settings.dissolveDuration || 2.0;
+        const totalDuration = delay + duration + 0.5;  // Add buffer
+
+        return {
+            duration: totalDuration,
+            loopPoint: null,
+            isSeamless: false,
+            confidence: 'medium',
+            explanation: `Dissolve sequence: ${delay}s delay + ${duration}s dissolve + 0.5s buffer`
+        };
+    }
+
+    /**
+     * Reset animation to initial state
+     */
+    reset() {
+        this.animationStartTime = null;  // Reset will trigger on next update()
+
+        // Reset all particles to original positions
+        if (this.geometry && this.originalPositions) {
+            const positions = this.geometry.attributes.position.array;
+            const dissolveAttr = this.geometry.attributes.dissolve.array;
+
+            for (let i = 0; i < this.originalPositions.length; i++) {
+                const orig = this.originalPositions[i];
+                positions[i * 3] = orig.x;
+                positions[i * 3 + 1] = orig.y;
+                positions[i * 3 + 2] = orig.z;
+
+                dissolveAttr[i] = 0;  // Reset dissolve progress
+
+                if (this.velocities[i]) {
+                    this.velocities[i].set(0, 0, 0);
+                }
+            }
+
+            this.geometry.attributes.position.needsUpdate = true;
+            this.geometry.attributes.dissolve.needsUpdate = true;
+        }
     }
 
     resize(width, height) {
