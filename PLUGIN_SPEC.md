@@ -7,9 +7,10 @@ This document explains how to create custom effects for the Kinetic Typography a
 Effects are ES6 classes that extend `EffectBase` and define:
 1. **Metadata** - Name, icon, description
 2. **Settings Schema** - Configurable parameters
-3. **Three.js Scene** - Geometry, materials, shaders
-4. **Animation Logic** - Update loop
-5. **Lifecycle Methods** - Init, resize, destroy
+3. **Export Configuration** - Video export behavior (NEW)
+4. **Three.js Scene** - Geometry, materials, shaders
+5. **Animation Logic** - Update loop
+6. **Lifecycle Methods** - Init, resize, destroy
 
 ## Quick Start: Your First Effect
 
@@ -254,6 +255,258 @@ getSettingsSchema() {
     };
 }
 ```
+
+## Export Configuration (Video Export)
+
+**IMPORTANT:** Every effect must define export behavior for PowerPoint video export.
+
+### Overview
+
+The app can export animations as MP4 videos optimized for PowerPoint. Effects must tell the export system:
+- **Loop or Oneshot?** - Does the animation loop seamlessly or play once?
+- **Perfect Loop Duration** - How long until the animation repeats perfectly?
+- **Reset Behavior** - How to reset to initial state (t=0) for recording
+
+### Static Export Defaults
+
+Define default export behavior in your effect class:
+
+```javascript
+export class MyEffect extends EffectBase {
+    // Define export defaults
+    static get exportDefaults() {
+        return {
+            type: 'loop',              // 'loop' | 'oneshot' | 'manual'
+            recommendedDuration: 5,    // Default seconds
+            minDuration: 1,            // Minimum sensible duration
+            maxDuration: 30,           // Maximum sensible duration
+            seamlessLoop: true         // Can loop without visible cut?
+        };
+    }
+}
+```
+
+**Export Types:**
+- `'loop'` - Animation loops infinitely (e.g., rotating text, waves)
+- `'oneshot'` - Animation plays once to completion (e.g., particle dissolution)
+- `'manual'` - No auto-suggestion, user sets duration manually
+
+### Dynamic Export Suggestion (Smart Duration)
+
+For effects that can calculate their perfect loop point based on current settings:
+
+```javascript
+calculateExportSuggestion() {
+    // Called when user enters export mode
+    // Returns intelligent duration based on CURRENT settings
+
+    const rotSpeed = this.settings.rotationSpeed || 0.5;
+
+    // Calculate one complete rotation
+    const fullRotation = (2 * Math.PI) / rotSpeed;
+    const loopDuration = fullRotation / 1000;  // ms to seconds
+
+    return {
+        duration: loopDuration,        // Suggested duration in seconds
+        loopPoint: loopDuration,       // Where perfect loop occurs
+        isSeamless: true,              // Can loop without visible cut
+        confidence: 'high',            // 'low' | 'medium' | 'high'
+        explanation: `One complete rotation (${loopDuration.toFixed(1)}s)`
+    };
+}
+```
+
+**Why This Matters:**
+- PowerPoint videos look best when they loop seamlessly
+- User sees "Smart Duration: 4.2s ⚡" based on their settings
+- Export system knows exactly when to cut for perfect loop
+
+### Reset Method (Optional)
+
+For effects that need explicit reset to t=0 before recording:
+
+```javascript
+reset() {
+    // Reset animation to initial state
+    // Called before export starts
+
+    // Example: Store rotation offset
+    this.rotationOffset = -this.mesh.rotation.y;
+
+    // Or: Re-initialize particles
+    this.particles.forEach(p => p.reset());
+}
+```
+
+**When to Implement:**
+- Effect has accumulated state (rotations, positions)
+- Export should always start from the same visual state
+- Default behavior (just using elapsedTime) isn't sufficient
+
+### Complete Examples
+
+#### Loop Effect (Rotation)
+
+```javascript
+export class RotatingTextEffect extends EffectBase {
+    static get exportDefaults() {
+        return {
+            type: 'loop',
+            recommendedDuration: 4,
+            minDuration: 2,
+            maxDuration: 20,
+            seamlessLoop: true
+        };
+    }
+
+    calculateExportSuggestion() {
+        // One complete 360° rotation
+        const rotSpeed = this.settings.rotationSpeed || 0.5;
+        const period = (2 * Math.PI) / rotSpeed / 1000;
+
+        return {
+            duration: period,
+            loopPoint: period,
+            isSeamless: true,
+            confidence: 'high',
+            explanation: `One complete rotation (${period.toFixed(1)}s)`
+        };
+    }
+
+    reset() {
+        // Store current rotation to subtract later
+        this.initialRotation = this.mesh.rotation.y;
+    }
+
+    update(deltaTime, elapsedTime) {
+        // Rotation relative to reset point
+        this.mesh.rotation.y = this.initialRotation + elapsedTime * this.settings.rotationSpeed;
+    }
+}
+```
+
+#### Loop Effect (Wave)
+
+```javascript
+export class WaveEffect extends EffectBase {
+    static get exportDefaults() {
+        return {
+            type: 'loop',
+            recommendedDuration: 6,
+            minDuration: 2,
+            maxDuration: 30,
+            seamlessLoop: true
+        };
+    }
+
+    calculateExportSuggestion() {
+        // One complete wave cycle
+        const frequency = this.settings.waveFrequency || 1.0;
+        const period = 1 / frequency;
+
+        return {
+            duration: period,
+            loopPoint: period,
+            isSeamless: true,
+            confidence: 'high',
+            explanation: `One wave cycle (${period.toFixed(1)}s)`
+        };
+    }
+
+    // No reset needed - wave naturally loops via sin/cos
+}
+```
+
+#### Oneshot Effect (Particle Dissolution)
+
+```javascript
+export class ParticleDissolveEffect extends EffectBase {
+    static get exportDefaults() {
+        return {
+            type: 'oneshot',
+            recommendedDuration: 8,
+            minDuration: 3,
+            maxDuration: 15,
+            seamlessLoop: false
+        };
+    }
+
+    calculateExportSuggestion() {
+        // Estimate when last particle fades out
+        const maxLifetime = this.settings.particleLifetime || 5000;
+        const duration = maxLifetime / 1000;
+
+        return {
+            duration: duration,
+            loopPoint: null,  // No loop for oneshot
+            isSeamless: false,
+            confidence: 'medium',
+            explanation: `Particles dissolve in ${duration.toFixed(1)}s`
+        };
+    }
+
+    isComplete() {
+        // Optional: Detect when effect is done
+        // Export can auto-stop when this returns true
+        return this.particles.every(p => p.opacity <= 0.01);
+    }
+
+    reset() {
+        // Re-initialize all particles
+        this.initializeParticles();
+    }
+}
+```
+
+### Export Configuration Checklist
+
+When creating a new effect, ask yourself:
+
+**1. Does it loop?**
+- ✅ YES → `type: 'loop'`, implement `calculateExportSuggestion()`
+- ❌ NO → `type: 'oneshot'`, estimate completion time
+
+**2. Can you calculate the perfect loop point?**
+- ✅ YES → Return `loopPoint` in `calculateExportSuggestion()`
+- ❌ NO → Return `null`, user will set duration manually
+
+**3. Does it need explicit reset?**
+- ✅ YES → Implement `reset()` method
+- ❌ NO → Animation works with `elapsedTime` from 0
+
+**4. What's a sensible duration range?**
+- Too short: < 2s (jumpy loops)
+- Too long: > 30s (huge file sizes)
+- Sweet spot: 3-8s for most effects
+
+### Testing Export Behavior
+
+1. **Enter Export Mode** (click EXPORT button)
+2. **Check Smart Duration** - Does it match expected loop point?
+3. **Preview Animation** - Does it loop seamlessly at that duration?
+4. **Export Video** - Download and test in PowerPoint
+5. **Verify Loop** - Set PowerPoint to loop video, check for jumps
+
+### Why This System Exists
+
+**Problem:** PowerPoint doesn't support infinite animations natively.
+**Solution:** Export a short, perfectly-looping video that can repeat forever.
+**Result:** Seamless kinetic typography in presentations!
+
+**Example:**
+```
+Bad Export:  5.0s (random duration, jumps at loop point)
+Good Export: 4.2s (exactly one rotation, seamless loop)
+```
+
+### Further Reading
+
+For deep technical details, see:
+- `/docs/VIDEO_EXPORT_SPEC.md` - Complete export system specification
+- `/js/core/video-export.js` - Implementation
+- `/js/effects/endless.js` - Reference implementation
+
+---
 
 ## Text Texture System
 

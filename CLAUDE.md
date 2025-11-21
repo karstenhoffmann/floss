@@ -231,6 +231,66 @@ See `PLUGIN_SPEC.md` for complete documentation.
 
 ---
 
+## 🎨 Developing New Effects
+
+**CRITICAL:** When developing a new effect, read these documents in order:
+
+### Required Reading
+
+1. **`PLUGIN_SPEC.md`** ⭐ - **READ THIS FIRST**
+   - Complete effect development guide
+   - Effect API (EffectBase methods & properties)
+   - Settings schema system
+   - **Export configuration** (REQUIRED for video export)
+   - Complete examples (loop vs oneshot effects)
+   - Testing checklist
+
+2. **`js/effects/endless.js`** - Reference implementation
+   - Production-ready example
+   - Perfect loop calculation
+   - Export configuration in action
+
+3. **`docs/VIDEO_EXPORT_SPEC.md`** - Export system deep-dive (optional)
+   - Technical architecture details
+
+### Effect Development Checklist
+
+When Claude creates a new effect, MUST implement:
+
+**Required (Basic Effect):**
+- ✅ `static get metadata()` - ID, name, icon, description
+- ✅ `getSettingsSchema()` - Define parameters (inherits from EffectBase)
+- ✅ `init(scene, camera, renderer)` - Create Three.js scene
+- ✅ `update(deltaTime, elapsedTime)` - Animation loop
+- ✅ `onSettingChanged(key, value)` - Reactive updates
+- ✅ `destroy()` - Cleanup resources
+
+**Required (Video Export Support):**
+- ✅ `static get exportDefaults()` - Export behavior (type: 'loop'|'oneshot', duration)
+- ✅ `calculateExportSuggestion()` - Smart duration based on CURRENT settings
+- ⚠️ `reset()` - Optional, reset to t=0 for export (if effect needs it)
+
+**Optional (Advanced):**
+- `resize(width, height)` - Handle window resize
+- `isComplete()` - For oneshot effects, detect when done
+- `getVisualCenter()` - Custom camera pivot point
+
+### Example Prompt for New Effect
+
+When user says: "Create a new wave effect"
+
+Claude should:
+1. Read PLUGIN_SPEC.md (especially Export Configuration section)
+2. Analyze if effect is 'loop' or 'oneshot'
+3. Implement `calculateExportSuggestion()` to calculate perfect loop point
+4. Follow the checklist above
+5. Test with Export Mode
+
+**Good Prompt:**
+> "Create a new effect called 'wave' that animates text with a sine wave displacement. It should loop seamlessly. Calculate the perfect loop duration based on wave frequency. See PLUGIN_SPEC.md for the complete API, especially the Export Configuration section."
+
+---
+
 ## Common Tasks
 
 ### Running Locally
