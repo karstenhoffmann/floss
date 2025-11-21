@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '2.4.0',
-    commit: 'VideoExportManager core & state machine',
+    number: '2.5.0',
+    commit: 'Complete video export: canvas-record & rendering',
     date: '2025-11-21',
-    time: '15:45'
+    time: '16:15'
 };
 
 export default VERSION;

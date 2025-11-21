@@ -48,6 +48,17 @@
             document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r115/three.min.js"><\/script>');
         }
     </script>
+
+    <!-- canvas-record for MP4/H.264 video export -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-record@4.2.0/build/index.min.js"></script>
+    <script>
+        // Verify canvas-record loaded
+        if (typeof CanvasRecord === 'undefined') {
+            console.error('canvas-record failed to load from CDN');
+        } else {
+            console.log('✓ canvas-record loaded:', CanvasRecord.version || 'v4.2.0');
+        }
+    </script>
 </head>
 <body>
     <div id="app" class="app">

@@ -119,7 +119,8 @@ export class VideoExportManager {
             fps: options.fps || 30,
             width: 1920,
             height: 1080,
-            format: 'mp4'
+            format: 'mp4',
+            bitrate: 8_000_000  // 8 Mbps
         };
 
         this.totalFrames = Math.ceil(this.exportOptions.duration * this.exportOptions.fps);
@@ -131,17 +132,49 @@ export class VideoExportManager {
         console.log(`  Resolution: ${this.exportOptions.width}×${this.exportOptions.height}`);
 
         try {
-            // TODO Phase 2: Initialize offscreen rendering
-            // TODO Phase 2: Initialize canvas-record
-            // TODO Phase 2: Reset effect to t=0
-            // TODO Phase 2: Frame-by-frame rendering loop
+            // 1. Create offscreen canvas and renderer
+            this.createOffscreenRenderer();
 
-            console.log('⚠ Video export not yet fully implemented (Phase 2 in progress)');
+            // 2. Initialize canvas-record for MP4 export
+            if (typeof CanvasRecord === 'undefined') {
+                throw new Error('canvas-record library not loaded');
+            }
 
-            // Temporary: Just exit after 1 second
-            setTimeout(() => {
-                this.completeExport();
-            }, 1000);
+            this.recorder = new CanvasRecord.Recorder(this.offscreenCanvas, {
+                encoderOptions: {
+                    codec: 'avc1.42E032',  // H.264 Main Profile Level 5.0 (PowerPoint compatible)
+                    bitrate: this.exportOptions.bitrate,
+                    width: this.exportOptions.width,
+                    height: this.exportOptions.height,
+                    framerate: this.exportOptions.fps
+                }
+            });
+
+            console.log('✓ canvas-record Recorder initialized');
+
+            // 3. Reset effect to t=0
+            const effect = this.sceneManager.activeEffect;
+            if (effect && typeof effect.reset === 'function') {
+                effect.reset();
+                console.log('✓ Effect reset to t=0');
+            }
+
+            // 4. Start recording
+            await this.recorder.start();
+            console.log('✓ Recording started');
+
+            // 5. Frame-by-frame rendering loop
+            await this.renderAllFrames();
+
+            // 6. Stop recording and get blob
+            const blob = await this.recorder.stop();
+            console.log('✓ Recording stopped, blob size:', (blob.size / 1024 / 1024).toFixed(2), 'MB');
+
+            // 7. Trigger download
+            this.downloadBlob(blob, `floss-export-${Date.now()}.mp4`);
+
+            // 8. Complete export
+            this.completeExport();
 
         } catch (error) {
             console.error('Export failed:', error);
@@ -256,6 +289,104 @@ export class VideoExportManager {
      */
     getSafeFrame() {
         return { ...this.safeFrame };
+    }
+
+    /**
+     * Create offscreen canvas and Three.js renderer for export
+     */
+    createOffscreenRenderer() {
+        // Create offscreen canvas
+        this.offscreenCanvas = document.createElement('canvas');
+        this.offscreenCanvas.width = this.exportOptions.width;
+        this.offscreenCanvas.height = this.exportOptions.height;
+
+        // Create Three.js WebGL renderer
+        this.offscreenRenderer = new THREE.WebGLRenderer({
+            canvas: this.offscreenCanvas,
+            antialias: true,
+            alpha: false,
+            preserveDrawingBuffer: true  // Required for canvas-record
+        });
+
+        this.offscreenRenderer.setSize(this.exportOptions.width, this.exportOptions.height);
+        this.offscreenRenderer.setPixelRatio(1);  // Always 1 for export (not devicePixelRatio)
+
+        console.log(`✓ Offscreen renderer created: ${this.exportOptions.width}×${this.exportOptions.height}`);
+    }
+
+    /**
+     * Render all frames for export (frame-by-frame)
+     */
+    async renderAllFrames() {
+        const effect = this.sceneManager.activeEffect;
+        const scene = this.sceneManager.scene;
+        const camera = this.sceneManager.camera;
+
+        if (!effect || !scene || !camera) {
+            throw new Error('Scene, camera, or effect not initialized');
+        }
+
+        const frameDuration = 1.0 / this.exportOptions.fps;  // Time per frame in seconds
+
+        console.log(`→ Rendering ${this.totalFrames} frames...`);
+
+        for (let frame = 0; frame < this.totalFrames; frame++) {
+            this.currentFrame = frame;
+
+            // Calculate elapsed time for this frame
+            const elapsedTime = frame * frameDuration;
+
+            // Update effect with this specific time
+            effect.update(frameDuration, elapsedTime);
+
+            // Render to offscreen canvas
+            this.offscreenRenderer.render(scene, camera);
+
+            // Record frame
+            await this.recorder.step();
+
+            // Update progress
+            const percentage = ((frame + 1) / this.totalFrames) * 100;
+            state.set('exportProgress', {
+                currentFrame: frame + 1,
+                totalFrames: this.totalFrames,
+                percentage: Math.round(percentage)
+            });
+
+            // Log progress every 30 frames
+            if (frame % 30 === 0 || frame === this.totalFrames - 1) {
+                console.log(`  Frame ${frame + 1}/${this.totalFrames} (${percentage.toFixed(1)}%)`);
+            }
+
+            // Allow UI to update (prevent freezing)
+            if (frame % 10 === 0) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+        }
+
+        console.log(`✓ All ${this.totalFrames} frames rendered`);
+    }
+
+    /**
+     * Download blob as file
+     */
+    downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename;
+
+        document.body.appendChild(a);
+        a.click();
+
+        // Cleanup
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
+
+        console.log(`✓ Download triggered: ${filename}`);
     }
 
     /**
