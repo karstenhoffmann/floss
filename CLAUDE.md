@@ -1,6 +1,6 @@
 # Claude Code Session Context
 
-**Last Updated:** 2024-11-20
+**Last Updated:** 2025-11-21
 **Project:** Floss - Professional Kinetic Typography Motion Design Tool
 **Repository:** https://github.com/karstenhoffmann/floss
 **Deployment:** https://karstenhoffmann.github.io/floss/
@@ -47,6 +47,168 @@ This means:
 - Source: Deploy from branch
 - Branch: **[current working branch]** ← CRITICAL TO UPDATE
 - Folder: **`/ (root)`** after restructure
+
+---
+
+## 📝 CRITICAL: Documentation Maintenance Guidelines
+
+**IMPORTANT:** This documentation is LIVING - not static! Claude Code sessions MUST maintain and update documentation as the project evolves.
+
+### When to Update Documentation
+
+**ALWAYS update docs when:**
+- ✅ Adding new features (add to relevant sections)
+- ✅ Changing APIs (update PLUGIN_SPEC.md)
+- ✅ Refactoring architecture (update CLAUDE.md)
+- ✅ Finding better practices (update examples)
+- ✅ Discovering inconsistencies (fix immediately)
+- ✅ Adding new effects (update reference list)
+- ✅ Changing workflows (update instructions)
+
+**Examples:**
+```
+Scenario: "Add new Effect method getVisualCenter()"
+→ Update PLUGIN_SPEC.md with method documentation
+→ Update example effects
+→ Update checklist if it's now required
+
+Scenario: "Refactor State Management"
+→ Update CLAUDE.md architecture section
+→ Update VIDEO_EXPORT_SPEC.md integration points
+→ Update code examples
+
+Scenario: "Find bug in export duration calculation"
+→ Fix code
+→ Update PLUGIN_SPEC.md with corrected example
+→ Add note about common mistake
+```
+
+### Documentation Hierarchy (Where to Document What)
+
+```
+1. CLAUDE.md (This File)
+   ├─ Purpose: Session Context & Project Overview
+   ├─ Update when: Architecture changes, new workflows, new major features
+   ├─ Audience: Claude Code sessions (automatic reading)
+   └─ Keep: High-level, links to other docs, critical workflows
+
+2. PLUGIN_SPEC.md
+   ├─ Purpose: Effect Development API Documentation
+   ├─ Update when: EffectBase API changes, new effect patterns, export config changes
+   ├─ Audience: Claude developing new effects (referenced from CLAUDE.md)
+   └─ Keep: Complete API, examples, checklists, best practices
+
+3. docs/*.md
+   ├─ Purpose: Deep Technical Specifications
+   ├─ Update when: Implementation details change, architecture decisions made
+   ├─ Audience: Deep dives, complex implementation details
+   └─ Keep: State machines, integration points, error handling, performance
+
+4. README.md
+   ├─ Purpose: User-facing GitHub landing page
+   ├─ Update when: Public-facing features change, project description changes
+   ├─ Audience: GitHub visitors, potential users
+   └─ Keep: What the app does, how to use it, screenshots
+```
+
+### How to Update Documentation
+
+**1. Identify what changed:**
+```javascript
+// Code change:
++ static get exportDefaults() { ... }
+
+// Documentation impact:
+→ PLUGIN_SPEC.md: Add method to API section
+→ PLUGIN_SPEC.md: Update examples
+→ CLAUDE.md: Update checklist (if breaking)
+```
+
+**2. Update all affected docs:**
+- Don't just update one file - follow the hierarchy
+- Check if examples need updating
+- Verify links still work
+- Update "Last Updated" dates
+
+**3. Commit with clear message:**
+```bash
+git commit -m "docs: Update effect API documentation for exportDefaults
+
+- Add exportDefaults to PLUGIN_SPEC.md API section
+- Update all effect examples
+- Add to development checklist in CLAUDE.md
+
+Reason: New export configuration system requires this method"
+```
+
+### Documentation Quality Standards
+
+**MUST follow:**
+- ✅ **Clear examples** - Every API has code example
+- ✅ **Consistent formatting** - Follow existing style
+- ✅ **No outdated info** - Delete/update obsolete sections
+- ✅ **Cross-references** - Link related sections
+- ✅ **Checklists** - For multi-step processes
+- ✅ **Rationale** - Explain WHY not just WHAT
+
+**Common mistakes to avoid:**
+- ❌ Adding features without documenting them
+- ❌ Updating code but not examples
+- ❌ Leaving contradictory information in different files
+- ❌ Making docs too verbose (use hierarchy!)
+- ❌ Forgetting to update checklists
+
+### Self-Check Before Finishing Session
+
+Before user ends session, Claude should ask itself:
+
+**Did I...**
+- [ ] Add new features? → Are they documented?
+- [ ] Change APIs? → Is PLUGIN_SPEC.md updated?
+- [ ] Refactor architecture? → Is CLAUDE.md updated?
+- [ ] Find inconsistencies? → Did I fix them in docs?
+- [ ] Add examples? → Are they in the right place?
+- [ ] Update dependencies? → Is it noted in docs?
+
+**If ANY checkbox is unchecked → Update docs before committing code!**
+
+### Documentation Commit Messages
+
+Use these prefixes:
+
+```bash
+docs: Add <feature> documentation
+docs: Update <section> for <reason>
+docs: Fix inconsistency in <file>
+docs: Remove outdated <section>
+docs: Clarify <concept> with examples
+
+Example:
+"docs: Update PLUGIN_SPEC.md for export configuration
+
+- Add Export Configuration section
+- Update effect development checklist
+- Add loop vs oneshot examples
+- Link to VIDEO_EXPORT_SPEC.md
+
+Reason: Video export system requires effects to define export behavior"
+```
+
+### Meta-Documentation Rule
+
+**IMPORTANT:** If you find that these documentation guidelines are insufficient or unclear:
+1. **Update this section** with better guidelines
+2. **Explain why** in commit message
+3. This is self-modifying documentation!
+
+**Example:**
+```
+User: "Claude, you forgot to document the new feature!"
+Claude: "You're right! Let me:
+  1. Document the feature
+  2. Update this Documentation Guidelines section
+     to remind future sessions to check for this"
+```
 
 ---
 
