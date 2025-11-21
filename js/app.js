@@ -287,7 +287,14 @@ class App {
             switch (e.key.toLowerCase()) {
                 case ' ':
                     e.preventDefault();
-                    this.toggleUI();
+                    // Context-aware spacebar behavior
+                    if (state.get('exportMode') !== null) {
+                        // In Export Mode: Pan mode (to be implemented with VideoExportManager)
+                        console.log('Export Mode: Pan mode (not yet implemented)');
+                    } else {
+                        // In Normal Mode: Toggle UI
+                        this.toggleUI();
+                    }
                     break;
                 case 'g':
                     e.preventDefault();
@@ -324,7 +331,14 @@ class App {
                     }
                     break;
                 case 'escape':
-                    this.closeOverlays();
+                    // Context-aware escape behavior
+                    if (state.get('exportMode') !== null) {
+                        // In Export Mode: Exit export mode (to be implemented with VideoExportManager)
+                        console.log('Export Mode: Exit export mode (not yet implemented)');
+                    } else {
+                        // In Normal Mode: Close overlays
+                        this.closeOverlays();
+                    }
                     break;
                 case '1':
                 case '2':
