@@ -1,4 +1,4 @@
-# 🎨 Kinetic Typography Motion Design App
+# floss
 
 A professional, browser-based kinetic typography motion design tool for creating stunning text animations in real-time. No build step required – just open and create!
 

@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'kinetic-typo-v2.2.0'; // Add settings overlay and app settings
+const CACHE_NAME = 'floss-v2.2.0'; // Add settings overlay and app settings
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
