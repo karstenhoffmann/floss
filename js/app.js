@@ -12,6 +12,7 @@ import state from './core/state.js';
 import appSettings from './core/app-settings.js';
 import notification from './ui/notification.js';
 import ICONS from './ui/icons.js';
+import VERSION from './version.js';
 
 // Import effects
 import EndlessEffect from './effects/endless.js';
@@ -34,26 +35,20 @@ class App {
     }
 
     async init() {
-        // App version and build info
-        const appVersion = '2.3.0';
-        const buildCommit = 'e6c3364';
-        const buildDate = '2025-11-20';
-
         console.log(`
-╔════════════════════════════════════════╗
-║   Floss - Motion Design                ║
-║   Version: ${appVersion}                      ║
-║   Build: ${buildCommit}                   ║
-║   Date: ${buildDate}                ║
-╚════════════════════════════════════════╝
+╔════════════════════════════════════════════════════════════════╗
+║   🎨 Floss - Motion Design                                     ║
+║   Version: ${VERSION.number.padEnd(10)} Date: ${VERSION.date} ${VERSION.time}        ║
+║   Last Commit: ${VERSION.commit.padEnd(47)}║
+╚════════════════════════════════════════════════════════════════╝
         `);
 
         // Clear old localStorage if needed (one-time migration)
         const storedVersion = localStorage.getItem('appVersion');
-        if (storedVersion !== appVersion) {
+        if (storedVersion !== VERSION.number) {
             console.log('🔄 Clearing old cache and localStorage...');
             localStorage.clear();
-            localStorage.setItem('appVersion', appVersion);
+            localStorage.setItem('appVersion', VERSION.number);
             // Clear service worker cache
             if ('caches' in window) {
                 caches.keys().then(names => {

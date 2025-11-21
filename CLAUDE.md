@@ -50,6 +50,118 @@ This means:
 
 ---
 
+## 🔢 CRITICAL: Version Management & Console Logging
+
+**MANDATORY: Update version WITH EVERY COMMIT!**
+
+### Version File Location
+
+**File:** `js/version.js`
+
+```javascript
+export const VERSION = {
+    number: '2.3.0',           // Semantic version (major.minor.patch)
+    commit: 'Brief commit message here',
+    date: '2025-11-21',        // YYYY-MM-DD
+    time: '14:30'              // HH:MM (24-hour format)
+};
+```
+
+### When to Update Version
+
+**ALWAYS update `js/version.js` BEFORE committing:**
+
+1. **Before EVERY commit:**
+   - Update `VERSION.number` (increment appropriately)
+   - Update `VERSION.commit` (brief description, max 47 chars)
+   - Update `VERSION.date` (today's date)
+   - Update `VERSION.time` (current time when committing)
+
+2. **Version Number Rules (Semantic Versioning):**
+   - **Major (X.0.0):** Breaking changes, architecture refactor
+   - **Minor (2.X.0):** New features, new effects, significant additions
+   - **Patch (2.3.X):** Bug fixes, minor improvements, documentation
+
+### Version Update Workflow
+
+**Step-by-step process:**
+
+```bash
+# 1. Make your code changes
+# ... edit files ...
+
+# 2. Update version.js
+# Edit js/version.js:
+#   - Increment version.number
+#   - Update commit message
+#   - Update date and time
+
+# 3. Commit with version in message
+git add .
+git commit -m "feat: [Your changes]
+
+Version: 2.3.1
+"
+
+# 4. Push
+git push -u origin [branch-name]
+```
+
+### Why This Matters
+
+**Benefits of version tracking:**
+- ✅ **Debug across sessions:** User can tell you "I'm seeing version 2.3.0, but documentation says 2.3.5"
+- ✅ **Session continuity:** Claude can immediately see what was changed last
+- ✅ **Cache debugging:** User can verify correct version loaded (not cached old code)
+- ✅ **Time tracking:** Know when changes were deployed
+- ✅ **Console visibility:** Version banner appears on every app start
+
+### Console Output
+
+When user loads the app, they see:
+
+```
+╔════════════════════════════════════════════════════════════════╗
+║   🎨 Floss - Motion Design                                     ║
+║   Version: 2.3.0       Date: 2025-11-21 14:30                 ║
+║   Last Commit: Context-aware keyboard shortcuts               ║
+╚════════════════════════════════════════════════════════════════╝
+```
+
+This makes it immediately clear:
+- What version is running
+- When it was built
+- What was changed last
+
+### Self-Check Before Committing
+
+Before `git commit`, ask yourself:
+
+- [ ] Did I update `js/version.js`?
+- [ ] Did I increment version number correctly?
+- [ ] Did I write a brief commit message (max 47 chars)?
+- [ ] Did I update date and time?
+
+**If ANY checkbox is unchecked → Update version.js before committing!**
+
+### Example Version Updates
+
+```javascript
+// Bug fix (patch)
+2.3.0 → 2.3.1
+commit: 'Fix particle reset on export'
+
+// New feature (minor)
+2.3.1 → 2.4.0
+commit: 'Add VideoExportManager core implementation'
+
+// Breaking change (major)
+2.4.0 → 3.0.0
+commit: 'Refactor effect system architecture'
+```
+
+---
+
 ## 📝 CRITICAL: Documentation Maintenance Guidelines
 
 **IMPORTANT:** This documentation is LIVING - not static! Claude Code sessions MUST maintain and update documentation as the project evolves.
@@ -746,6 +858,34 @@ PLUGIN_SPEC.md: "## Required Methods
 
 ---
 
+**13. Forgetting to Update version.js Before Committing**
+```bash
+# ❌ WRONG: Commit without updating version
+# ... make code changes ...
+git add .
+git commit -m "feat: new feature"
+# version.js still shows old version!
+
+# ✅ CORRECT: Always update version.js FIRST
+# 1. Make code changes
+# 2. Update js/version.js:
+export const VERSION = {
+    number: '2.3.1',  // Incremented!
+    commit: 'Add new feature',
+    date: '2025-11-21',
+    time: '15:45'
+};
+# 3. Then commit
+git add .
+git commit -m "feat: Add new feature
+
+Version: 2.3.1"
+```
+
+**Why it matters:** User can't tell which version is deployed, debugging becomes impossible, cache issues are invisible.
+
+---
+
 ### Self-Check Before Finishing Session
 
 Before marking work complete, ask yourself:
@@ -765,7 +905,11 @@ Before marking work complete, ask yourself:
 - [ ] Did I update examples if API changed?
 - [ ] Are all docs consistent with each other?
 
-**Deployment:**
+**Version & Deployment:**
+- [ ] Did I update `js/version.js` before committing?
+- [ ] Did I increment version number correctly?
+- [ ] Did I write brief commit message in version.js (max 47 chars)?
+- [ ] Did I update date and time in version.js?
 - [ ] Did I commit with clear message?
 - [ ] Did I push to correct branch (with session ID)?
 - [ ] Did I TELL USER to update GitHub Pages settings?
