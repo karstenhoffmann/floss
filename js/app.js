@@ -6,6 +6,7 @@
 import { isWebGLAvailable, getWebGLErrorMessage } from './utils/webgl-check.js';
 import SceneManager from './core/scene.js';
 import RenderLoop from './core/renderer.js';
+import VideoExportManager from './core/video-export.js';
 import effectManager from './core/effect-manager.js';
 import presetManager from './core/preset-manager.js';
 import state from './core/state.js';
@@ -29,6 +30,7 @@ class App {
 
         this.sceneManager = null;
         this.renderLoop = null;
+        this.videoExportManager = null;
         this.currentEffect = null;
 
         this.init();
@@ -66,6 +68,12 @@ class App {
 
         // Initialize render loop
         this.renderLoop = new RenderLoop(this.sceneManager);
+
+        // Initialize video export manager
+        this.videoExportManager = new VideoExportManager(this, this.sceneManager);
+
+        // Expose for debugging
+        window.app = this;
 
         // Setup UI
         this.setupUI();
@@ -284,7 +292,7 @@ class App {
                     e.preventDefault();
                     // Context-aware spacebar behavior
                     if (state.get('exportMode') !== null) {
-                        // In Export Mode: Pan mode (to be implemented with VideoExportManager)
+                        // In Export Mode: Pan mode (TODO: Implement camera pan)
                         console.log('Export Mode: Pan mode (not yet implemented)');
                     } else {
                         // In Normal Mode: Toggle UI
@@ -328,8 +336,9 @@ class App {
                 case 'escape':
                     // Context-aware escape behavior
                     if (state.get('exportMode') !== null) {
-                        // In Export Mode: Exit export mode (to be implemented with VideoExportManager)
-                        console.log('Export Mode: Exit export mode (not yet implemented)');
+                        // In Export Mode: Exit export mode
+                        e.preventDefault();
+                        this.videoExportManager.exit();
                     } else {
                         // In Normal Mode: Close overlays
                         this.closeOverlays();
