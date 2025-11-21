@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Standardized app name to lowercase "floss" across codebase
+  - README.md: Updated main title to "floss"
+  - index.html: Updated meta description
+  - service-worker.js: Updated cache name from "kinetic-typo" to "floss"
+
 ### Planned
 - Video/GIF export functionality
 - Custom text input
