@@ -455,13 +455,15 @@ export class VideoExportManager {
         const avgSpeed = totalFrames / elapsed;
         console.log(`✓ All frames rendered in ${elapsed.toFixed(2)}s (${avgSpeed.toFixed(1)}× realtime)`);
 
-        // Final step to trigger stop() and get the buffer
-        // When frame === frameTotal, step() calls stop() and returns the buffer
-        console.log('→ Finalizing recording...');
-        const buffer = await this.recorder.step();
-        console.log('✓ Recording finalized, buffer received:', buffer ? 'yes' : 'no');
+        // Stop recording and get the buffer
+        // Note: step() doesn't return the buffer, so we call stop() directly
+        console.log('→ Stopping recording...');
+        console.log('  Current frame count:', this.recorder.frame, '/', this.recorder.frameTotal);
+        const buffer = await this.recorder.stop();
+        console.log('✓ Recording stopped, buffer type:', buffer ? buffer.constructor.name : 'undefined');
+        console.log('  Buffer size:', buffer ? buffer.byteLength : 0, 'bytes');
 
-        return buffer;  // Return the buffer from the final step
+        return buffer;  // Return the buffer from stop()
     }
 
     /**

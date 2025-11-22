@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v5.1.0'; // Use initOnly + final step() for buffer
+const CACHE_NAME = 'floss-v5.1.1'; // Call stop() directly (step returns void)
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
