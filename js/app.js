@@ -322,9 +322,19 @@ class App {
                     }
                     break;
                 case 'e':
+                    e.preventDefault();
                     if (e.ctrlKey || e.metaKey) {
-                        e.preventDefault();
+                        // Ctrl+E / Cmd+E: Export settings
                         this.exportSettings();
+                    } else {
+                        // E alone: Toggle video export mode
+                        if (state.get('exportMode') === null) {
+                            // Not in export mode → Enter export mode
+                            this.videoExportManager.enter();
+                        } else {
+                            // Already in export mode → Exit export mode
+                            this.videoExportManager.exit();
+                        }
                     }
                     break;
                 case 'i':
