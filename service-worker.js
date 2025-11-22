@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v5.0.6'; // Force MP4WasmEncoder (not WebCodecsEncoder)
+const CACHE_NAME = 'floss-v5.0.7'; // Add encoderOptions.bitrateMode for MP4WasmEncoder
 
 // Assets to cache
 const ASSETS_TO_CACHE = [

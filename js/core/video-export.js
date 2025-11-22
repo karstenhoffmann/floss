@@ -212,7 +212,12 @@ export class VideoExportManager {
                 frameRate: this.exportOptions.fps,
                 download: false,  // We handle download ourselves
                 extension: 'mp4',
-                encoder: encoder  // Explicitly use MP4WasmEncoder (embedded WASM)
+                encoder: encoder,  // Explicitly use MP4WasmEncoder (embedded WASM)
+                encoderOptions: {
+                    // MP4WasmEncoder requires these options
+                    bitrateMode: 'variable',  // 'variable' or 'constant'
+                    // bitrate is auto-calculated by estimateBitRate()
+                }
             });
 
             console.log('✓ canvas-record Recorder initialized with MP4WasmEncoder');
