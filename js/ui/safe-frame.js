@@ -112,7 +112,7 @@ export class SafeFrameComponent {
     }
 
     /**
-     * Calculate optimal scale to fit browser window
+     * Calculate optimal scale to fit browser window and center
      */
     calculateScale() {
         const targetWidth = 1920;
@@ -132,6 +132,14 @@ export class SafeFrameComponent {
         if (this.isScaled) {
             this.scale = this.autoScale;
         }
+
+        // Center based on SCALED size
+        const scaledWidth = targetWidth * this.scale;
+        const scaledHeight = targetHeight * this.scale;
+        const x = (window.innerWidth - scaledWidth) / 2;
+        const y = (window.innerHeight - scaledHeight) / 2;
+
+        this.videoExportManager.updateSafeFrame({ x, y });
 
         this.updateLabel();
     }

@@ -3,16 +3,18 @@
  * Handles video export functionality for PowerPoint integration
  *
  * Features:
- * - MP4/H.264 export (PowerPoint compatible)
+ * - MP4/H.264 export (PowerPoint compatible) via native MediaRecorder
  * - 1920×1080 @ 30fps
  * - Safe Frame system for export region
  * - Frame-by-frame offline rendering
  * - Perfect loop calculation via effects
+ * - No external dependencies (uses browser APIs)
  */
 
 import state from './state.js';
 import SafeFrameComponent from '../ui/safe-frame.js';
 import ExportPanelComponent from '../ui/export-panel.js';
+import CanvasRecorder from '../../lib/canvas-recorder.js';
 
 export class VideoExportManager {
     constructor(app, sceneManager) {
@@ -159,42 +161,16 @@ export class VideoExportManager {
             // 1. Create offscreen canvas and renderer
             this.createOffscreenRenderer();
 
-            // 2. Load and initialize canvas-record for MP4 export (ES module)
-            // Try multiple CDNs with fallback
-            const cdnUrls = [
-                'https://cdn.skypack.dev/canvas-record@4.2.4',
-                'https://unpkg.com/canvas-record@4.2.4?module',
-                'https://cdn.jsdelivr.net/npm/canvas-record@4.2.4/+esm'
-            ];
+            // 2. Initialize canvas recorder (native MediaRecorder API - no dependencies!)
+            console.log('→ Initializing CanvasRecorder (native MediaRecorder)...');
 
-            let Recorder = null;
-            let loadError = null;
+            // Log supported codecs
+            const codecs = CanvasRecorder.getSupportedCodecs();
+            console.log('📹 Supported codecs:', codecs);
 
-            for (const url of cdnUrls) {
-                try {
-                    console.log(`→ Trying canvas-record from ${url}...`);
-                    const module = await import(url);
-                    Recorder = module.Recorder;
-                    console.log(`✓ canvas-record loaded from ${url}`);
-                    break;
-                } catch (err) {
-                    console.warn(`✗ Failed to load from ${url}:`, err.message);
-                    loadError = err;
-                }
-            }
-
-            if (!Recorder) {
-                throw new Error(`Failed to load canvas-record from all CDNs. Last error: ${loadError?.message}`);
-            }
-
-            this.recorder = new Recorder(this.offscreenCanvas, {
-                encoderOptions: {
-                    codec: 'avc1.42E032',  // H.264 Main Profile Level 5.0 (PowerPoint compatible)
-                    bitrate: this.exportOptions.bitrate,
-                    width: this.exportOptions.width,
-                    height: this.exportOptions.height,
-                    framerate: this.exportOptions.fps
-                }
+            this.recorder = new CanvasRecorder(this.offscreenCanvas, {
+                videoBitsPerSecond: this.exportOptions.bitrate,
+                frameRate: this.exportOptions.fps
             });
 
             console.log('✓ canvas-record Recorder initialized');
@@ -442,8 +418,8 @@ export class VideoExportManager {
     hideMainUI() {
         const toolbar = document.getElementById('toolbar');
         const settingsPanel = document.getElementById('settings-panel');
-        const colorsPanel = document.getElementById('colors-panel');
-        const presetsPanel = document.getElementById('presets-panel');
+        const inspectorPanel = document.getElementById('inspector-panel');
+        const controlsPanel = document.getElementById('controls-panel');
 
         if (toolbar) {
             toolbar.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
@@ -453,23 +429,23 @@ export class VideoExportManager {
 
         if (settingsPanel) {
             settingsPanel.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
-            settingsPanel.style.transform = 'translateX(100%)';
+            settingsPanel.style.transform = 'translateX(-100%)';
             settingsPanel.style.opacity = '0';
         }
 
-        if (colorsPanel) {
-            colorsPanel.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
-            colorsPanel.style.transform = 'translateX(100%)';
-            colorsPanel.style.opacity = '0';
+        if (inspectorPanel) {
+            inspectorPanel.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+            inspectorPanel.style.transform = 'translateX(100%)';
+            inspectorPanel.style.opacity = '0';
         }
 
-        if (presetsPanel) {
-            presetsPanel.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
-            presetsPanel.style.transform = 'translateX(100%)';
-            presetsPanel.style.opacity = '0';
+        if (controlsPanel) {
+            controlsPanel.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+            controlsPanel.style.transform = 'translateY(100%)';
+            controlsPanel.style.opacity = '0';
         }
 
-        console.log('✓ Main UI hidden');
+        console.log('✓ Main UI hidden (toolbar, settings, inspector, controls)');
     }
 
     /**
@@ -478,8 +454,8 @@ export class VideoExportManager {
     showMainUI() {
         const toolbar = document.getElementById('toolbar');
         const settingsPanel = document.getElementById('settings-panel');
-        const colorsPanel = document.getElementById('colors-panel');
-        const presetsPanel = document.getElementById('presets-panel');
+        const inspectorPanel = document.getElementById('inspector-panel');
+        const controlsPanel = document.getElementById('controls-panel');
 
         if (toolbar) {
             toolbar.style.transform = 'translateY(0)';
@@ -491,17 +467,17 @@ export class VideoExportManager {
             settingsPanel.style.opacity = '1';
         }
 
-        if (colorsPanel) {
-            colorsPanel.style.transform = 'translateX(0)';
-            colorsPanel.style.opacity = '1';
+        if (inspectorPanel) {
+            inspectorPanel.style.transform = 'translateX(0)';
+            inspectorPanel.style.opacity = '1';
         }
 
-        if (presetsPanel) {
-            presetsPanel.style.transform = 'translateX(0)';
-            presetsPanel.style.opacity = '1';
+        if (controlsPanel) {
+            controlsPanel.style.transform = 'translateY(0)';
+            controlsPanel.style.opacity = '1';
         }
 
-        console.log('✓ Main UI shown');
+        console.log('✓ Main UI shown (toolbar, settings, inspector, controls)');
     }
 
     /**
