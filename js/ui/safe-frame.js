@@ -69,17 +69,58 @@ export class SafeFrameComponent {
     }
 
     /**
-     * Setup drag to move safe frame
+     * Setup drag to move safe frame (only from edges)
      */
     setupDrag() {
+        const edgeWidth = 15;  // Width of draggable edge zone
+
         this.rect.addEventListener('mousedown', (e) => {
-            if (e.target === this.rect) {
+            if (e.target !== this.rect) {
+                return;  // Clicked on child element (label, button)
+            }
+
+            // Check if click is within edge zone
+            const rect = this.rect.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const width = rect.width;
+            const height = rect.height;
+
+            const isOnEdge = (
+                x < edgeWidth ||                    // Left edge
+                x > width - edgeWidth ||            // Right edge
+                y < edgeWidth ||                    // Top edge
+                y > height - edgeWidth              // Bottom edge
+            );
+
+            if (isOnEdge) {
                 this.isDragging = true;
                 const safeFrame = this.videoExportManager.getSafeFrame();
                 this.dragOffset.x = e.clientX - safeFrame.x;
                 this.dragOffset.y = e.clientY - safeFrame.y;
                 e.preventDefault();
+                e.stopPropagation();  // Don't let click through to scene
             }
+        });
+
+        // Update cursor to show draggable edges
+        this.rect.addEventListener('mousemove', (e) => {
+            if (this.isDragging) return;  // Don't change cursor while dragging
+
+            const rect = this.rect.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const width = rect.width;
+            const height = rect.height;
+
+            const isOnEdge = (
+                x < edgeWidth ||
+                x > width - edgeWidth ||
+                y < edgeWidth ||
+                y > height - edgeWidth
+            );
+
+            this.rect.style.cursor = isOnEdge ? 'move' : 'default';
         });
 
         document.addEventListener('mousemove', (e) => {
@@ -88,6 +129,8 @@ export class SafeFrameComponent {
                 const y = e.clientY - this.dragOffset.y;
                 this.videoExportManager.updateSafeFrame({ x, y });
                 this.update();
+                e.preventDefault();
+                e.stopPropagation();
             }
         });
 

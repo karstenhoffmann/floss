@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '2.8.0',
-    commit: 'feat: Native canvas recorder (no dependencies!)',
+    number: '2.8.1',
+    commit: 'fix: Realtime recording & edge-only frame drag',
     date: '2025-11-22',
-    time: '13:30'
+    time: '14:15'
 };
 
 export default VERSION;

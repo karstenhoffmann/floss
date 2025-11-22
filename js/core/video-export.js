@@ -186,8 +186,8 @@ export class VideoExportManager {
             await this.recorder.start();
             console.log('✓ Recording started');
 
-            // 5. Frame-by-frame rendering loop
-            await this.renderAllFrames();
+            // 5. Render animation in realtime (MediaRecorder captures stream)
+            await this.renderRealtimeAnimation();
 
             // 6. Stop recording and get blob
             const blob = await this.recorder.stop();
@@ -338,9 +338,10 @@ export class VideoExportManager {
     }
 
     /**
-     * Render all frames for export (frame-by-frame)
+     * Render animation in realtime and record with MediaRecorder
+     * MediaRecorder captures whatever is drawn on canvas in realtime
      */
-    async renderAllFrames() {
+    async renderRealtimeAnimation() {
         const effect = this.sceneManager.activeEffect;
         const scene = this.sceneManager.scene;
         const camera = this.sceneManager.camera;
@@ -349,45 +350,59 @@ export class VideoExportManager {
             throw new Error('Scene, camera, or effect not initialized');
         }
 
-        const frameDuration = 1.0 / this.exportOptions.fps;  // Time per frame in seconds
+        const duration = this.exportOptions.duration * 1000;  // Convert to ms
+        const frameDuration = 1000 / this.exportOptions.fps;  // ms per frame
+        const startTime = performance.now();
+        let lastFrameTime = startTime;
+        let frameCount = 0;
 
-        console.log(`→ Rendering ${this.totalFrames} frames...`);
+        console.log(`→ Recording ${this.exportOptions.duration}s at ${this.exportOptions.fps}fps...`);
 
-        for (let frame = 0; frame < this.totalFrames; frame++) {
-            this.currentFrame = frame;
+        return new Promise((resolve, reject) => {
+            const animate = (currentTime) => {
+                try {
+                    const elapsed = currentTime - startTime;
+                    const elapsedSec = elapsed / 1000;
 
-            // Calculate elapsed time for this frame
-            const elapsedTime = frame * frameDuration;
+                    // Check if recording is complete
+                    if (elapsed >= duration) {
+                        console.log(`✓ Recording complete (${frameCount} frames)`);
+                        resolve();
+                        return;
+                    }
 
-            // Update effect with this specific time
-            effect.update(frameDuration, elapsedTime);
+                    // Render frame
+                    effect.update(frameDuration / 1000, elapsedSec);
+                    this.offscreenRenderer.render(scene, camera);
 
-            // Render to offscreen canvas
-            this.offscreenRenderer.render(scene, camera);
+                    frameCount++;
+                    lastFrameTime = currentTime;
 
-            // Record frame
-            await this.recorder.step();
+                    // Update progress
+                    const percentage = (elapsed / duration) * 100;
+                    state.set('exportProgress', {
+                        currentFrame: frameCount,
+                        totalFrames: this.totalFrames,
+                        percentage: Math.round(percentage)
+                    });
 
-            // Update progress
-            const percentage = ((frame + 1) / this.totalFrames) * 100;
-            state.set('exportProgress', {
-                currentFrame: frame + 1,
-                totalFrames: this.totalFrames,
-                percentage: Math.round(percentage)
-            });
+                    // Log progress every second
+                    if (frameCount % this.exportOptions.fps === 0) {
+                        console.log(`  ${elapsedSec.toFixed(1)}s / ${this.exportOptions.duration}s (${percentage.toFixed(1)}%)`);
+                    }
 
-            // Log progress every 30 frames
-            if (frame % 30 === 0 || frame === this.totalFrames - 1) {
-                console.log(`  Frame ${frame + 1}/${this.totalFrames} (${percentage.toFixed(1)}%)`);
-            }
+                    // Continue animation loop
+                    requestAnimationFrame(animate);
 
-            // Allow UI to update (prevent freezing)
-            if (frame % 10 === 0) {
-                await new Promise(resolve => setTimeout(resolve, 0));
-            }
-        }
+                } catch (error) {
+                    console.error('Animation error:', error);
+                    reject(error);
+                }
+            };
 
-        console.log(`✓ All ${this.totalFrames} frames rendered`);
+            // Start animation loop
+            requestAnimationFrame(animate);
+        });
     }
 
     /**
