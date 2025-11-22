@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.0.9',
-    commit: 'fix: Capture buffer from last step() call',
-    date: '2025-11-22',
-    time: '23:55'
+    number: '5.1.0',
+    commit: 'fix: Use initOnly + final step() for buffer',
+    date: '2025-11-23',
+    time: '00:05'
 };
 
 export default VERSION;

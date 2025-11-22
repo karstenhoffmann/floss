@@ -234,12 +234,12 @@ export class VideoExportManager {
 
             console.log('✓ canvas-record Recorder initialized with MP4WasmEncoder');
 
-            // 4. Start recording
-            await this.recorder.start();
+            // 4. Start recording (initOnly - don't call first step yet)
+            await this.recorder.start({ initOnly: true });
             console.log('✓ Recording started - rendering frames...');
 
             // 5. Render animation frame-by-frame (OFFLINE - frame-perfect!)
-            // The last step() call will automatically stop the recorder and return the buffer
+            // The FINAL step() call (after totalFrames) will stop and return the buffer
             const buffer = await this.renderFrameByFrame();
 
             // 6. Convert buffer to Blob
@@ -420,7 +420,6 @@ export class VideoExportManager {
         console.log(`→ Rendering ${totalFrames} frames at ${fps}fps (offline)...`);
 
         const startTime = performance.now();
-        let buffer = null;
 
         // Frame-by-frame rendering loop (OFFLINE - not realtime!)
         for (let frameNumber = 0; frameNumber < totalFrames; frameNumber++) {
@@ -434,11 +433,7 @@ export class VideoExportManager {
             this.offscreenRenderer.render(scene, camera);
 
             // 3. Tell recorder to capture this frame
-            // The LAST step() call will auto-stop and return the buffer
-            const result = await this.recorder.step();
-            if (result) {
-                buffer = result;  // Capture buffer from last step
-            }
+            await this.recorder.step();
 
             // Update progress
             const percentage = ((frameNumber + 1) / totalFrames) * 100;
@@ -460,7 +455,13 @@ export class VideoExportManager {
         const avgSpeed = totalFrames / elapsed;
         console.log(`✓ All frames rendered in ${elapsed.toFixed(2)}s (${avgSpeed.toFixed(1)}× realtime)`);
 
-        return buffer;  // Return the buffer from the last step
+        // Final step to trigger stop() and get the buffer
+        // When frame === frameTotal, step() calls stop() and returns the buffer
+        console.log('→ Finalizing recording...');
+        const buffer = await this.recorder.step();
+        console.log('✓ Recording finalized, buffer received:', buffer ? 'yes' : 'no');
+
+        return buffer;  // Return the buffer from the final step
     }
 
     /**
