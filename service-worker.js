@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v5.0.5'; // Fixed WebGL context access (.context property)
+const CACHE_NAME = 'floss-v5.0.6'; // Force MP4WasmEncoder (not WebCodecsEncoder)
 
 // Assets to cache
 const ASSETS_TO_CACHE = [

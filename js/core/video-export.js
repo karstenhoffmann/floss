@@ -20,7 +20,7 @@
 import state from './state.js';
 import SafeFrameComponent from '../ui/safe-frame.js';
 import ExportPanelComponent from '../ui/export-panel.js';
-import { Recorder } from '../../lib/canvas-record/package/index.js';
+import { Recorder, Encoders } from '../../lib/canvas-record/package/index.js';
 
 export class VideoExportManager {
     constructor(app, sceneManager) {
@@ -198,15 +198,24 @@ export class VideoExportManager {
 
             const filename = `floss-export-${Date.now()}.mp4`;
 
+            // Create MP4WasmEncoder explicitly (instead of letting canvas-record
+            // auto-select WebCodecsEncoder, which has browser support issues)
+            const encoder = new Encoders.MP4WasmEncoder({
+                extension: 'mp4'
+            });
+
+            console.log('  Using encoder:', encoder.constructor.name);
+
             this.recorder = new Recorder(gl, {
                 name: filename,
                 duration: this.exportOptions.duration,
                 frameRate: this.exportOptions.fps,
                 download: false,  // We handle download ourselves
-                extension: 'mp4'  // Uses MP4WasmEncoder (embedded WASM)
+                extension: 'mp4',
+                encoder: encoder  // Explicitly use MP4WasmEncoder (embedded WASM)
             });
 
-            console.log('✓ canvas-record Recorder initialized');
+            console.log('✓ canvas-record Recorder initialized with MP4WasmEncoder');
 
             // 4. Start recording
             await this.recorder.start();

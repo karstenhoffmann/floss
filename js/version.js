@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.0.5',
-    commit: 'fix: Use .context property (not .getContext method)',
+    number: '5.0.6',
+    commit: 'fix: Force MP4WasmEncoder (not WebCodecsEncoder)',
     date: '2025-11-22',
-    time: '23:15'
+    time: '23:25'
 };
 
 export default VERSION;
