@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '2.10.3',
-    commit: 'fix: Warm-up frames + end delay (perfect sync)',
+    number: '3.0.0',
+    commit: 'refactor: Professional requestFrame() approach',
     date: '2025-11-22',
-    time: '17:45'
+    time: '18:00'
 };
 
 export default VERSION;

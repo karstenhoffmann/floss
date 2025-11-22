@@ -182,38 +182,21 @@ export class VideoExportManager {
                 console.log('✓ Effect reset to t=0');
             }
 
-            // 4. Warm-up: Render a few frames BEFORE starting recording
-            // This ensures captureStream() is fully initialized
-            console.log('→ Warming up captureStream (rendering 3 dummy frames)...');
-            for (let i = 0; i < 3; i++) {
-                effect.update(0, 0);
-                this.offscreenRenderer.render(this.sceneManager.scene, this.sceneManager.camera);
-                await new Promise(resolve => setTimeout(resolve, 50));
-            }
-            console.log('✓ Warm-up complete');
-
-            // 5. Start recording
+            // 4. Start recording with manual frame control
             await this.recorder.start();
-            console.log('✓ Recording started');
+            console.log('✓ Recording started (manual frame triggering via requestFrame)');
 
-            // 6. Wait a moment for MediaRecorder to be ready
-            await new Promise(resolve => setTimeout(resolve, 100));
-
-            // 7. Render animation in realtime (MediaRecorder captures stream)
+            // 5. Render animation frame-by-frame with explicit frame capture
             await this.renderRealtimeAnimation();
 
-            // 8. Wait for last frame to be captured before stopping
-            const frameDuration = 1000 / this.exportOptions.fps;
-            await new Promise(resolve => setTimeout(resolve, frameDuration * 2));
-
-            // 9. Stop recording and get blob
+            // 6. Stop recording and get blob
             const blob = await this.recorder.stop();
             console.log('✓ Recording stopped, blob size:', (blob.size / 1024 / 1024).toFixed(2), 'MB');
 
-            // 10. Trigger download
+            // 7. Trigger download
             this.downloadBlob(blob, `floss-export-${Date.now()}.mp4`);
 
-            // 11. Complete export
+            // 8. Complete export
             this.completeExport();
 
         } catch (error) {
@@ -355,8 +338,14 @@ export class VideoExportManager {
     }
 
     /**
-     * Render animation with precise frame timing for smooth video
-     * Uses fixed-timestep rendering for consistent frame rate
+     * Render animation with frame-perfect precision
+     *
+     * Professional approach using MediaStreamTrack.requestFrame():
+     * - captureStream(0) = manual frame control (no automatic sampling)
+     * - After each render(), call requestFrame() to explicitly capture
+     * - 100% deterministic, no dropped frames, no async timing issues
+     *
+     * This is the industry-standard approach for canvas video recording.
      */
     async renderRealtimeAnimation() {
         const effect = this.sceneManager.activeEffect;
@@ -399,10 +388,15 @@ export class VideoExportManager {
                     // Calculate exact time for THIS specific frame (deterministic)
                     const frameTime = frameCount * (frameDuration / 1000);
 
-                    // Render ONE frame per call
-                    // captureStream(fps) will sample these frames at the target FPS
+                    // 1. Update effect state
                     effect.update(frameDuration / 1000, frameTime);
+
+                    // 2. Render to canvas
                     this.offscreenRenderer.render(scene, camera);
+
+                    // 3. EXPLICITLY request MediaRecorder to capture this frame
+                    // This is the key to frame-perfect recording!
+                    this.recorder.captureFrame();
 
                     frameCount++;
 
