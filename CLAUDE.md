@@ -1,6 +1,6 @@
 # Claude Code Session Context
 
-**Last Updated:** 2025-11-21
+**Last Updated:** 2025-11-23
 **Project:** Floss - Professional Kinetic Typography Motion Design Tool
 **Repository:** https://github.com/karstenhoffmann/floss
 **Deployment:** https://karstenhoffmann.github.io/floss/
@@ -1050,6 +1050,383 @@ User can ONLY test via GitHub Pages. **Always remind them to update settings!**
 - **Icons**: Add to `js/ui/icons.js` SVG sprite
 - **Notifications**: Use `showNotification()` from `js/ui/notification.js`
 - **Controls**: Auto-generated from effect settings schema
+
+---
+
+## 🎬 Video Export System
+
+**Status:** ✅ Fully implemented (v5.1.1+)
+**Format:** MP4 (H.264), PowerPoint compatible
+**Resolution:** 1920×1080
+**Frame Rates:** 30fps, 60fps
+**Export Type:** Frame-perfect offline rendering
+
+### Overview
+
+The video export system uses **canvas-record** library with **MP4WasmEncoder** for frame-perfect, offline video rendering. This means:
+- ✅ Faster than realtime (30-40× speed)
+- ✅ Perfect loops (calculated from effect settings)
+- ✅ No frame drops or timing issues
+- ✅ Deterministic animation (same input = same output)
+- ✅ No external dependencies (WASM embedded)
+
+### Implementation Architecture
+
+**File:** `js/core/video-export.js`
+
+```
+User clicks Export
+  ↓
+VideoExportManager.enterExportMode()
+  ↓
+SafeFrame component shows 1920×1080 region
+  ↓
+User clicks "Start Export"
+  ↓
+VideoExportManager.startExport()
+  ├─ Create offscreen renderer (1920×1080)
+  ├─ Clone effect to offscreen scene
+  ├─ Reset effect to t=0
+  ├─ Initialize canvas-record Recorder
+  │   ├─ Create MP4WasmEncoder explicitly
+  │   ├─ Calculate bitrate manually
+  │   └─ Start with { initOnly: true }
+  ↓
+renderFrameByFrame()
+  ├─ Loop: for frame 0 to 149 (150 frames)
+  │   ├─ Calculate time = frame / fps
+  │   ├─ effect.update(deltaTime, time)
+  │   ├─ offscreenRenderer.render(scene, camera)
+  │   └─ recorder.step()
+  ↓
+recorder.stop() → Returns Uint8Array buffer
+  ↓
+Convert to Blob → Download MP4
+```
+
+### Critical Learnings (MUST READ)
+
+**🚨 IMPORTANT:** These are hard-learned lessons from v4.0.0-v5.1.1 development. Follow these exactly to avoid wasting time.
+
+#### 1. **Use MP4WasmEncoder, NOT WebCodecsEncoder**
+
+**Problem:**
+- canvas-record auto-selects WebCodecsEncoder if browser supports WebCodecs API
+- WebCodecsEncoder has inconsistent browser support and configuration issues
+- Codec compatibility varies across devices (avc1.420034 vs avc1.4d0034)
+
+**Solution:**
+```javascript
+import { Recorder, Encoders } from '../../lib/canvas-record/package/index.js';
+
+// ✅ CORRECT: Explicitly create MP4WasmEncoder
+const encoder = new Encoders.MP4WasmEncoder({
+    extension: 'mp4'
+});
+
+this.recorder = new Recorder(gl, {
+    encoder: encoder,  // Force MP4WasmEncoder
+    // ...
+});
+```
+
+**Why:** MP4WasmEncoder uses embedded WASM binary, no browser API dependencies, works everywhere.
+
+---
+
+#### 2. **Pass WebGL Context, NOT Canvas Element**
+
+**Problem:**
+- Recorder expects a RenderingContext (WebGLRenderingContext), not HTMLCanvasElement
+- Error: "Cannot read properties of undefined (reading 'width')"
+
+**Solution:**
+```javascript
+// ❌ WRONG:
+this.recorder = new Recorder(this.offscreenCanvas, {...});
+
+// ✅ CORRECT:
+const gl = this.offscreenRenderer.context;  // Property, not method!
+this.recorder = new Recorder(gl, {...});
+```
+
+**Why:** Recorder.js accesses `this.context.canvas.width` - needs context, not canvas.
+
+---
+
+#### 3. **Use Three.js `.context` Property (r115)**
+
+**Problem:**
+- Three.js r115 has `.context` property, not `.getContext()` method
+- Calling `.getContext()` throws deprecation warning or fails
+
+**Solution:**
+```javascript
+// ❌ WRONG:
+const gl = this.offscreenRenderer.getContext();  // Not a method!
+
+// ✅ CORRECT:
+const gl = this.offscreenRenderer.context;  // Property in r115
+```
+
+**Why:** Three.js API changed - use property access for renderer context.
+
+---
+
+#### 4. **Provide encoderOptions.bitrateMode**
+
+**Problem:**
+- MP4WasmEncoder.init() accesses `this.encoderOptions.bitrateMode`
+- Error: "Cannot read properties of undefined (reading 'bitrateMode')"
+
+**Solution:**
+```javascript
+this.recorder = new Recorder(gl, {
+    encoder: encoder,
+    encoderOptions: {
+        bitrateMode: 'variable',  // Required!
+        bitrate: bitrate  // Explicit value
+    }
+});
+```
+
+**Why:** Encoder needs bitrateMode to calculate bitrate via estimateBitRate().
+
+---
+
+#### 5. **Calculate Bitrate Manually**
+
+**Problem:**
+- `estimateBitRate(width, height, frameRate, motionRank, bitrateMode)`
+- MP4WasmEncoder calls it with wrong parameter order → NaN bitrate
+- Error: "Failed to read the 'bitrate' property from 'VideoEncoderConfig'"
+
+**Solution:**
+```javascript
+// Calculate bitrate manually
+const width = 1920;
+const height = 1080;
+const fps = 60;
+const motionRank = 4;  // 1=low, 2=medium, 4=high motion
+const bitrateMode = 'variable';
+
+const bitrate = Math.round(
+    width * height * fps * motionRank * 0.07 * (bitrateMode === 'variable' ? 0.75 : 1)
+);
+// For 1920×1080@60fps: ~26 Mbps
+
+this.recorder = new Recorder(gl, {
+    encoderOptions: {
+        bitrateMode: bitrateMode,
+        bitrate: bitrate  // Explicit value
+    }
+});
+```
+
+**Why:** Avoid relying on estimateBitRate() parameter order bugs.
+
+---
+
+#### 6. **Use start({ initOnly: true }) + Final stop()**
+
+**Problem:**
+- `start()` calls first `step()` automatically → encodes frame 0
+- Loop encodes frames 0-149 → total 151 frames (off by one!)
+- `step()` doesn't return buffer, only calls `stop()` internally
+
+**Solution:**
+```javascript
+// Start without first step
+await this.recorder.start({ initOnly: true });
+
+// Render all frames
+for (let frameNumber = 0; frameNumber < totalFrames; frameNumber++) {
+    effect.update(deltaTime, time);
+    this.offscreenRenderer.render(scene, camera);
+    await this.recorder.step();  // Doesn't return anything!
+}
+
+// Call stop() directly to get buffer
+const buffer = await this.recorder.stop();  // Returns Uint8Array
+const blob = new Blob([buffer], { type: 'video/mp4' });
+```
+
+**Why:**
+- `initOnly: true` prevents double-encoding first frame
+- `step()` has no return statement in else branch
+- `stop()` returns the buffer properly
+
+---
+
+#### 7. **Use Deterministic Timing (elapsedTime, not deltaTime)**
+
+**Problem:**
+- Using deltaTime for position accumulates floating-point errors
+- Breaks perfect loops and frame-perfect rendering
+
+**Solution:**
+```javascript
+// ❌ WRONG: Accumulates error
+this.rotation += deltaTime * speed;
+
+// ✅ CORRECT: Deterministic
+for (let frame = 0; frame < totalFrames; frame++) {
+    const time = frame / fps;  // Exact time
+    effect.update(1/fps, time);  // deltaTime, elapsedTime
+}
+```
+
+**Why:** Export relies on exact frame timing for perfect loops.
+
+---
+
+### Complete Working Example
+
+```javascript
+// js/core/video-export.js
+import { Recorder, Encoders } from '../../lib/canvas-record/package/index.js';
+
+async startExport() {
+    // 1. Setup
+    const width = 1920;
+    const height = 1080;
+    const fps = 60;
+    const duration = 2.5;  // seconds
+    const totalFrames = duration * fps;  // 150 frames
+
+    // 2. Create offscreen renderer
+    const offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = width;
+    offscreenCanvas.height = height;
+
+    const offscreenRenderer = new THREE.WebGLRenderer({
+        canvas: offscreenCanvas,
+        alpha: true,
+        antialias: true
+    });
+
+    // 3. Get WebGL context (property, not method!)
+    const gl = offscreenRenderer.context;
+
+    // 4. Calculate bitrate manually
+    const motionRank = 4;
+    const bitrateMode = 'variable';
+    const bitrate = Math.round(
+        width * height * fps * motionRank * 0.07 * (bitrateMode === 'variable' ? 0.75 : 1)
+    );
+
+    // 5. Create MP4WasmEncoder explicitly
+    const encoder = new Encoders.MP4WasmEncoder({
+        extension: 'mp4'
+    });
+
+    // 6. Create Recorder
+    this.recorder = new Recorder(gl, {
+        name: `floss-export-${Date.now()}.mp4`,
+        duration: duration,
+        frameRate: fps,
+        download: false,
+        extension: 'mp4',
+        encoder: encoder,
+        encoderOptions: {
+            bitrateMode: bitrateMode,
+            bitrate: bitrate
+        }
+    });
+
+    // 7. Start recording (initOnly - skip first step)
+    await this.recorder.start({ initOnly: true });
+
+    // 8. Render frames
+    for (let frame = 0; frame < totalFrames; frame++) {
+        const time = frame / fps;
+        effect.update(1/fps, time);
+        offscreenRenderer.render(scene, camera);
+        await this.recorder.step();
+    }
+
+    // 9. Stop and get buffer
+    const buffer = await this.recorder.stop();
+    const blob = new Blob([buffer], { type: 'video/mp4' });
+
+    // 10. Download
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `floss-export-${Date.now()}.mp4`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+```
+
+---
+
+### Debugging Video Export
+
+**If export fails, check these in order:**
+
+1. **Console logging:**
+   ```
+   ✓ Using encoder: MP4WasmEncoder  ← Must be MP4WasmEncoder
+   ✓ Bitrate: 26.1 Mbps (variable)  ← Valid number
+   ✓ All frames rendered in X.XXs   ← Should complete
+   → Stopping recording...
+     Current frame count: 150 / 150  ← Should match
+   ✓ Recording stopped, buffer type: Uint8Array  ← Not undefined!
+     Buffer size: XXXXXX bytes  ← Not 0!
+   ✓ Recording stopped, blob size: X.XX MB  ← Valid size
+   ```
+
+2. **Common errors:**
+   - "Cannot read properties of undefined (reading 'width')" → Pass context, not canvas
+   - "Cannot read properties of undefined (reading 'bitrateMode')" → Add encoderOptions
+   - "Failed to read 'bitrate' property" → Calculate bitrate manually
+   - Blob size 0.00 MB → Buffer is undefined, check stop() call
+   - File contains "undefined" → new Blob([undefined], ...) - buffer is undefined
+
+3. **Verify MP4 file:**
+   - Size should be 2-10 MB (depending on duration/fps)
+   - Should open in QuickTime/VLC
+   - Should play in PowerPoint
+   - Should loop perfectly (if effect implements calculateExportSuggestion)
+
+---
+
+### Dependencies
+
+**Library:** canvas-record v5.5.0 (vendored in `/lib/canvas-record/`)
+
+**Import Map:** (in `index.html`)
+```html
+<script type="importmap">
+{
+  "imports": {
+    "canvas-context": "https://esm.sh/canvas-context@3.3.1",
+    "canvas-screenshot": "https://esm.sh/canvas-screenshot@4.2.2",
+    "mediabunny": "https://esm.sh/mediabunny@1.24.2",
+    "media-codecs": "https://esm.sh/media-codecs@2.0.2",
+    "gifenc": "https://esm.sh/gifenc@1.0.3",
+    "h264-mp4-encoder": "https://esm.sh/h264-mp4-encoder@1.0.12",
+    "@ffmpeg/ffmpeg": "https://esm.sh/@ffmpeg/ffmpeg@0.12.7",
+    "@ffmpeg/util": "https://esm.sh/@ffmpeg/util@0.12.1"
+  }
+}
+</script>
+```
+
+**Why Import Maps:** canvas-record uses bare module specifiers that need resolution.
+
+---
+
+### Future Improvements
+
+- [ ] Custom bitrate control (UI slider)
+- [ ] Multiple format support (WebM, GIF)
+- [ ] Resolution presets (4K, 1080p, 720p)
+- [ ] Background export (Web Worker)
+- [ ] Progress bar with time estimates
+- [ ] Cancel export functionality
+- [ ] Export queue (multiple exports)
 
 ---
 
