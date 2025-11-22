@@ -374,19 +374,16 @@ export class VideoExportManager {
                     const elapsed = currentTime - startTime;
 
                     // Check if recording is complete
-                    if (frameCount >= totalFrames || elapsed >= duration) {
+                    if (frameCount >= totalFrames) {
                         console.log(`✓ Recording complete (${frameCount} frames rendered in ${(elapsed / 1000).toFixed(2)}s)`);
                         resolve();
                         return;
                     }
 
-                    // Calculate target time for next frame
-                    const targetFrameTime = frameCount * frameDuration;
-
-                    // Only render if enough time has passed for the next frame
-                    // This ensures we don't render too fast and create duplicate frames
-                    if (elapsed >= targetFrameTime) {
-                        // Calculate exact elapsed time in seconds for deterministic animation
+                    // CRITICAL: Render all frames we should have rendered by now
+                    // This catch-up logic ensures NO frames are dropped
+                    while (frameCount < totalFrames && elapsed >= frameCount * frameDuration) {
+                        // Calculate exact time for THIS specific frame
                         const frameTime = frameCount * (frameDuration / 1000);
 
                         // Render frame with deterministic time
@@ -405,11 +402,11 @@ export class VideoExportManager {
 
                         // Log progress every second
                         if (frameCount % fps === 0) {
-                            console.log(`  ${frameTime.toFixed(1)}s / ${this.exportOptions.duration}s (${percentage.toFixed(1)}%)`);
+                            console.log(`  Frame ${frameCount}/${totalFrames} (${percentage.toFixed(1)}%) @ ${frameTime.toFixed(2)}s`);
                         }
                     }
 
-                    // Continue to next frame (browser-synced, no dropped frames)
+                    // Continue to next RAF call
                     requestAnimationFrame(renderFrame);
 
                 } catch (error) {
