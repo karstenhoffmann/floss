@@ -11,6 +11,8 @@
  */
 
 import state from './state.js';
+import SafeFrameComponent from '../ui/safe-frame.js';
+import ExportPanelComponent from '../ui/export-panel.js';
 
 export class VideoExportManager {
     constructor(app, sceneManager) {
@@ -38,9 +40,9 @@ export class VideoExportManager {
         this.offscreenCanvas = null;
         this.offscreenRenderer = null;
 
-        // UI components (to be created in Phase 3)
-        this.safeFrameComponent = null;
-        this.exportPanelComponent = null;
+        // UI components
+        this.safeFrameComponent = new SafeFrameComponent(this);
+        this.exportPanelComponent = new ExportPanelComponent(this);
 
         console.log('✓ VideoExportManager initialized');
     }
@@ -64,8 +66,9 @@ export class VideoExportManager {
         // Center safe frame in viewport
         this.centerSafeFrame();
 
-        // TODO Phase 3: Show SafeFrame UI
-        // TODO Phase 3: Show ExportPanel UI
+        // Show UI
+        this.safeFrameComponent.show();
+        this.exportPanelComponent.show();
 
         console.log('✓ Export Mode: setup');
     }
@@ -93,8 +96,9 @@ export class VideoExportManager {
             percentage: 0
         });
 
-        // TODO Phase 3: Hide SafeFrame UI
-        // TODO Phase 3: Hide ExportPanel UI
+        // Hide UI
+        this.safeFrameComponent.hide();
+        this.exportPanelComponent.hide();
 
         console.log('✓ Export Mode: null (normal)');
     }
@@ -400,6 +404,17 @@ export class VideoExportManager {
         if (this.offscreenRenderer) {
             this.offscreenRenderer.dispose();
             this.offscreenRenderer = null;
+        }
+
+        // Cleanup UI components
+        if (this.safeFrameComponent) {
+            this.safeFrameComponent.destroy();
+            this.safeFrameComponent = null;
+        }
+
+        if (this.exportPanelComponent) {
+            this.exportPanelComponent.destroy();
+            this.exportPanelComponent = null;
         }
 
         console.log('✓ VideoExportManager destroyed');
