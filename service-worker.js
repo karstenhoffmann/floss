@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v5.0.8'; // Calculate bitrate manually (explicit value)
+const CACHE_NAME = 'floss-v5.0.9'; // Capture buffer from last step() call
 
 // Assets to cache
 const ASSETS_TO_CACHE = [

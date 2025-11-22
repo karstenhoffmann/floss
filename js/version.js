@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.0.8',
-    commit: 'fix: Calculate bitrate manually (explicit value)',
+    number: '5.0.9',
+    commit: 'fix: Capture buffer from last step() call',
     date: '2025-11-22',
-    time: '23:45'
+    time: '23:55'
 };
 
 export default VERSION;

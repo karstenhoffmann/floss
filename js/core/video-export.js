@@ -239,10 +239,11 @@ export class VideoExportManager {
             console.log('✓ Recording started - rendering frames...');
 
             // 5. Render animation frame-by-frame (OFFLINE - frame-perfect!)
-            await this.renderFrameByFrame();
+            // The last step() call will automatically stop the recorder and return the buffer
+            const buffer = await this.renderFrameByFrame();
 
-            // 6. Stop recording and get blob
-            const blob = await this.recorder.stop();
+            // 6. Convert buffer to Blob
+            const blob = new Blob([buffer], { type: 'video/mp4' });
             console.log('✓ Recording stopped, blob size:', (blob.size / 1024 / 1024).toFixed(2), 'MB');
 
             // 7. Complete export and trigger download
@@ -419,6 +420,7 @@ export class VideoExportManager {
         console.log(`→ Rendering ${totalFrames} frames at ${fps}fps (offline)...`);
 
         const startTime = performance.now();
+        let buffer = null;
 
         // Frame-by-frame rendering loop (OFFLINE - not realtime!)
         for (let frameNumber = 0; frameNumber < totalFrames; frameNumber++) {
@@ -432,8 +434,11 @@ export class VideoExportManager {
             this.offscreenRenderer.render(scene, camera);
 
             // 3. Tell recorder to capture this frame
-            // This is synchronous - the frame is captured immediately
-            await this.recorder.step();
+            // The LAST step() call will auto-stop and return the buffer
+            const result = await this.recorder.step();
+            if (result) {
+                buffer = result;  // Capture buffer from last step
+            }
 
             // Update progress
             const percentage = ((frameNumber + 1) / totalFrames) * 100;
@@ -454,6 +459,8 @@ export class VideoExportManager {
         const elapsed = (performance.now() - startTime) / 1000;
         const avgSpeed = totalFrames / elapsed;
         console.log(`✓ All frames rendered in ${elapsed.toFixed(2)}s (${avgSpeed.toFixed(1)}× realtime)`);
+
+        return buffer;  // Return the buffer from the last step
     }
 
     /**
