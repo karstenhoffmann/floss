@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '2.10.1',
-    commit: 'fix: Zero dropped frames with catch-up logic',
+    number: '2.10.2',
+    commit: 'fix: One frame per render (fix broken video)',
     date: '2025-11-22',
-    time: '17:15'
+    time: '17:30'
 };
 
 export default VERSION;

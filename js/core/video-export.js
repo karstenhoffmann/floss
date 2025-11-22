@@ -364,50 +364,47 @@ export class VideoExportManager {
             let startTime = null;
             let lastLogTime = 0;
 
-            const renderFrame = (currentTime) => {
+            const renderFrame = () => {
                 try {
-                    // Initialize start time on first frame
-                    if (startTime === null) {
-                        startTime = currentTime;
-                    }
-
-                    const elapsed = currentTime - startTime;
-
                     // Check if recording is complete
                     if (frameCount >= totalFrames) {
+                        const elapsed = performance.now() - startTime;
                         console.log(`✓ Recording complete (${frameCount} frames rendered in ${(elapsed / 1000).toFixed(2)}s)`);
                         resolve();
                         return;
                     }
 
-                    // CRITICAL: Render all frames we should have rendered by now
-                    // This catch-up logic ensures NO frames are dropped
-                    while (frameCount < totalFrames && elapsed >= frameCount * frameDuration) {
-                        // Calculate exact time for THIS specific frame
-                        const frameTime = frameCount * (frameDuration / 1000);
-
-                        // Render frame with deterministic time
-                        effect.update(frameDuration / 1000, frameTime);
-                        this.offscreenRenderer.render(scene, camera);
-
-                        frameCount++;
-
-                        // Update progress
-                        const percentage = (frameCount / totalFrames) * 100;
-                        state.set('exportProgress', {
-                            currentFrame: frameCount,
-                            totalFrames: totalFrames,
-                            percentage: Math.round(percentage)
-                        });
-
-                        // Log progress every second
-                        if (frameCount % fps === 0) {
-                            console.log(`  Frame ${frameCount}/${totalFrames} (${percentage.toFixed(1)}%) @ ${frameTime.toFixed(2)}s`);
-                        }
+                    // Initialize start time on first frame
+                    if (startTime === null) {
+                        startTime = performance.now();
                     }
 
-                    // Continue to next RAF call
-                    requestAnimationFrame(renderFrame);
+                    // Calculate exact time for THIS specific frame (deterministic)
+                    const frameTime = frameCount * (frameDuration / 1000);
+
+                    // Render ONE frame per call
+                    // captureStream(fps) will sample these frames at the target FPS
+                    effect.update(frameDuration / 1000, frameTime);
+                    this.offscreenRenderer.render(scene, camera);
+
+                    frameCount++;
+
+                    // Update progress
+                    const percentage = (frameCount / totalFrames) * 100;
+                    state.set('exportProgress', {
+                        currentFrame: frameCount,
+                        totalFrames: totalFrames,
+                        percentage: Math.round(percentage)
+                    });
+
+                    // Log progress every second
+                    if (frameCount % fps === 0) {
+                        console.log(`  Frame ${frameCount}/${totalFrames} (${percentage.toFixed(1)}%) @ ${frameTime.toFixed(2)}s`);
+                    }
+
+                    // Continue rendering at steady pace
+                    // Render at target FPS (or slightly faster to ensure MediaRecorder has frames)
+                    setTimeout(renderFrame, frameDuration);
 
                 } catch (error) {
                     console.error('Frame render error:', error);
@@ -415,8 +412,8 @@ export class VideoExportManager {
                 }
             };
 
-            // Start rendering (synced with browser refresh rate)
-            requestAnimationFrame(renderFrame);
+            // Start rendering loop
+            renderFrame();
         });
     }
 
