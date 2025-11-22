@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '3.0.0',
-    commit: 'refactor: Professional requestFrame() approach',
+    number: '3.1.0',
+    commit: 'fix: RAF precision timing (no setTimeout drift)',
     date: '2025-11-22',
-    time: '18:00'
+    time: '18:30'
 };
 
 export default VERSION;

@@ -182,11 +182,11 @@ export class VideoExportManager {
                 console.log('✓ Effect reset to t=0');
             }
 
-            // 4. Start recording with manual frame control
+            // 4. Start recording (browser samples at target FPS)
             await this.recorder.start();
-            console.log('✓ Recording started (manual frame triggering via requestFrame)');
+            console.log('✓ Recording started');
 
-            // 5. Render animation frame-by-frame with explicit frame capture
+            // 5. Render animation with precise RAF timing
             await this.renderRealtimeAnimation();
 
             // 6. Stop recording and get blob
@@ -338,14 +338,13 @@ export class VideoExportManager {
     }
 
     /**
-     * Render animation with frame-perfect precision
+     * Render animation with high-precision timing
      *
-     * Professional approach using MediaStreamTrack.requestFrame():
-     * - captureStream(0) = manual frame control (no automatic sampling)
-     * - After each render(), call requestFrame() to explicitly capture
-     * - 100% deterministic, no dropped frames, no async timing issues
-     *
-     * This is the industry-standard approach for canvas video recording.
+     * Uses requestAnimationFrame for precise frame timing (NOT setTimeout!)
+     * - captureStream(fps) - browser samples canvas at target FPS
+     * - requestAnimationFrame - browser's native high-precision timer
+     * - Only render when exact target time is reached
+     * - Deterministic animation time for each frame
      */
     async renderRealtimeAnimation() {
         const effect = this.sceneManager.activeEffect;
@@ -356,66 +355,67 @@ export class VideoExportManager {
             throw new Error('Scene, camera, or effect not initialized');
         }
 
-        const duration = this.exportOptions.duration * 1000;  // Convert to ms
         const fps = this.exportOptions.fps;
         const frameDuration = 1000 / fps;  // ms per frame (33.33ms for 30fps, 16.67ms for 60fps)
         const totalFrames = Math.ceil(this.exportOptions.duration * fps);
 
-        console.log(`→ Recording ${this.exportOptions.duration}s at ${fps}fps (frame-perfect timing)...`);
-        console.log(`  Total frames to render: ${totalFrames}`);
+        console.log(`→ Recording ${this.exportOptions.duration}s at ${fps}fps...`);
+        console.log(`  Total frames: ${totalFrames}`);
         console.log(`  Frame duration: ${frameDuration.toFixed(2)}ms`);
 
         return new Promise((resolve, reject) => {
             let frameCount = 0;
             let startTime = null;
-            let lastLogTime = 0;
 
-            const renderFrame = () => {
+            const renderFrame = (timestamp) => {
                 try {
+                    // Initialize start time on first frame
+                    if (startTime === null) {
+                        startTime = timestamp;
+                    }
+
+                    const elapsed = timestamp - startTime;
+
                     // Check if recording is complete
                     if (frameCount >= totalFrames) {
-                        const elapsed = performance.now() - startTime;
-                        console.log(`✓ Recording complete (${frameCount} frames rendered in ${(elapsed / 1000).toFixed(2)}s)`);
+                        console.log(`✓ Recording complete (${frameCount} frames in ${(elapsed / 1000).toFixed(2)}s)`);
                         resolve();
                         return;
                     }
 
-                    // Initialize start time on first frame
-                    if (startTime === null) {
-                        startTime = performance.now();
+                    // Calculate target time for NEXT frame
+                    const nextFrameTime = frameCount * frameDuration;
+
+                    // Only render if we've reached the target time for this frame
+                    // This ensures precise timing - no setTimeout drift!
+                    if (elapsed >= nextFrameTime) {
+                        // Calculate exact animation time for this frame (deterministic)
+                        const frameTime = frameCount * (frameDuration / 1000);
+
+                        // Update effect state
+                        effect.update(frameDuration / 1000, frameTime);
+
+                        // Render to canvas (captureStream will sample this)
+                        this.offscreenRenderer.render(scene, camera);
+
+                        frameCount++;
+
+                        // Update progress
+                        const percentage = (frameCount / totalFrames) * 100;
+                        state.set('exportProgress', {
+                            currentFrame: frameCount,
+                            totalFrames: totalFrames,
+                            percentage: Math.round(percentage)
+                        });
+
+                        // Log progress every second
+                        if (frameCount % fps === 0) {
+                            console.log(`  Frame ${frameCount}/${totalFrames} (${percentage.toFixed(1)}%)`);
+                        }
                     }
 
-                    // Calculate exact time for THIS specific frame (deterministic)
-                    const frameTime = frameCount * (frameDuration / 1000);
-
-                    // 1. Update effect state
-                    effect.update(frameDuration / 1000, frameTime);
-
-                    // 2. Render to canvas
-                    this.offscreenRenderer.render(scene, camera);
-
-                    // 3. EXPLICITLY request MediaRecorder to capture this frame
-                    // This is the key to frame-perfect recording!
-                    this.recorder.captureFrame();
-
-                    frameCount++;
-
-                    // Update progress
-                    const percentage = (frameCount / totalFrames) * 100;
-                    state.set('exportProgress', {
-                        currentFrame: frameCount,
-                        totalFrames: totalFrames,
-                        percentage: Math.round(percentage)
-                    });
-
-                    // Log progress every second
-                    if (frameCount % fps === 0) {
-                        console.log(`  Frame ${frameCount}/${totalFrames} (${percentage.toFixed(1)}%) @ ${frameTime.toFixed(2)}s`);
-                    }
-
-                    // Continue rendering at steady pace
-                    // Render at target FPS (or slightly faster to ensure MediaRecorder has frames)
-                    setTimeout(renderFrame, frameDuration);
+                    // Continue animation loop
+                    requestAnimationFrame(renderFrame);
 
                 } catch (error) {
                     console.error('Frame render error:', error);
@@ -423,8 +423,8 @@ export class VideoExportManager {
                 }
             };
 
-            // Start rendering loop
-            renderFrame();
+            // Start the animation loop
+            requestAnimationFrame(renderFrame);
         });
     }
 
