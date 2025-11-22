@@ -153,12 +153,12 @@ export class VideoExportManager {
             // 1. Create offscreen canvas and renderer
             this.createOffscreenRenderer();
 
-            // 2. Initialize canvas-record for MP4 export
-            if (typeof CanvasRecord === 'undefined') {
-                throw new Error('canvas-record library not loaded');
-            }
+            // 2. Load and initialize canvas-record for MP4 export (ES module via esm.sh)
+            console.log('→ Loading canvas-record from esm.sh...');
+            const { Recorder } = await import('https://esm.sh/canvas-record@4.2.4');
+            console.log('✓ canvas-record loaded successfully');
 
-            this.recorder = new CanvasRecord.Recorder(this.offscreenCanvas, {
+            this.recorder = new Recorder(this.offscreenCanvas, {
                 encoderOptions: {
                     codec: 'avc1.42E032',  // H.264 Main Profile Level 5.0 (PowerPoint compatible)
                     bitrate: this.exportOptions.bitrate,

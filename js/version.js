@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '2.6.1',
-    commit: 'Fix: canvas-record CDN & lazy UI initialization',
-    date: '2025-11-21',
-    time: '17:00'
+    number: '2.6.2',
+    commit: 'Fix: Load canvas-record as ES module via esm.sh',
+    date: '2025-11-22',
+    time: '11:15'
 };
 
 export default VERSION;

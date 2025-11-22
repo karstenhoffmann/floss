@@ -50,16 +50,8 @@
         }
     </script>
 
-    <!-- canvas-record for MP4/H.264 video export -->
-    <script src="https://unpkg.com/canvas-record@4.2.4/build/index.umd.js"></script>
-    <script>
-        // Verify canvas-record loaded
-        if (typeof CanvasRecord === 'undefined') {
-            console.error('❌ canvas-record failed to load from CDN');
-        } else {
-            console.log('✓ canvas-record loaded from unpkg.com');
-        }
-    </script>
+    <!-- canvas-record: Loaded as ES module in video-export.js via esm.sh CDN -->
+    <!-- No script tag needed here - imported dynamically when needed -->
 </head>
 <body>
     <div id="app" class="app">
