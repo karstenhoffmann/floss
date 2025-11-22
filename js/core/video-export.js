@@ -182,21 +182,38 @@ export class VideoExportManager {
                 console.log('✓ Effect reset to t=0');
             }
 
-            // 4. Start recording
+            // 4. Warm-up: Render a few frames BEFORE starting recording
+            // This ensures captureStream() is fully initialized
+            console.log('→ Warming up captureStream (rendering 3 dummy frames)...');
+            for (let i = 0; i < 3; i++) {
+                effect.update(0, 0);
+                this.offscreenRenderer.render(this.sceneManager.scene, this.sceneManager.camera);
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            console.log('✓ Warm-up complete');
+
+            // 5. Start recording
             await this.recorder.start();
             console.log('✓ Recording started');
 
-            // 5. Render animation in realtime (MediaRecorder captures stream)
+            // 6. Wait a moment for MediaRecorder to be ready
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // 7. Render animation in realtime (MediaRecorder captures stream)
             await this.renderRealtimeAnimation();
 
-            // 6. Stop recording and get blob
+            // 8. Wait for last frame to be captured before stopping
+            const frameDuration = 1000 / this.exportOptions.fps;
+            await new Promise(resolve => setTimeout(resolve, frameDuration * 2));
+
+            // 9. Stop recording and get blob
             const blob = await this.recorder.stop();
             console.log('✓ Recording stopped, blob size:', (blob.size / 1024 / 1024).toFixed(2), 'MB');
 
-            // 7. Trigger download
+            // 10. Trigger download
             this.downloadBlob(blob, `floss-export-${Date.now()}.mp4`);
 
-            // 8. Complete export
+            // 11. Complete export
             this.completeExport();
 
         } catch (error) {
