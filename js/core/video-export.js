@@ -40,9 +40,9 @@ export class VideoExportManager {
         this.offscreenCanvas = null;
         this.offscreenRenderer = null;
 
-        // UI components
-        this.safeFrameComponent = new SafeFrameComponent(this);
-        this.exportPanelComponent = new ExportPanelComponent(this);
+        // UI components (lazy initialization on enter())
+        this.safeFrameComponent = null;
+        this.exportPanelComponent = null;
 
         console.log('✓ VideoExportManager initialized');
     }
@@ -65,6 +65,15 @@ export class VideoExportManager {
 
         // Center safe frame in viewport
         this.centerSafeFrame();
+
+        // Create UI components if not already created (lazy initialization)
+        if (!this.safeFrameComponent) {
+            this.safeFrameComponent = new SafeFrameComponent(this);
+        }
+
+        if (!this.exportPanelComponent) {
+            this.exportPanelComponent = new ExportPanelComponent(this);
+        }
 
         // Show UI
         this.safeFrameComponent.show();
@@ -96,9 +105,14 @@ export class VideoExportManager {
             percentage: 0
         });
 
-        // Hide UI
-        this.safeFrameComponent.hide();
-        this.exportPanelComponent.hide();
+        // Hide UI (if created)
+        if (this.safeFrameComponent) {
+            this.safeFrameComponent.hide();
+        }
+
+        if (this.exportPanelComponent) {
+            this.exportPanelComponent.hide();
+        }
 
         console.log('✓ Export Mode: null (normal)');
     }
