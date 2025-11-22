@@ -351,56 +351,75 @@ export class VideoExportManager {
         }
 
         const duration = this.exportOptions.duration * 1000;  // Convert to ms
-        const frameDuration = 1000 / this.exportOptions.fps;  // ms per frame (33.33ms for 30fps)
-        const startTime = performance.now();
-        let frameCount = 0;
-        let nextFrameTime = startTime;
+        const fps = this.exportOptions.fps;
+        const frameDuration = 1000 / fps;  // ms per frame (33.33ms for 30fps, 16.67ms for 60fps)
+        const totalFrames = Math.ceil(this.exportOptions.duration * fps);
 
-        console.log(`→ Recording ${this.exportOptions.duration}s at ${this.exportOptions.fps}fps (precise timing)...`);
+        console.log(`→ Recording ${this.exportOptions.duration}s at ${fps}fps (frame-perfect timing)...`);
+        console.log(`  Total frames to render: ${totalFrames}`);
+        console.log(`  Frame duration: ${frameDuration.toFixed(2)}ms`);
 
         return new Promise((resolve, reject) => {
-            // Use setInterval for precise frame timing instead of requestAnimationFrame
-            const intervalId = setInterval(() => {
+            let frameCount = 0;
+            let startTime = null;
+            let lastLogTime = 0;
+
+            const renderFrame = (currentTime) => {
                 try {
-                    const currentTime = performance.now();
+                    // Initialize start time on first frame
+                    if (startTime === null) {
+                        startTime = currentTime;
+                    }
+
                     const elapsed = currentTime - startTime;
 
                     // Check if recording is complete
-                    if (elapsed >= duration) {
-                        clearInterval(intervalId);
-                        console.log(`✓ Recording complete (${frameCount} frames rendered)`);
+                    if (frameCount >= totalFrames || elapsed >= duration) {
+                        console.log(`✓ Recording complete (${frameCount} frames rendered in ${(elapsed / 1000).toFixed(2)}s)`);
                         resolve();
                         return;
                     }
 
-                    // Calculate exact elapsed time for this frame
-                    const frameTime = frameCount * (frameDuration / 1000);  // in seconds
+                    // Calculate target time for next frame
+                    const targetFrameTime = frameCount * frameDuration;
 
-                    // Render frame with deterministic time
-                    effect.update(frameDuration / 1000, frameTime);
-                    this.offscreenRenderer.render(scene, camera);
+                    // Only render if enough time has passed for the next frame
+                    // This ensures we don't render too fast and create duplicate frames
+                    if (elapsed >= targetFrameTime) {
+                        // Calculate exact elapsed time in seconds for deterministic animation
+                        const frameTime = frameCount * (frameDuration / 1000);
 
-                    frameCount++;
+                        // Render frame with deterministic time
+                        effect.update(frameDuration / 1000, frameTime);
+                        this.offscreenRenderer.render(scene, camera);
 
-                    // Update progress
-                    const percentage = (elapsed / duration) * 100;
-                    state.set('exportProgress', {
-                        currentFrame: frameCount,
-                        totalFrames: this.totalFrames,
-                        percentage: Math.round(percentage)
-                    });
+                        frameCount++;
 
-                    // Log progress every second
-                    if (frameCount % this.exportOptions.fps === 0) {
-                        console.log(`  ${frameTime.toFixed(1)}s / ${this.exportOptions.duration}s (${percentage.toFixed(1)}%)`);
+                        // Update progress
+                        const percentage = (frameCount / totalFrames) * 100;
+                        state.set('exportProgress', {
+                            currentFrame: frameCount,
+                            totalFrames: totalFrames,
+                            percentage: Math.round(percentage)
+                        });
+
+                        // Log progress every second
+                        if (frameCount % fps === 0) {
+                            console.log(`  ${frameTime.toFixed(1)}s / ${this.exportOptions.duration}s (${percentage.toFixed(1)}%)`);
+                        }
                     }
 
+                    // Continue to next frame (browser-synced, no dropped frames)
+                    requestAnimationFrame(renderFrame);
+
                 } catch (error) {
-                    clearInterval(intervalId);
-                    console.error('Animation error:', error);
+                    console.error('Frame render error:', error);
                     reject(error);
                 }
-            }, frameDuration);  // Precise interval timing (33.33ms for 30fps)
+            };
+
+            // Start rendering (synced with browser refresh rate)
+            requestAnimationFrame(renderFrame);
         });
     }
 

@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '2.9.1',
-    commit: 'fix: Enable "e" key for video export mode',
+    number: '2.10.0',
+    commit: 'fix: Frame-perfect video with requestAnimationFrame',
     date: '2025-11-22',
-    time: '16:45'
+    time: '17:00'
 };
 
 export default VERSION;
