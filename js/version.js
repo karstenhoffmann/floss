@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '4.1.0',
-    commit: 'fix: Native MediaRecorder video export (no deps)',
+    number: '4.2.0',
+    commit: 'feat: Frame-perfect WebCodecs+WebM muxer export',
     date: '2025-11-22',
-    time: '20:15'
+    time: '21:00'
 };
 
 export default VERSION;

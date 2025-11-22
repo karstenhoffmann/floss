@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v4.1.0'; // Video export with native MediaRecorder API
+const CACHE_NAME = 'floss-v4.2.0'; // Frame-perfect video export with WebCodecs + WebM muxer
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
@@ -35,6 +35,7 @@ const ASSETS_TO_CACHE = [
     './js/utils/storage.js',
     './js/utils/text-texture.js',
     './js/utils/webgl-check.js',
+    './lib/webm-muxer/index.js',
     './manifest.json',
     // Three.js from CDN
     'https://unpkg.com/three@0.115.0/build/three.min.js',
