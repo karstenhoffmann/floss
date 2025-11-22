@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v4.0.0'; // Frame-perfect video export with canvas-record
+const CACHE_NAME = 'floss-v4.1.0'; // Video export with native MediaRecorder API
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
@@ -44,10 +44,7 @@ const ASSETS_TO_CACHE = [
     'https://unpkg.com/open-props/normalize.min.css',
     // Coloris Color Picker
     'https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css',
-    'https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js',
-    // canvas-record from esm.sh (frame-perfect video recording)
-    'https://esm.sh/canvas-record@5.0.0',
-    'https://esm.sh/v135/canvas-record@5.0.0/es2022/canvas-record.mjs'
+    'https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js'
 ];
 
 // Install event - cache assets

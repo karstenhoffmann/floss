@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '4.0.0',
-    commit: 'feat: Frame-perfect export with canvas-record',
+    number: '4.1.0',
+    commit: 'fix: Native MediaRecorder video export (no deps)',
     date: '2025-11-22',
-    time: '19:00'
+    time: '20:15'
 };
 
 export default VERSION;
