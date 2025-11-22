@@ -347,6 +347,49 @@
     font-style: italic;
 }
 
+/* FPS controls */
+.fps-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.fps-control label {
+    color: #ccc;
+    font-size: 13px;
+    min-width: 80px;
+}
+
+.fps-select {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: #fff;
+    font-size: 14px;
+    font-family: 'Courier New', monospace;
+    cursor: pointer;
+}
+
+.fps-select:focus {
+    outline: none;
+    border-color: #00ff88;
+    box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+}
+
+.fps-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.fps-control__hint {
+    color: #888;
+    font-size: 11px;
+    font-style: italic;
+}
+
 /* Progress bar */
 .export-progress {
     display: none;

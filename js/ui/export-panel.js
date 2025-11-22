@@ -51,10 +51,6 @@ export class ExportPanelComponent {
                         <span class="export-info__value">1920 × 1080</span>
                     </div>
                     <div class="export-info__item">
-                        <span class="export-info__label">Frame Rate</span>
-                        <span class="export-info__value">30 FPS</span>
-                    </div>
-                    <div class="export-info__item">
                         <span class="export-info__label">Format</span>
                         <span class="export-info__value">MP4 (H.264)</span>
                     </div>
@@ -80,6 +76,16 @@ export class ExportPanelComponent {
                         value="${opts.duration.toFixed(1)}"
                     />
                     <span class="duration-control__hint">${opts.explanation}</span>
+                </div>
+
+                <!-- FPS Control -->
+                <div class="fps-control">
+                    <label for="export-fps">Frame Rate:</label>
+                    <select id="export-fps" class="fps-select">
+                        <option value="30" selected>30 FPS (Standard)</option>
+                        <option value="60">60 FPS (Smooth)</option>
+                    </select>
+                    <span class="fps-control__hint">Higher FPS = smoother motion, larger file</span>
                 </div>
 
                 <!-- Progress Bar (hidden initially) -->
@@ -111,6 +117,7 @@ export class ExportPanelComponent {
         this.header = this.element.querySelector('.export-panel__header');
         this.content = this.element.querySelector('.export-panel__content');
         this.durationInput = this.element.querySelector('#export-duration');
+        this.fpsSelect = this.element.querySelector('#export-fps');
         this.progressBar = this.element.querySelector('.export-progress');
         this.progressFill = this.element.querySelector('.export-progress__fill');
         this.progressText = this.element.querySelector('.export-progress__text');
@@ -129,7 +136,8 @@ export class ExportPanelComponent {
         // Start button
         this.startButton.addEventListener('click', async () => {
             const duration = parseFloat(this.durationInput.value);
-            await this.startExport(duration);
+            const fps = parseInt(this.fpsSelect.value, 10);
+            await this.startExport(duration, fps);
         });
 
         // Cancel button
@@ -175,10 +183,11 @@ export class ExportPanelComponent {
     /**
      * Start export
      */
-    async startExport(duration) {
+    async startExport(duration, fps) {
         // Disable controls
         this.startButton.disabled = true;
         this.durationInput.disabled = true;
+        this.fpsSelect.disabled = true;
 
         // Show progress
         this.progressBar.classList.add('visible');
@@ -187,7 +196,7 @@ export class ExportPanelComponent {
         this.startButton.innerHTML = '⏸️ Recording...';
 
         try {
-            await this.videoExportManager.startExport({ duration });
+            await this.videoExportManager.startExport({ duration, fps });
         } catch (error) {
             console.error('Export error:', error);
             alert(`Export failed: ${error.message}`);
@@ -196,6 +205,7 @@ export class ExportPanelComponent {
         // Re-enable controls
         this.startButton.disabled = false;
         this.durationInput.disabled = false;
+        this.fpsSelect.disabled = false;
         this.startButton.innerHTML = `
             <svg viewBox="0 0 24 24" fill="currentColor">
                 <circle cx="12" cy="12" r="10" fill="currentColor"/>
@@ -267,7 +277,18 @@ export class ExportPanelComponent {
             }
 
             this.isDragging = true;
+
+            // Get current visual position
             const rect = this.element.getBoundingClientRect();
+
+            // Remove centering transform to prevent jump
+            this.element.style.transform = 'none';
+            this.element.style.left = `${rect.left}px`;
+            this.element.style.top = `${rect.top}px`;
+            this.element.style.bottom = 'auto';
+            this.element.style.right = 'auto';
+
+            // Calculate drag offset from current position
             this.dragOffset.x = e.clientX - rect.left;
             this.dragOffset.y = e.clientY - rect.top;
 
@@ -282,8 +303,6 @@ export class ExportPanelComponent {
 
                 this.element.style.left = `${x}px`;
                 this.element.style.top = `${y}px`;
-                this.element.style.bottom = 'auto';  // Override bottom positioning
-                this.element.style.right = 'auto';  // Override right positioning
             }
         });
 

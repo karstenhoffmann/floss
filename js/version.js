@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '2.8.2',
-    commit: 'fix: Click-through frame & smooth 30fps video',
+    number: '2.9.0',
+    commit: 'feat: FPS selector & fix panel drag jump',
     date: '2025-11-22',
-    time: '15:00'
+    time: '16:30'
 };
 
 export default VERSION;
