@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.0.0',
-    commit: 'feat: canvas-record MP4 export (embedded WASM)',
+    number: '5.0.1',
+    commit: 'fix: Add import maps for canvas-record deps',
     date: '2025-11-22',
-    time: '22:30'
+    time: '22:45'
 };
 
 export default VERSION;

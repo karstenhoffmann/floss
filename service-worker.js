@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v5.0.0'; // Frame-perfect export with canvas-record (embedded WASM MP4)
+const CACHE_NAME = 'floss-v5.0.1'; // Frame-perfect export with canvas-record + import maps
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
