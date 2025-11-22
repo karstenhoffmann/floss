@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v4.2.1'; // Frame-perfect export with codec detection + VP8 fallback
+const CACHE_NAME = 'floss-v5.0.0'; // Frame-perfect export with canvas-record (embedded WASM MP4)
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
@@ -35,7 +35,8 @@ const ASSETS_TO_CACHE = [
     './js/utils/storage.js',
     './js/utils/text-texture.js',
     './js/utils/webgl-check.js',
-    './lib/webm-muxer/index.js',
+    // canvas-record library (vendored, will be cached on first load)
+    './lib/canvas-record/package/index.js',
     './manifest.json',
     // Three.js from CDN
     'https://unpkg.com/three@0.115.0/build/three.min.js',

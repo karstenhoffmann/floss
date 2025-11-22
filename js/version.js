@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '4.2.1',
-    commit: 'fix: Codec detection + VP8 fallback',
+    number: '5.0.0',
+    commit: 'feat: canvas-record MP4 export (embedded WASM)',
     date: '2025-11-22',
-    time: '21:15'
+    time: '22:30'
 };
 
 export default VERSION;

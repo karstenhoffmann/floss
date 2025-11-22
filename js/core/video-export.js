@@ -3,24 +3,24 @@
  * Handles video export functionality for PowerPoint integration
  *
  * Features:
- * - WebM export (PowerPoint compatible) via WebCodecs + custom muxer
+ * - MP4 export (PowerPoint compatible) via canvas-record
  * - 1920×1080 @ 30/60fps
  * - Safe Frame system for export region
  * - Frame-perfect offline rendering (faster than realtime)
  * - Perfect loop calculation via effects
- * - Zero external dependencies - vendored WebM muxer
+ * - Zero external dependencies - canvas-record vendored with embedded WASM
  *
  * Architecture:
- * - Uses WebCodecs VideoEncoder API (hardware-accelerated VP9)
- * - Custom EBML-based WebM muxer (vendored in /lib/)
- * - Frame-by-frame offline rendering (deterministic)
- * - Exact timestamp control (no frame drops, no timing drift)
+ * - Uses canvas-record Recorder API with MP4WasmEncoder
+ * - Embedded WASM MP4 encoder (no external dependencies)
+ * - Frame-by-frame offline rendering via await recorder.step()
+ * - Deterministic animation timing
  */
 
 import state from './state.js';
 import SafeFrameComponent from '../ui/safe-frame.js';
 import ExportPanelComponent from '../ui/export-panel.js';
-import WebMMuxer from '../../lib/webm-muxer/index.js';
+import { Recorder } from '../../lib/canvas-record/package/index.js';
 
 export class VideoExportManager {
     constructor(app, sceneManager) {
@@ -39,9 +39,7 @@ export class VideoExportManager {
         };
 
         // Recording state
-        this.encoder = null;         // WebCodecs VideoEncoder
-        this.muxer = null;           // WebM muxer
-        this.encoderReady = null;    // Promise for encoder configuration
+        this.recorder = null;        // canvas-record Recorder
         this.currentFrame = 0;
         this.totalFrames = 0;
         this.exportOptions = null;
@@ -166,84 +164,42 @@ export class VideoExportManager {
         console.log(`  Resolution: ${this.exportOptions.width}×${this.exportOptions.height}`);
 
         try {
-            // 1. Check WebCodecs support
-            if (!window.VideoEncoder) {
-                throw new Error('WebCodecs API not supported in this browser. Use Chrome/Edge 94+');
-            }
-
-            // 2. Create offscreen canvas and renderer
+            // 1. Create offscreen canvas and renderer
             this.createOffscreenRenderer();
             console.log('✓ Offscreen renderer created');
 
-            // 3. Reset effect to t=0
+            // 2. Reset effect to t=0
             const effect = this.sceneManager.activeEffect;
             if (effect && typeof effect.reset === 'function') {
                 effect.reset();
                 console.log('✓ Effect reset to t=0');
             }
 
-            // 4. Detect best supported codec
-            console.log('→ Detecting best supported video codec...');
-            const codecConfig = await this.detectBestCodec();
-            console.log(`✓ Selected codec: ${codecConfig.codec} (${codecConfig.name})`);
+            // 3. Initialize canvas-record Recorder
+            console.log('→ Initializing canvas-record (frame-perfect MP4 export)...');
 
-            // 5. Initialize WebM muxer
-            console.log('→ Initializing WebM muxer...');
-            this.muxer = new WebMMuxer({
-                width: this.exportOptions.width,
-                height: this.exportOptions.height,
+            this.recorder = new Recorder(this.offscreenCanvas, {
+                name: `floss-export-${Date.now()}`,
+                duration: this.exportOptions.duration,
                 frameRate: this.exportOptions.fps,
-                codec: codecConfig.muxerCodec
-            });
-            console.log('✓ WebM muxer initialized');
-
-            // 6. Initialize VideoEncoder
-            console.log('→ Initializing VideoEncoder (WebCodecs API)...');
-
-            let encoderError = null;
-            this.encoderReady = new Promise((resolve) => {
-                this.encoder = new VideoEncoder({
-                    output: (chunk, metadata) => {
-                        // Add encoded chunk to muxer
-                        const timestamp = chunk.timestamp / 1000; // microseconds → milliseconds
-                        this.muxer.addFrame(chunk, timestamp);
-                    },
-                    error: (e) => {
-                        encoderError = e;
-                        console.error('VideoEncoder error:', e);
-                    }
-                });
-
-                // Configure encoder with detected codec
-                this.encoder.configure(codecConfig);
-
-                resolve();
+                download: false,  // We handle download ourselves
+                extension: 'mp4'  // Uses MP4WasmEncoder (embedded WASM)
             });
 
-            await this.encoderReady;
+            console.log('✓ canvas-record Recorder initialized');
 
-            if (encoderError) {
-                throw encoderError;
-            }
+            // 4. Start recording
+            await this.recorder.start({ initOnly: true });  // Don't call first step() yet
+            console.log('✓ Recording started - rendering frames...');
 
-            console.log('✓ VideoEncoder configured');
-
-            // 7. Render animation frame-by-frame (OFFLINE - frame-perfect!)
-            console.log('✓ Encoder ready - rendering frames...');
+            // 5. Render animation frame-by-frame (OFFLINE - frame-perfect!)
             await this.renderFrameByFrame();
 
-            // 8. Flush encoder (finish encoding all frames)
-            console.log('→ Flushing encoder...');
-            await this.encoder.flush();
-            this.encoder.close();
-            console.log('✓ Encoder flushed and closed');
+            // 6. Stop recording and get blob
+            const blob = await this.recorder.stop();
+            console.log('✓ Recording stopped, blob size:', (blob.size / 1024 / 1024).toFixed(2), 'MB');
 
-            // 9. Finalize muxer and get blob
-            console.log('→ Finalizing WebM file...');
-            const blob = this.muxer.finalize();
-            console.log('✓ WebM finalized, blob size:', (blob.size / 1024 / 1024).toFixed(2), 'MB');
-
-            // 10. Complete export and trigger download
+            // 7. Complete export and trigger download
             this.completeExport(blob);
 
         } catch (error) {
@@ -251,87 +207,6 @@ export class VideoExportManager {
             this.cancelExport();
             throw error;
         }
-    }
-
-    /**
-     * Detect best supported video codec
-     * Tests VP9, VP8, and AV1 in order of preference
-     */
-    async detectBestCodec() {
-        const width = this.exportOptions.width;
-        const height = this.exportOptions.height;
-        const bitrate = this.exportOptions.bitrate;
-        const fps = this.exportOptions.fps;
-
-        // Codec candidates (in order of preference)
-        const candidates = [
-            {
-                name: 'VP9',
-                codec: 'vp09.00.10.08',
-                muxerCodec: 'vp9',
-                config: {
-                    codec: 'vp09.00.10.08',
-                    width,
-                    height,
-                    bitrate,
-                    framerate: fps,
-                    hardwareAcceleration: 'prefer-hardware',
-                    latencyMode: 'quality'
-                }
-            },
-            {
-                name: 'VP8',
-                codec: 'vp8',
-                muxerCodec: 'vp8',
-                config: {
-                    codec: 'vp8',
-                    width,
-                    height,
-                    bitrate,
-                    framerate: fps,
-                    hardwareAcceleration: 'prefer-hardware',
-                    latencyMode: 'quality'
-                }
-            },
-            {
-                name: 'AV1',
-                codec: 'av01.0.04M.08',
-                muxerCodec: 'vp9', // AV1 goes in WebM container
-                config: {
-                    codec: 'av01.0.04M.08',
-                    width,
-                    height,
-                    bitrate,
-                    framerate: fps,
-                    hardwareAcceleration: 'prefer-hardware',
-                    latencyMode: 'quality'
-                }
-            }
-        ];
-
-        // Test each codec
-        for (const candidate of candidates) {
-            try {
-                const support = await VideoEncoder.isConfigSupported(candidate.config);
-
-                if (support.supported) {
-                    console.log(`  ✓ ${candidate.name} supported`);
-                    // Return full candidate object (includes muxerCodec and name)
-                    return {
-                        ...candidate.config,
-                        muxerCodec: candidate.muxerCodec,
-                        name: candidate.name
-                    };
-                } else {
-                    console.log(`  ✗ ${candidate.name} not supported`);
-                }
-            } catch (error) {
-                console.log(`  ✗ ${candidate.name} check failed:`, error.message);
-            }
-        }
-
-        // No codec supported - throw error
-        throw new Error('No supported video codec found. WebCodecs requires Chrome/Edge 94+');
     }
 
     /**
@@ -346,12 +221,12 @@ export class VideoExportManager {
 
         console.log('⏹ Cancelling export');
 
-        // Cleanup encoder
-        if (this.encoder && this.encoder.state !== 'closed') {
-            this.encoder.close();
+        // Cleanup recorder
+        if (this.recorder) {
+            // canvas-record doesn't have explicit cancel/abort
+            // Cleanup will happen in dispose
+            this.recorder = null;
         }
-        this.encoder = null;
-        this.muxer = null;
 
         // Back to setup mode
         this.exportMode = 'setup';
@@ -477,10 +352,10 @@ export class VideoExportManager {
      * This is the correct approach for frame-perfect video:
      * - NO requestAnimationFrame (not realtime!)
      * - Simple for-loop rendering each frame
-     * - encoder.encode(VideoFrame) captures each frame exactly
+     * - await recorder.step() captures each frame
      * - 100% deterministic - no timing issues, no dropped frames
      *
-     * Uses WebCodecs VideoEncoder API for frame-perfect encoding.
+     * Uses canvas-record Recorder API with MP4WasmEncoder.
      */
     async renderFrameByFrame() {
         const effect = this.sceneManager.activeEffect;
@@ -503,7 +378,6 @@ export class VideoExportManager {
         for (let frameNumber = 0; frameNumber < totalFrames; frameNumber++) {
             // Calculate exact time for this frame (deterministic)
             const time = frameNumber * frameDuration;
-            const timestamp = time * 1_000_000;  // seconds → microseconds
 
             // 1. Update effect state
             effect.update(frameDuration, time);
@@ -511,18 +385,9 @@ export class VideoExportManager {
             // 2. Render to offscreen canvas
             this.offscreenRenderer.render(scene, camera);
 
-            // 3. Create VideoFrame from canvas
-            const videoFrame = new VideoFrame(this.offscreenCanvas, {
-                timestamp: timestamp,
-                duration: frameDuration * 1_000_000  // microseconds
-            });
-
-            // 4. Encode frame
-            const isKeyframe = frameNumber % (fps * 2) === 0;  // Keyframe every 2 seconds
-            this.encoder.encode(videoFrame, { keyFrame: isKeyframe });
-
-            // 5. Close VideoFrame (free memory)
-            videoFrame.close();
+            // 3. Tell recorder to capture this frame
+            // This is synchronous - the frame is captured immediately
+            await this.recorder.step();
 
             // Update progress
             const percentage = ((frameNumber + 1) / totalFrames) * 100;
