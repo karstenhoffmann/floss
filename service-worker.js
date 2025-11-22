@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v5.0.3'; // Frame-perfect export with canvas-record + complete import maps
+const CACHE_NAME = 'floss-v5.0.5'; // Fixed WebGL context access (.context property)
 
 // Assets to cache
 const ASSETS_TO_CACHE = [

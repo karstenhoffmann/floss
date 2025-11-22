@@ -179,9 +179,26 @@ export class VideoExportManager {
             console.log('→ Initializing canvas-record (frame-perfect MP4 export)...');
             console.log('  Canvas:', this.offscreenCanvas, 'Size:', this.offscreenCanvas.width, 'x', this.offscreenCanvas.height);
 
+            // canvas-record expects a RenderingContext, not a Canvas element
+            // Get the WebGL context from the Three.js renderer
+            // In Three.js r115, the context is a property, not a method
+            console.log('  Renderer:', this.offscreenRenderer);
+            console.log('  Renderer.context:', this.offscreenRenderer.context);
+
+            const gl = this.offscreenRenderer.context;  // Property, not method!
+
+            console.log('  WebGL Context:', gl);
+            console.log('  Context type:', gl ? gl.constructor.name : 'null/undefined');
+            console.log('  Has canvas?', gl && 'canvas' in gl);
+            console.log('  Has drawingBufferWidth?', gl && 'drawingBufferWidth' in gl);
+
+            if (!gl) {
+                throw new Error('Failed to get WebGL context from renderer');
+            }
+
             const filename = `floss-export-${Date.now()}.mp4`;
 
-            this.recorder = new Recorder(this.offscreenCanvas, {
+            this.recorder = new Recorder(gl, {
                 name: filename,
                 duration: this.exportOptions.duration,
                 frameRate: this.exportOptions.fps,
