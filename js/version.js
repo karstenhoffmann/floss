@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '3.1.0',
-    commit: 'fix: RAF precision timing (no setTimeout drift)',
+    number: '4.0.0',
+    commit: 'feat: Frame-perfect export with canvas-record',
     date: '2025-11-22',
-    time: '18:30'
+    time: '19:00'
 };
 
 export default VERSION;

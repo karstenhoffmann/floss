@@ -3,18 +3,26 @@
  * Handles video export functionality for PowerPoint integration
  *
  * Features:
- * - MP4/H.264 export (PowerPoint compatible) via native MediaRecorder
- * - 1920×1080 @ 30fps
+ * - MP4/H.264 export (PowerPoint compatible) via canvas-record
+ * - 1920×1080 @ 30/60fps
  * - Safe Frame system for export region
- * - Frame-by-frame offline rendering
+ * - Frame-by-frame offline rendering (deterministic, no dropped frames)
  * - Perfect loop calculation via effects
- * - No external dependencies (uses browser APIs)
+ * - Professional recording with canvas-record library
+ *
+ * Architecture:
+ * - Uses canvas-record from esm.sh (CDN, cached by Service Worker)
+ * - .step() API for frame-perfect recording
+ * - WebCodecs encoder when available, fallback to MediaRecorder
  */
 
 import state from './state.js';
 import SafeFrameComponent from '../ui/safe-frame.js';
 import ExportPanelComponent from '../ui/export-panel.js';
-import CanvasRecorder from '../../lib/canvas-recorder.js';
+
+// Import canvas-record from esm.sh CDN
+// This will be cached by Service Worker for offline use
+import { Recorder } from 'https://esm.sh/canvas-record@5.0.0';
 
 export class VideoExportManager {
     constructor(app, sceneManager) {
@@ -160,43 +168,41 @@ export class VideoExportManager {
         try {
             // 1. Create offscreen canvas and renderer
             this.createOffscreenRenderer();
+            console.log('✓ Offscreen renderer created');
 
-            // 2. Initialize canvas recorder (native MediaRecorder API - no dependencies!)
-            console.log('→ Initializing CanvasRecorder (native MediaRecorder)...');
-
-            // Log supported codecs
-            const codecs = CanvasRecorder.getSupportedCodecs();
-            console.log('📹 Supported codecs:', codecs);
-
-            this.recorder = new CanvasRecorder(this.offscreenCanvas, {
-                videoBitsPerSecond: this.exportOptions.bitrate,
-                frameRate: this.exportOptions.fps
-            });
-
-            console.log('✓ canvas-record Recorder initialized');
-
-            // 3. Reset effect to t=0
+            // 2. Reset effect to t=0
             const effect = this.sceneManager.activeEffect;
             if (effect && typeof effect.reset === 'function') {
                 effect.reset();
                 console.log('✓ Effect reset to t=0');
             }
 
-            // 4. Start recording (browser samples at target FPS)
-            await this.recorder.start();
-            console.log('✓ Recording started');
+            // 3. Initialize canvas-record Recorder
+            console.log('→ Initializing canvas-record (frame-perfect recording)...');
 
-            // 5. Render animation with precise RAF timing
-            await this.renderRealtimeAnimation();
+            this.recorder = new Recorder(this.offscreenCanvas, {
+                name: `floss-export-${Date.now()}`,
+                extension: 'mp4',
+                target: 'download',  // Auto-download when done
+                mimeType: 'video/mp4',
+                videoBitsPerSecond: this.exportOptions.bitrate,
+                // canvas-record will use WebCodecs H.264 if available, MediaRecorder otherwise
+            });
+
+            console.log('✓ canvas-record Recorder initialized');
+
+            // 4. Start recording
+            await this.recorder.start();
+            console.log('✓ Recording started - rendering frames...');
+
+            // 5. Render animation frame-by-frame (OFFLINE, deterministic!)
+            await this.renderFrameByFrame();
 
             // 6. Stop recording and get blob
             const blob = await this.recorder.stop();
             console.log('✓ Recording stopped, blob size:', (blob.size / 1024 / 1024).toFixed(2), 'MB');
 
-            // 7. Trigger download
-            this.downloadBlob(blob, `floss-export-${Date.now()}.mp4`);
-
-            // 8. Complete export
+            // 7. Complete export
             this.completeExport();
 
         } catch (error) {
@@ -338,15 +344,18 @@ export class VideoExportManager {
     }
 
     /**
-     * Render animation with high-precision timing
+     * Render animation frame-by-frame (OFFLINE, deterministic)
      *
-     * Uses requestAnimationFrame for precise frame timing (NOT setTimeout!)
-     * - captureStream(fps) - browser samples canvas at target FPS
-     * - requestAnimationFrame - browser's native high-precision timer
-     * - Only render when exact target time is reached
-     * - Deterministic animation time for each frame
+     * This is the correct approach for frame-perfect video:
+     * - NO requestAnimationFrame (not realtime!)
+     * - NO setTimeout (imprecise!)
+     * - Simple for-loop rendering each frame
+     * - recorder.step() captures each frame synchronously
+     * - 100% deterministic - no timing issues, no dropped frames
+     *
+     * This is possible because canvas-record uses .step() API for offline rendering.
      */
-    async renderRealtimeAnimation() {
+    async renderFrameByFrame() {
         const effect = this.sceneManager.activeEffect;
         const scene = this.sceneManager.scene;
         const camera = this.sceneManager.camera;
@@ -356,76 +365,47 @@ export class VideoExportManager {
         }
 
         const fps = this.exportOptions.fps;
-        const frameDuration = 1000 / fps;  // ms per frame (33.33ms for 30fps, 16.67ms for 60fps)
-        const totalFrames = Math.ceil(this.exportOptions.duration * fps);
+        const frameDuration = 1 / fps;  // seconds per frame (0.0333s for 30fps)
+        const totalFrames = this.totalFrames;
 
-        console.log(`→ Recording ${this.exportOptions.duration}s at ${fps}fps...`);
-        console.log(`  Total frames: ${totalFrames}`);
-        console.log(`  Frame duration: ${frameDuration.toFixed(2)}ms`);
+        console.log(`→ Rendering ${totalFrames} frames at ${fps}fps...`);
 
-        return new Promise((resolve, reject) => {
-            let frameCount = 0;
-            let startTime = null;
+        const startTime = performance.now();
 
-            const renderFrame = (timestamp) => {
-                try {
-                    // Initialize start time on first frame
-                    if (startTime === null) {
-                        startTime = timestamp;
-                    }
+        // Frame-by-frame rendering loop (OFFLINE - not realtime!)
+        for (let frameNumber = 0; frameNumber < totalFrames; frameNumber++) {
+            // Calculate exact time for this frame (deterministic)
+            const time = frameNumber * frameDuration;
 
-                    const elapsed = timestamp - startTime;
+            // 1. Update effect state
+            effect.update(frameDuration, time);
 
-                    // Check if recording is complete
-                    if (frameCount >= totalFrames) {
-                        console.log(`✓ Recording complete (${frameCount} frames in ${(elapsed / 1000).toFixed(2)}s)`);
-                        resolve();
-                        return;
-                    }
+            // 2. Render to offscreen canvas
+            this.offscreenRenderer.render(scene, camera);
 
-                    // Calculate target time for NEXT frame
-                    const nextFrameTime = frameCount * frameDuration;
+            // 3. Tell recorder to capture this frame
+            // This is synchronous - the frame is captured immediately
+            await this.recorder.step();
 
-                    // Only render if we've reached the target time for this frame
-                    // This ensures precise timing - no setTimeout drift!
-                    if (elapsed >= nextFrameTime) {
-                        // Calculate exact animation time for this frame (deterministic)
-                        const frameTime = frameCount * (frameDuration / 1000);
+            // Update progress
+            const percentage = ((frameNumber + 1) / totalFrames) * 100;
+            state.set('exportProgress', {
+                currentFrame: frameNumber + 1,
+                totalFrames: totalFrames,
+                percentage: Math.round(percentage)
+            });
 
-                        // Update effect state
-                        effect.update(frameDuration / 1000, frameTime);
+            // Log progress every second worth of frames
+            if ((frameNumber + 1) % fps === 0) {
+                const elapsed = (performance.now() - startTime) / 1000;
+                const speed = (frameNumber + 1) / elapsed;
+                console.log(`  Frame ${frameNumber + 1}/${totalFrames} (${percentage.toFixed(1)}%) - ${speed.toFixed(1)}fps render speed`);
+            }
+        }
 
-                        // Render to canvas (captureStream will sample this)
-                        this.offscreenRenderer.render(scene, camera);
-
-                        frameCount++;
-
-                        // Update progress
-                        const percentage = (frameCount / totalFrames) * 100;
-                        state.set('exportProgress', {
-                            currentFrame: frameCount,
-                            totalFrames: totalFrames,
-                            percentage: Math.round(percentage)
-                        });
-
-                        // Log progress every second
-                        if (frameCount % fps === 0) {
-                            console.log(`  Frame ${frameCount}/${totalFrames} (${percentage.toFixed(1)}%)`);
-                        }
-                    }
-
-                    // Continue animation loop
-                    requestAnimationFrame(renderFrame);
-
-                } catch (error) {
-                    console.error('Frame render error:', error);
-                    reject(error);
-                }
-            };
-
-            // Start the animation loop
-            requestAnimationFrame(renderFrame);
-        });
+        const elapsed = (performance.now() - startTime) / 1000;
+        const avgSpeed = totalFrames / elapsed;
+        console.log(`✓ All frames rendered in ${elapsed.toFixed(2)}s (${avgSpeed.toFixed(1)}× realtime)`);
     }
 
     /**
