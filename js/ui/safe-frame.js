@@ -51,13 +51,15 @@ export class SafeFrameComponent {
         center.className = 'safe-frame-center';
         this.rect.appendChild(center);
 
-        // Resize handles (disabled for now - fixed 1920x1080)
-        // const handles = ['nw', 'ne', 'sw', 'se'];
-        // handles.forEach(pos => {
-        //     const handle = document.createElement('div');
-        //     handle.className = `safe-frame-handle ${pos}`;
-        //     this.rect.appendChild(handle);
-        // });
+        // Create draggable edge zones (invisible but interactive)
+        const edges = ['top', 'right', 'bottom', 'left'];
+        this.edges = {};
+        edges.forEach(edge => {
+            const edgeEl = document.createElement('div');
+            edgeEl.className = `safe-frame-edge ${edge}`;
+            this.rect.appendChild(edgeEl);
+            this.edges[edge] = edgeEl;
+        });
 
         this.element.appendChild(this.rect);
         document.body.appendChild(this.element);
@@ -69,60 +71,22 @@ export class SafeFrameComponent {
     }
 
     /**
-     * Setup drag to move safe frame (only from edges)
+     * Setup drag to move safe frame (only from edge elements)
      */
     setupDrag() {
-        const edgeWidth = 15;  // Width of draggable edge zone
-
-        this.rect.addEventListener('mousedown', (e) => {
-            if (e.target !== this.rect) {
-                return;  // Clicked on child element (label, button)
-            }
-
-            // Check if click is within edge zone
-            const rect = this.rect.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const width = rect.width;
-            const height = rect.height;
-
-            const isOnEdge = (
-                x < edgeWidth ||                    // Left edge
-                x > width - edgeWidth ||            // Right edge
-                y < edgeWidth ||                    // Top edge
-                y > height - edgeWidth              // Bottom edge
-            );
-
-            if (isOnEdge) {
+        // Add mousedown listener to all edge elements
+        Object.values(this.edges).forEach(edge => {
+            edge.addEventListener('mousedown', (e) => {
                 this.isDragging = true;
                 const safeFrame = this.videoExportManager.getSafeFrame();
                 this.dragOffset.x = e.clientX - safeFrame.x;
                 this.dragOffset.y = e.clientY - safeFrame.y;
                 e.preventDefault();
-                e.stopPropagation();  // Don't let click through to scene
-            }
+                e.stopPropagation();
+            });
         });
 
-        // Update cursor to show draggable edges
-        this.rect.addEventListener('mousemove', (e) => {
-            if (this.isDragging) return;  // Don't change cursor while dragging
-
-            const rect = this.rect.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const width = rect.width;
-            const height = rect.height;
-
-            const isOnEdge = (
-                x < edgeWidth ||
-                x > width - edgeWidth ||
-                y < edgeWidth ||
-                y > height - edgeWidth
-            );
-
-            this.rect.style.cursor = isOnEdge ? 'move' : 'default';
-        });
-
+        // Global mousemove for dragging
         document.addEventListener('mousemove', (e) => {
             if (this.isDragging) {
                 const x = e.clientX - this.dragOffset.x;
@@ -134,6 +98,7 @@ export class SafeFrameComponent {
             }
         });
 
+        // Global mouseup to stop dragging
         document.addEventListener('mouseup', () => {
             this.isDragging = false;
         });

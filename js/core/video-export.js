@@ -338,8 +338,8 @@ export class VideoExportManager {
     }
 
     /**
-     * Render animation in realtime and record with MediaRecorder
-     * MediaRecorder captures whatever is drawn on canvas in realtime
+     * Render animation with precise frame timing for smooth video
+     * Uses fixed-timestep rendering for consistent frame rate
      */
     async renderRealtimeAnimation() {
         const effect = this.sceneManager.activeEffect;
@@ -351,32 +351,36 @@ export class VideoExportManager {
         }
 
         const duration = this.exportOptions.duration * 1000;  // Convert to ms
-        const frameDuration = 1000 / this.exportOptions.fps;  // ms per frame
+        const frameDuration = 1000 / this.exportOptions.fps;  // ms per frame (33.33ms for 30fps)
         const startTime = performance.now();
-        let lastFrameTime = startTime;
         let frameCount = 0;
+        let nextFrameTime = startTime;
 
-        console.log(`→ Recording ${this.exportOptions.duration}s at ${this.exportOptions.fps}fps...`);
+        console.log(`→ Recording ${this.exportOptions.duration}s at ${this.exportOptions.fps}fps (precise timing)...`);
 
         return new Promise((resolve, reject) => {
-            const animate = (currentTime) => {
+            // Use setInterval for precise frame timing instead of requestAnimationFrame
+            const intervalId = setInterval(() => {
                 try {
+                    const currentTime = performance.now();
                     const elapsed = currentTime - startTime;
-                    const elapsedSec = elapsed / 1000;
 
                     // Check if recording is complete
                     if (elapsed >= duration) {
-                        console.log(`✓ Recording complete (${frameCount} frames)`);
+                        clearInterval(intervalId);
+                        console.log(`✓ Recording complete (${frameCount} frames rendered)`);
                         resolve();
                         return;
                     }
 
-                    // Render frame
-                    effect.update(frameDuration / 1000, elapsedSec);
+                    // Calculate exact elapsed time for this frame
+                    const frameTime = frameCount * (frameDuration / 1000);  // in seconds
+
+                    // Render frame with deterministic time
+                    effect.update(frameDuration / 1000, frameTime);
                     this.offscreenRenderer.render(scene, camera);
 
                     frameCount++;
-                    lastFrameTime = currentTime;
 
                     // Update progress
                     const percentage = (elapsed / duration) * 100;
@@ -388,20 +392,15 @@ export class VideoExportManager {
 
                     // Log progress every second
                     if (frameCount % this.exportOptions.fps === 0) {
-                        console.log(`  ${elapsedSec.toFixed(1)}s / ${this.exportOptions.duration}s (${percentage.toFixed(1)}%)`);
+                        console.log(`  ${frameTime.toFixed(1)}s / ${this.exportOptions.duration}s (${percentage.toFixed(1)}%)`);
                     }
 
-                    // Continue animation loop
-                    requestAnimationFrame(animate);
-
                 } catch (error) {
+                    clearInterval(intervalId);
                     console.error('Animation error:', error);
                     reject(error);
                 }
-            };
-
-            // Start animation loop
-            requestAnimationFrame(animate);
+            }, frameDuration);  // Precise interval timing (33.33ms for 30fps)
         });
     }
 

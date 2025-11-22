@@ -42,8 +42,42 @@
         0 0 0 9999px rgba(0, 0, 0, 0.5),
         inset 0 0 20px rgba(0, 255, 136, 0.2),
         0 0 30px rgba(0, 255, 136, 0.3);
+    pointer-events: none;  /* Make transparent to clicks */
+}
+
+/* Draggable edge zones (invisible overlay) */
+.safe-frame-edge {
+    position: absolute;
     pointer-events: auto;
-    cursor: default;  /* Cursor changes dynamically in JS based on position */
+    cursor: move;
+}
+
+.safe-frame-edge.top {
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 15px;
+}
+
+.safe-frame-edge.bottom {
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 15px;
+}
+
+.safe-frame-edge.left {
+    left: -2px;
+    top: 0;
+    bottom: 0;
+    width: 15px;
+}
+
+.safe-frame-edge.right {
+    right: -2px;
+    top: 0;
+    bottom: 0;
+    width: 15px;
 }
 
 /* Safe frame info label */
