@@ -177,9 +177,12 @@ export class VideoExportManager {
 
             // 3. Initialize canvas-record Recorder
             console.log('→ Initializing canvas-record (frame-perfect MP4 export)...');
+            console.log('  Canvas:', this.offscreenCanvas, 'Size:', this.offscreenCanvas.width, 'x', this.offscreenCanvas.height);
+
+            const filename = `floss-export-${Date.now()}.mp4`;
 
             this.recorder = new Recorder(this.offscreenCanvas, {
-                name: `floss-export-${Date.now()}`,
+                name: filename,
                 duration: this.exportOptions.duration,
                 frameRate: this.exportOptions.fps,
                 download: false,  // We handle download ourselves
@@ -189,7 +192,7 @@ export class VideoExportManager {
             console.log('✓ canvas-record Recorder initialized');
 
             // 4. Start recording
-            await this.recorder.start({ initOnly: true });  // Don't call first step() yet
+            await this.recorder.start();
             console.log('✓ Recording started - rendering frames...');
 
             // 5. Render animation frame-by-frame (OFFLINE - frame-perfect!)
