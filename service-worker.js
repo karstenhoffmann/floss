@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v5.0.7'; // Add encoderOptions.bitrateMode for MP4WasmEncoder
+const CACHE_NAME = 'floss-v5.0.8'; // Calculate bitrate manually (explicit value)
 
 // Assets to cache
 const ASSETS_TO_CACHE = [

@@ -206,6 +206,19 @@ export class VideoExportManager {
 
             console.log('  Using encoder:', encoder.constructor.name);
 
+            // Calculate bitrate manually (estimateBitRate has wrong param order in MP4WasmEncoder)
+            // Formula: width × height × fps × motionRank × 0.07 × (0.75 if variable, 1 if constant)
+            const width = this.offscreenCanvas.width;
+            const height = this.offscreenCanvas.height;
+            const fps = this.exportOptions.fps;
+            const motionRank = 4;  // 1=low motion, 2=medium, 4=high motion
+            const bitrateMode = 'variable';
+            const bitrate = Math.round(
+                width * height * fps * motionRank * 0.07 * (bitrateMode === 'variable' ? 0.75 : 1)
+            );
+
+            console.log(`  Bitrate: ${(bitrate / 1_000_000).toFixed(1)} Mbps (${bitrateMode})`);
+
             this.recorder = new Recorder(gl, {
                 name: filename,
                 duration: this.exportOptions.duration,
@@ -214,9 +227,8 @@ export class VideoExportManager {
                 extension: 'mp4',
                 encoder: encoder,  // Explicitly use MP4WasmEncoder (embedded WASM)
                 encoderOptions: {
-                    // MP4WasmEncoder requires these options
-                    bitrateMode: 'variable',  // 'variable' or 'constant'
-                    // bitrate is auto-calculated by estimateBitRate()
+                    bitrateMode: bitrateMode,
+                    bitrate: bitrate  // Provide explicit bitrate value
                 }
             });
 
