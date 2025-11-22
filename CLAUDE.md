@@ -409,6 +409,56 @@ Professional motion designers creating kinetic typography animations for:
 - **No build tools**: Direct ES6 modules, no webpack/bundlers
 - **Professional UX**: Inspired by After Effects and Rive
 
+###⚠️ **CRITICAL: Deployment Philosophy - Copy & Paste Portability**
+
+**Core Requirement:** The app MUST be deployable by simply copying the entire directory to any location and opening `index.html` in a browser.
+
+**Rules:**
+1. **ALL dependencies MUST be in the repository**
+   - ✅ Vendor third-party libraries in `/lib/` directory
+   - ✅ Include ALL files needed to run offline
+   - ❌ NO reliance on CDN for critical functionality
+   - ❌ NO build process required
+
+2. **Local-first, CDN optional**
+   - Libraries SHOULD be in `/lib/` (vendored)
+   - CDN imports only acceptable if:
+     - Service Worker caches them for offline use
+     - App still works if CDN is down (fallback)
+   - Prefer: `import from './lib/library.js'`
+   - Avoid: `import from 'https://cdn.../library.js'`
+
+3. **Why this matters:**
+   - User can zip the repo and send it to someone
+   - Works on air-gapped machines (no internet)
+   - No npm install, no build, no server setup
+   - Open `index.html` → works immediately
+   - GitHub Pages deployment is automatic (just push)
+
+4. **Current vendored libraries:**
+   - `/lib/` - Third-party libraries (vendored)
+   - Three.js, OrbitControls - **TODO: Should be vendored!**
+   - Open Props, Coloris - **TODO: Should be vendored!**
+   - canvas-record - **TODO: Must be vendored!**
+
+5. **When adding new dependencies:**
+   - [ ] Download library files to `/lib/`
+   - [ ] Update imports to use local path
+   - [ ] Test that app works offline (DevTools → Offline mode)
+   - [ ] Document in this file what was added and why
+   - [ ] Commit library files to repo
+
+**Example:**
+```javascript
+// ❌ WRONG - CDN dependency
+import { Recorder } from 'https://esm.sh/canvas-record@5.0.0';
+
+// ✅ CORRECT - Vendored in repo
+import { Recorder } from './lib/canvas-record/index.js';
+```
+
+**For new Claude sessions:** If user says "add library X", your FIRST step is to vendor it in `/lib/`, NOT import from CDN!
+
 ---
 
 ## Technology Stack
