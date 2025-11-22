@@ -182,17 +182,22 @@ export class VideoExportManager {
                 console.log('✓ Effect reset to t=0');
             }
 
-            // 4. Initialize WebM muxer
+            // 4. Detect best supported codec
+            console.log('→ Detecting best supported video codec...');
+            const codecConfig = await this.detectBestCodec();
+            console.log(`✓ Selected codec: ${codecConfig.codec} (${codecConfig.name})`);
+
+            // 5. Initialize WebM muxer
             console.log('→ Initializing WebM muxer...');
             this.muxer = new WebMMuxer({
                 width: this.exportOptions.width,
                 height: this.exportOptions.height,
                 frameRate: this.exportOptions.fps,
-                codec: 'vp9'
+                codec: codecConfig.muxerCodec
             });
             console.log('✓ WebM muxer initialized');
 
-            // 5. Initialize VideoEncoder
+            // 6. Initialize VideoEncoder
             console.log('→ Initializing VideoEncoder (WebCodecs API)...');
 
             let encoderError = null;
@@ -209,16 +214,8 @@ export class VideoExportManager {
                     }
                 });
 
-                // Configure encoder (VP9, hardware-accelerated if available)
-                this.encoder.configure({
-                    codec: 'vp09.00.10.08',  // VP9 Profile 0
-                    width: this.exportOptions.width,
-                    height: this.exportOptions.height,
-                    bitrate: this.exportOptions.bitrate,
-                    framerate: this.exportOptions.fps,
-                    hardwareAcceleration: 'prefer-hardware',
-                    latencyMode: 'quality'
-                });
+                // Configure encoder with detected codec
+                this.encoder.configure(codecConfig);
 
                 resolve();
             });
@@ -231,22 +228,22 @@ export class VideoExportManager {
 
             console.log('✓ VideoEncoder configured');
 
-            // 6. Render animation frame-by-frame (OFFLINE - frame-perfect!)
+            // 7. Render animation frame-by-frame (OFFLINE - frame-perfect!)
             console.log('✓ Encoder ready - rendering frames...');
             await this.renderFrameByFrame();
 
-            // 7. Flush encoder (finish encoding all frames)
+            // 8. Flush encoder (finish encoding all frames)
             console.log('→ Flushing encoder...');
             await this.encoder.flush();
             this.encoder.close();
             console.log('✓ Encoder flushed and closed');
 
-            // 8. Finalize muxer and get blob
+            // 9. Finalize muxer and get blob
             console.log('→ Finalizing WebM file...');
             const blob = this.muxer.finalize();
             console.log('✓ WebM finalized, blob size:', (blob.size / 1024 / 1024).toFixed(2), 'MB');
 
-            // 9. Complete export and trigger download
+            // 10. Complete export and trigger download
             this.completeExport(blob);
 
         } catch (error) {
@@ -254,6 +251,87 @@ export class VideoExportManager {
             this.cancelExport();
             throw error;
         }
+    }
+
+    /**
+     * Detect best supported video codec
+     * Tests VP9, VP8, and AV1 in order of preference
+     */
+    async detectBestCodec() {
+        const width = this.exportOptions.width;
+        const height = this.exportOptions.height;
+        const bitrate = this.exportOptions.bitrate;
+        const fps = this.exportOptions.fps;
+
+        // Codec candidates (in order of preference)
+        const candidates = [
+            {
+                name: 'VP9',
+                codec: 'vp09.00.10.08',
+                muxerCodec: 'vp9',
+                config: {
+                    codec: 'vp09.00.10.08',
+                    width,
+                    height,
+                    bitrate,
+                    framerate: fps,
+                    hardwareAcceleration: 'prefer-hardware',
+                    latencyMode: 'quality'
+                }
+            },
+            {
+                name: 'VP8',
+                codec: 'vp8',
+                muxerCodec: 'vp8',
+                config: {
+                    codec: 'vp8',
+                    width,
+                    height,
+                    bitrate,
+                    framerate: fps,
+                    hardwareAcceleration: 'prefer-hardware',
+                    latencyMode: 'quality'
+                }
+            },
+            {
+                name: 'AV1',
+                codec: 'av01.0.04M.08',
+                muxerCodec: 'vp9', // AV1 goes in WebM container
+                config: {
+                    codec: 'av01.0.04M.08',
+                    width,
+                    height,
+                    bitrate,
+                    framerate: fps,
+                    hardwareAcceleration: 'prefer-hardware',
+                    latencyMode: 'quality'
+                }
+            }
+        ];
+
+        // Test each codec
+        for (const candidate of candidates) {
+            try {
+                const support = await VideoEncoder.isConfigSupported(candidate.config);
+
+                if (support.supported) {
+                    console.log(`  ✓ ${candidate.name} supported`);
+                    // Return full candidate object (includes muxerCodec and name)
+                    return {
+                        ...candidate.config,
+                        muxerCodec: candidate.muxerCodec,
+                        name: candidate.name
+                    };
+                } else {
+                    console.log(`  ✗ ${candidate.name} not supported`);
+                }
+            } catch (error) {
+                console.log(`  ✗ ${candidate.name} check failed:`, error.message);
+            }
+        }
+
+        // No codec supported - throw error
+        throw new Error('No supported video codec found. WebCodecs requires Chrome/Edge 94+');
     }
 
     /**

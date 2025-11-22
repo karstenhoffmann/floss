@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v4.2.0'; // Frame-perfect video export with WebCodecs + WebM muxer
+const CACHE_NAME = 'floss-v4.2.1'; // Frame-perfect export with codec detection + VP8 fallback
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
