@@ -75,7 +75,10 @@ export class VideoExportManager {
             this.exportPanelComponent = new ExportPanelComponent(this);
         }
 
-        // Show UI
+        // Hide main UI elements
+        this.hideMainUI();
+
+        // Show export UI
         this.safeFrameComponent.show();
         this.exportPanelComponent.show();
 
@@ -105,7 +108,7 @@ export class VideoExportManager {
             percentage: 0
         });
 
-        // Hide UI (if created)
+        // Hide export UI (if created)
         if (this.safeFrameComponent) {
             this.safeFrameComponent.hide();
         }
@@ -113,6 +116,9 @@ export class VideoExportManager {
         if (this.exportPanelComponent) {
             this.exportPanelComponent.hide();
         }
+
+        // Restore main UI
+        this.showMainUI();
 
         console.log('✓ Export Mode: null (normal)');
     }
@@ -153,10 +159,33 @@ export class VideoExportManager {
             // 1. Create offscreen canvas and renderer
             this.createOffscreenRenderer();
 
-            // 2. Load and initialize canvas-record for MP4 export (ES module via esm.sh)
-            console.log('→ Loading canvas-record from esm.sh...');
-            const { Recorder } = await import('https://esm.sh/canvas-record@4.2.4');
-            console.log('✓ canvas-record loaded successfully');
+            // 2. Load and initialize canvas-record for MP4 export (ES module)
+            // Try multiple CDNs with fallback
+            const cdnUrls = [
+                'https://cdn.skypack.dev/canvas-record@4.2.4',
+                'https://unpkg.com/canvas-record@4.2.4?module',
+                'https://cdn.jsdelivr.net/npm/canvas-record@4.2.4/+esm'
+            ];
+
+            let Recorder = null;
+            let loadError = null;
+
+            for (const url of cdnUrls) {
+                try {
+                    console.log(`→ Trying canvas-record from ${url}...`);
+                    const module = await import(url);
+                    Recorder = module.Recorder;
+                    console.log(`✓ canvas-record loaded from ${url}`);
+                    break;
+                } catch (err) {
+                    console.warn(`✗ Failed to load from ${url}:`, err.message);
+                    loadError = err;
+                }
+            }
+
+            if (!Recorder) {
+                throw new Error(`Failed to load canvas-record from all CDNs. Last error: ${loadError?.message}`);
+            }
 
             this.recorder = new Recorder(this.offscreenCanvas, {
                 encoderOptions: {
@@ -405,6 +434,74 @@ export class VideoExportManager {
         }, 100);
 
         console.log(`✓ Download triggered: ${filename}`);
+    }
+
+    /**
+     * Hide main UI elements when entering Export Mode
+     */
+    hideMainUI() {
+        const toolbar = document.getElementById('toolbar');
+        const settingsPanel = document.getElementById('settings-panel');
+        const colorsPanel = document.getElementById('colors-panel');
+        const presetsPanel = document.getElementById('presets-panel');
+
+        if (toolbar) {
+            toolbar.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+            toolbar.style.transform = 'translateY(-100%)';
+            toolbar.style.opacity = '0';
+        }
+
+        if (settingsPanel) {
+            settingsPanel.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+            settingsPanel.style.transform = 'translateX(100%)';
+            settingsPanel.style.opacity = '0';
+        }
+
+        if (colorsPanel) {
+            colorsPanel.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+            colorsPanel.style.transform = 'translateX(100%)';
+            colorsPanel.style.opacity = '0';
+        }
+
+        if (presetsPanel) {
+            presetsPanel.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+            presetsPanel.style.transform = 'translateX(100%)';
+            presetsPanel.style.opacity = '0';
+        }
+
+        console.log('✓ Main UI hidden');
+    }
+
+    /**
+     * Show main UI elements when exiting Export Mode
+     */
+    showMainUI() {
+        const toolbar = document.getElementById('toolbar');
+        const settingsPanel = document.getElementById('settings-panel');
+        const colorsPanel = document.getElementById('colors-panel');
+        const presetsPanel = document.getElementById('presets-panel');
+
+        if (toolbar) {
+            toolbar.style.transform = 'translateY(0)';
+            toolbar.style.opacity = '1';
+        }
+
+        if (settingsPanel) {
+            settingsPanel.style.transform = 'translateX(0)';
+            settingsPanel.style.opacity = '1';
+        }
+
+        if (colorsPanel) {
+            colorsPanel.style.transform = 'translateX(0)';
+            colorsPanel.style.opacity = '1';
+        }
+
+        if (presetsPanel) {
+            presetsPanel.style.transform = 'translateX(0)';
+            presetsPanel.style.opacity = '1';
+        }
+
+        console.log('✓ Main UI shown');
     }
 
     /**

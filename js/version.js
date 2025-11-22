@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '2.6.2',
-    commit: 'Fix: Load canvas-record as ES module via esm.sh',
+    number: '2.7.0',
+    commit: 'feat: Video export UI with SafeFrame & ExportPanel',
     date: '2025-11-22',
-    time: '11:15'
+    time: '12:00'
 };
 
 export default VERSION;

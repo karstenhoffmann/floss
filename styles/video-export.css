@@ -62,6 +62,27 @@
     white-space: nowrap;
 }
 
+/* Scale toggle button */
+.safe-frame-scale-toggle {
+    position: absolute;
+    top: -30px;
+    right: 0;
+    background: rgba(0, 255, 136, 0.9);
+    color: #000;
+    padding: 4px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: all 0.2s;
+}
+
+.safe-frame-scale-toggle:hover {
+    background: rgba(0, 255, 136, 1);
+    transform: scale(1.1);
+}
+
 /* Resize handles (corners) */
 .safe-frame-handle {
     position: absolute;
@@ -172,8 +193,16 @@
     font-weight: 600;
     color: #00ff88;
     margin: 0;
+    flex: 1;
+    user-select: none;
 }
 
+.export-panel__controls {
+    display: flex;
+    gap: 8px;
+}
+
+.export-panel__minimize,
 .export-panel__close {
     background: none;
     border: none;
@@ -190,9 +219,21 @@
     transition: all 0.2s;
 }
 
+.export-panel__minimize:hover,
 .export-panel__close:hover {
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
+}
+
+/* Minimized state */
+.export-panel.minimized {
+    min-width: 250px;
+}
+
+.export-panel.minimized .export-panel__header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 
 /* Panel content */

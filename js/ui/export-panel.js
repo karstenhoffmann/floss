@@ -12,6 +12,9 @@ export class ExportPanelComponent {
         this.progressText = null;
         this.startButton = null;
         this.cancelButton = null;
+        this.isMinimized = false;
+        this.isDragging = false;
+        this.dragOffset = { x: 0, y: 0 };
 
         this.create();
         this.setupEventListeners();
@@ -30,7 +33,10 @@ export class ExportPanelComponent {
         this.element.innerHTML = `
             <div class="export-panel__header">
                 <h3 class="export-panel__title">📹 Export Video</h3>
-                <button class="export-panel__close" title="Exit Export Mode (ESC)">×</button>
+                <div class="export-panel__controls">
+                    <button class="export-panel__minimize" title="Minimize">−</button>
+                    <button class="export-panel__close" title="Exit Export Mode (ESC)">×</button>
+                </div>
             </div>
 
             <div class="export-panel__content">
@@ -102,12 +108,15 @@ export class ExportPanelComponent {
         document.body.appendChild(this.element);
 
         // Store references
+        this.header = this.element.querySelector('.export-panel__header');
+        this.content = this.element.querySelector('.export-panel__content');
         this.durationInput = this.element.querySelector('#export-duration');
         this.progressBar = this.element.querySelector('.export-progress');
         this.progressFill = this.element.querySelector('.export-progress__fill');
         this.progressText = this.element.querySelector('.export-progress__text');
         this.startButton = this.element.querySelector('[data-action="start"]');
         this.cancelButton = this.element.querySelector('[data-action="cancel"]');
+        this.minimizeButton = this.element.querySelector('.export-panel__minimize');
         this.closeButton = this.element.querySelector('.export-panel__close');
 
         console.log('✓ ExportPanelComponent created');
@@ -136,6 +145,14 @@ export class ExportPanelComponent {
         this.closeButton.addEventListener('click', () => {
             this.videoExportManager.exit();
         });
+
+        // Minimize/Maximize button
+        this.minimizeButton.addEventListener('click', () => {
+            this.toggleMinimize();
+        });
+
+        // Draggable header
+        this.setupDrag();
 
         // Listen to export progress
         this.setupProgressListener();
@@ -218,6 +235,67 @@ export class ExportPanelComponent {
      */
     hide() {
         this.element.classList.remove('visible');
+    }
+
+    /**
+     * Toggle minimize/maximize
+     */
+    toggleMinimize() {
+        this.isMinimized = !this.isMinimized;
+
+        if (this.isMinimized) {
+            this.element.classList.add('minimized');
+            this.content.style.display = 'none';
+            this.minimizeButton.innerHTML = '+';
+            this.minimizeButton.title = 'Maximize';
+        } else {
+            this.element.classList.remove('minimized');
+            this.content.style.display = 'block';
+            this.minimizeButton.innerHTML = '−';
+            this.minimizeButton.title = 'Minimize';
+        }
+    }
+
+    /**
+     * Setup dragging for the header
+     */
+    setupDrag() {
+        this.header.addEventListener('mousedown', (e) => {
+            // Don't drag if clicking on buttons
+            if (e.target === this.minimizeButton || e.target === this.closeButton) {
+                return;
+            }
+
+            this.isDragging = true;
+            const rect = this.element.getBoundingClientRect();
+            this.dragOffset.x = e.clientX - rect.left;
+            this.dragOffset.y = e.clientY - rect.top;
+
+            this.header.style.cursor = 'grabbing';
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (this.isDragging) {
+                const x = e.clientX - this.dragOffset.x;
+                const y = e.clientY - this.dragOffset.y;
+
+                this.element.style.left = `${x}px`;
+                this.element.style.top = `${y}px`;
+                this.element.style.bottom = 'auto';  // Override bottom positioning
+                this.element.style.right = 'auto';  // Override right positioning
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (this.isDragging) {
+                this.isDragging = false;
+                this.header.style.cursor = 'grab';
+            }
+        });
+
+        // Set initial cursor
+        this.header.style.cursor = 'grab';
     }
 
     /**

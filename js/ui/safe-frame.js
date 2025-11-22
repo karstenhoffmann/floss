@@ -10,8 +10,11 @@ export class SafeFrameComponent {
         this.rect = null;
         this.isDragging = false;
         this.dragOffset = { x: 0, y: 0 };
+        this.scale = 1.0;  // Current scale (1.0 = full 1920x1080)
+        this.isScaled = true;  // Start scaled to fit window
 
         this.create();
+        this.calculateScale();
     }
 
     /**
@@ -27,10 +30,21 @@ export class SafeFrameComponent {
         this.rect.className = 'safe-frame-rect';
 
         // Info label
-        const label = document.createElement('div');
-        label.className = 'safe-frame-label';
-        label.textContent = '1920 × 1080 (16:9) Export Region';
-        this.rect.appendChild(label);
+        this.label = document.createElement('div');
+        this.label.className = 'safe-frame-label';
+        this.label.textContent = '1920 × 1080 (16:9) Export Region';
+        this.rect.appendChild(this.label);
+
+        // Scale toggle button
+        this.scaleButton = document.createElement('button');
+        this.scaleButton.className = 'safe-frame-scale-toggle';
+        this.scaleButton.innerHTML = '⛶';  // Expand icon
+        this.scaleButton.title = 'Expand to full size (1920×1080)';
+        this.scaleButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggleScale();
+        });
+        this.rect.appendChild(this.scaleButton);
 
         // Center crosshair
         const center = document.createElement('div');
@@ -98,15 +112,85 @@ export class SafeFrameComponent {
     }
 
     /**
+     * Calculate optimal scale to fit browser window
+     */
+    calculateScale() {
+        const targetWidth = 1920;
+        const targetHeight = 1080;
+        const padding = 100;  // Safety margin from edges
+
+        const maxWidth = window.innerWidth - padding * 2;
+        const maxHeight = window.innerHeight - padding * 2;
+
+        const scaleX = maxWidth / targetWidth;
+        const scaleY = maxHeight / targetHeight;
+
+        // Use smaller scale to maintain aspect ratio
+        this.autoScale = Math.min(scaleX, scaleY, 1.0);  // Never scale up, only down
+
+        // Apply auto scale if enabled
+        if (this.isScaled) {
+            this.scale = this.autoScale;
+        }
+
+        this.updateLabel();
+    }
+
+    /**
+     * Toggle between scaled and full size
+     */
+    toggleScale() {
+        this.isScaled = !this.isScaled;
+
+        if (this.isScaled) {
+            this.scale = this.autoScale;
+            this.scaleButton.innerHTML = '⛶';
+            this.scaleButton.title = 'Expand to full size (1920×1080)';
+        } else {
+            this.scale = 1.0;
+            this.scaleButton.innerHTML = '⛶';  // Could use different icon
+            this.scaleButton.title = 'Fit to window';
+        }
+
+        this.updateLabel();
+        this.update();
+
+        // Recenter after scale change
+        const safeFrame = this.videoExportManager.getSafeFrame();
+        const scaledWidth = safeFrame.width * this.scale;
+        const scaledHeight = safeFrame.height * this.scale;
+        const x = (window.innerWidth - scaledWidth) / 2;
+        const y = (window.innerHeight - scaledHeight) / 2;
+        this.videoExportManager.updateSafeFrame({ x, y });
+        this.update();
+    }
+
+    /**
+     * Update label with current scale info
+     */
+    updateLabel() {
+        const scalePercent = Math.round(this.scale * 100);
+        if (this.scale < 1.0) {
+            this.label.textContent = `1920 × 1080 (16:9) • ${scalePercent}% of target size`;
+        } else {
+            this.label.textContent = `1920 × 1080 (16:9) Export Region`;
+        }
+    }
+
+    /**
      * Update position from VideoExportManager
      */
     update() {
         const safeFrame = this.videoExportManager.getSafeFrame();
 
+        // Apply scale
+        const scaledWidth = safeFrame.width * this.scale;
+        const scaledHeight = safeFrame.height * this.scale;
+
         this.rect.style.left = `${safeFrame.x}px`;
         this.rect.style.top = `${safeFrame.y}px`;
-        this.rect.style.width = `${safeFrame.width}px`;
-        this.rect.style.height = `${safeFrame.height}px`;
+        this.rect.style.width = `${scaledWidth}px`;
+        this.rect.style.height = `${scaledHeight}px`;
     }
 
     /**
