@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.3.0',
-    commit: 'feat: Add index-iife.html for file:// support',
+    number: '5.3.1',
+    commit: 'fix: Improve text rendering and animation smoothness',
     date: '2025-11-23',
-    time: '19:45'
+    time: '20:00'
 };
 
 export default VERSION;

@@ -211,22 +211,38 @@
         // =====================================================================
         function createTextTexture(text) {
             const canvas = document.createElement('canvas');
-            canvas.width = 512;
-            canvas.height = 256;
+            canvas.width = 1024;
+            canvas.height = 1024;
             const ctx = canvas.getContext('2d');
 
             // Background
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Text
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 80px Arial Black, sans-serif';
+            // Text (repeated pattern for better tiling)
+            ctx.fillStyle = '#8b5cf6';  // Violet color
+            ctx.font = 'bold 120px Arial Black, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+            // Tile text multiple times for better coverage
+            const cols = 3;
+            const rows = 3;
+            const cellWidth = canvas.width / cols;
+            const cellHeight = canvas.height / rows;
+
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const x = cellWidth * (col + 0.5);
+                    const y = cellHeight * (row + 0.5);
+                    ctx.fillText(text, x, y);
+                }
+            }
 
             const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(2, 2);
             texture.needsUpdate = true;
             return texture;
         }
@@ -247,6 +263,9 @@
                 scene.remove(mesh);
                 mesh.geometry.dispose();
                 mesh.material.dispose();
+                if (mesh.material.map) {
+                    mesh.material.map.dispose();
+                }
             }
 
             // Create geometry
@@ -256,8 +275,7 @@
             const texture = createTextTexture(settings.text);
             const material = new THREE.MeshBasicMaterial({
                 map: texture,
-                color: 0xffffff,
-                wireframe: false
+                color: 0xffffff
             });
 
             mesh = new THREE.Mesh(geometry, material);
@@ -270,22 +288,25 @@
         // =====================================================================
         // Animation Loop
         // =====================================================================
-        let time = 0;
-        function animate() {
+        let lastTime = performance.now();
+        function animate(currentTime) {
             requestAnimationFrame(animate);
 
-            time += 0.016; // ~60fps
+            // Calculate delta time in seconds
+            const deltaTime = (currentTime - lastTime) / 1000;
+            lastTime = currentTime;
 
+            // Incremental rotation (no jumps when settings change)
             if (mesh) {
-                mesh.rotation.x = time * settings.rotationSpeed * 0.3;
-                mesh.rotation.y = time * settings.rotationSpeed * 0.5;
+                mesh.rotation.x += deltaTime * settings.rotationSpeed * 0.3;
+                mesh.rotation.y += deltaTime * settings.rotationSpeed * 0.5;
             }
 
             controls.update();
             renderer.render(scene, camera);
         }
 
-        animate();
+        animate(performance.now());
 
         // =====================================================================
         // UI Controls
