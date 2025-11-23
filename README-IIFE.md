@@ -135,11 +135,38 @@ To modify the IIFE version:
 - Preset management needed
 - Production deployment
 
+## Known Limitations & Future Improvements
+
+### Current State (v5.3.4)
+
+**Intentional Simplifications:**
+- ✅ Uses simple **Torus geometry** (not TorusKnot) for better text UV mapping
+- ✅ Basic **MeshBasicMaterial** (no lighting, no shaders)
+- ✅ Text rendered as **canvas texture** (not shader-based)
+- ✅ Single effect only (no effect switching)
+
+**Why:** This is a **Proof of Concept** for file:// compatibility. Visual finesse comes after core architecture migration.
+
+### Future Improvements (Post-Migration)
+
+**After vendoring CDN dependencies and completing offline-first architecture:**
+
+- [ ] **Replace Torus with TorusKnot** - More visually interesting (like original Codrops)
+- [ ] **Shader-based text rendering** - Better quality, GPU-accelerated
+- [ ] **Advanced materials** - Lighting, reflections, post-processing
+- [ ] **Multiple effects** - Effect switcher UI
+- [ ] **More parameters** - Color controls, animation presets
+- [ ] **Better UV mapping** - Custom UV unwrapping for complex geometries
+
+**Priority:** LOW - Focus on architecture first, visuals later
+
+**See:** `CLAUDE.md` → "Future Enhancements" → "index-iife.html Visual Polish"
+
 ## Version
 
-- **Version:** 5.2.1
+- **Version:** 5.3.4
 - **Date:** 2025-11-23
-- **Type:** Simplified IIFE bundle
+- **Type:** Simplified IIFE bundle (PoC)
 
 ## License
 

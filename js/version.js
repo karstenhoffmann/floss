@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.3.4',
-    commit: 'fix: Preserve rotation on text change, improve reset',
+    number: '5.3.5',
+    commit: 'docs: Document index-iife.html limitations and future',
     date: '2025-11-23',
-    time: '20:45'
+    time: '21:00'
 };
 
 export default VERSION;

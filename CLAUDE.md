@@ -1613,6 +1613,21 @@ Priority features:
 - [ ] Effect parameters randomization
 - [ ] Keyboard shortcuts customization
 
+### index-iife.html Visual Polish (Post-Migration)
+
+**Context:** `index-iife.html` currently uses simple Torus geometry for text rendering (PoC for file:// compatibility). This is intentional - visual finesse comes later.
+
+**TODO (Future Phase):**
+- [ ] Replace Torus with TorusKnot geometry (like original Codrops example)
+- [ ] Improve UV mapping for complex geometries
+- [ ] Add shader-based text rendering for better quality
+- [ ] Implement multiple effect options (not just one geometry)
+- [ ] Add proper lighting and materials (MeshStandardMaterial vs MeshBasicMaterial)
+
+**Priority:** LOW - Only after core migration is complete (vendoring CDN dependencies, offline-first architecture)
+
+**Rationale:** index-iife.html is a simplified IIFE entry point for file:// compatibility testing. The production app (index.html with ES6 modules) will have full visual effects. Don't spend time on visual polish until architecture is solid.
+
 ---
 
 ## External Dependencies
