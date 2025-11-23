@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.2.0',
-    commit: 'feat: Add Wave Plane and Sphere Text effects',
+    number: '5.2.1',
+    commit: 'wip: Add IIFE bundle skeleton for file:// support',
     date: '2025-11-23',
-    time: '14:45'
+    time: '19:30'
 };
 
 export default VERSION;
