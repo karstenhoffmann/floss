@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.3.1',
-    commit: 'fix: Improve text rendering and animation smoothness',
+    number: '5.3.2',
+    commit: 'fix: Use Torus geometry and fix camera reset',
     date: '2025-11-23',
-    time: '20:00'
+    time: '20:15'
 };
 
 export default VERSION;
