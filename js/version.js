@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.1.1',
-    commit: 'fix: Call stop() directly (step returns void)',
+    number: '5.2.0',
+    commit: 'feat: Add Wave Plane and Sphere Text effects',
     date: '2025-11-23',
-    time: '00:15'
+    time: '14:45'
 };
 
 export default VERSION;

@@ -19,6 +19,8 @@ import VERSION from './version.js';
 import EndlessEffect from './effects/endless.js';
 import GlitchEffect from './effects/glitch.js';
 import ParticlesEffect from './effects/particles.js';
+import WavePlaneEffect from './effects/wave-plane.js';
+import SphereTextEffect from './effects/sphere-text.js';
 
 class App {
     constructor() {
@@ -109,6 +111,8 @@ class App {
         effectManager.register(EndlessEffect);
         effectManager.register(GlitchEffect);
         effectManager.register(ParticlesEffect);
+        effectManager.register(WavePlaneEffect);
+        effectManager.register(SphereTextEffect);
         // More effects will be added here
     }
 
