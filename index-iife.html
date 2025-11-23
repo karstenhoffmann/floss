@@ -161,7 +161,7 @@
         console.log(`
 ╔════════════════════════════════════════════════════════════════╗
 ║   🎨 Floss - Motion Design (IIFE Version)                      ║
-║   Version: 5.2.1       Date: 2025-11-23 19:30                 ║
+║   Version: 5.3.4       Date: 2025-11-23 20:45                 ║
 ║   Mode: file:// compatible                                     ║
 ╚════════════════════════════════════════════════════════════════╝
         `);
@@ -262,6 +262,16 @@
         };
 
         function createEffect() {
+            // Save old rotation to preserve animation state
+            let oldRotation = null;
+            if (mesh) {
+                oldRotation = {
+                    x: mesh.rotation.x,
+                    y: mesh.rotation.y,
+                    z: mesh.rotation.z
+                };
+            }
+
             // Remove old mesh
             if (mesh) {
                 scene.remove(mesh);
@@ -284,6 +294,12 @@
 
             mesh = new THREE.Mesh(geometry, material);
             mesh.scale.setScalar(settings.scale);
+
+            // Restore rotation to preserve animation continuity
+            if (oldRotation) {
+                mesh.rotation.set(oldRotation.x, oldRotation.y, oldRotation.z);
+            }
+
             scene.add(mesh);
         }
 
@@ -350,10 +366,21 @@
             // Reset camera rotation
             camera.rotation.set(0, 0, 0);
 
+            // Reset mesh rotation (visual feedback that reset happened)
+            if (mesh) {
+                mesh.rotation.set(0, 0, 0);
+            }
+
             // Force update controls
             controls.update();
 
-            console.log('Camera reset to:', camera.position);
+            console.log('✓ Camera and mesh reset');
+
+            // Visual feedback: flash the button
+            resetBtn.style.background = 'rgba(139, 92, 246, 0.5)';
+            setTimeout(() => {
+                resetBtn.style.background = 'rgba(139, 92, 246, 0.2)';
+            }, 200);
         });
 
         // =====================================================================
