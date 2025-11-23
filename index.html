@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="./styles/help-overlay.css">
     <link rel="stylesheet" href="./styles/settings-overlay.css">
     <link rel="stylesheet" href="./styles/notifications.css">
+    <link rel="stylesheet" href="./styles/video-export.css">
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="./manifest.json">
@@ -48,6 +49,9 @@
             document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r115/three.min.js"><\/script>');
         }
     </script>
+
+    <!-- canvas-record: Loaded as ES module in video-export.js via esm.sh CDN -->
+    <!-- No script tag needed here - imported dynamically when needed -->
 </head>
 <body>
     <div id="app" class="app">
@@ -392,6 +396,23 @@
 
     <!-- Coloris - Modern Color Picker -->
     <script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
+
+    <!-- Import Maps - Map bare module specifiers to CDN URLs -->
+    <!-- Required for canvas-record dependencies -->
+    <script type="importmap">
+    {
+      "imports": {
+        "canvas-context": "https://esm.sh/canvas-context@3.3.1",
+        "canvas-screenshot": "https://esm.sh/canvas-screenshot@4.2.2",
+        "mediabunny": "https://esm.sh/mediabunny@1.24.2",
+        "media-codecs": "https://esm.sh/media-codecs@2.0.2",
+        "gifenc": "https://esm.sh/gifenc@1.0.3",
+        "h264-mp4-encoder": "https://esm.sh/h264-mp4-encoder@1.0.12",
+        "@ffmpeg/ffmpeg": "https://esm.sh/@ffmpeg/ffmpeg@0.12.7",
+        "@ffmpeg/util": "https://esm.sh/@ffmpeg/util@0.12.1"
+      }
+    }
+    </script>
 
     <!-- Main App (ES6 Module) -->
     <script type="module" src="./js/app.js"></script>

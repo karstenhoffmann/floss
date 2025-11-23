@@ -6,12 +6,14 @@
 import { isWebGLAvailable, getWebGLErrorMessage } from './utils/webgl-check.js';
 import SceneManager from './core/scene.js';
 import RenderLoop from './core/renderer.js';
+import VideoExportManager from './core/video-export.js';
 import effectManager from './core/effect-manager.js';
 import presetManager from './core/preset-manager.js';
 import state from './core/state.js';
 import appSettings from './core/app-settings.js';
 import notification from './ui/notification.js';
 import ICONS from './ui/icons.js';
+import VERSION from './version.js';
 
 // Import effects
 import EndlessEffect from './effects/endless.js';
@@ -28,32 +30,27 @@ class App {
 
         this.sceneManager = null;
         this.renderLoop = null;
+        this.videoExportManager = null;
         this.currentEffect = null;
 
         this.init();
     }
 
     async init() {
-        // App version and build info
-        const appVersion = '2.3.0';
-        const buildCommit = 'e6c3364';
-        const buildDate = '2025-11-20';
-
         console.log(`
-╔════════════════════════════════════════╗
-║   Floss - Motion Design                ║
-║   Version: ${appVersion}                      ║
-║   Build: ${buildCommit}                   ║
-║   Date: ${buildDate}                ║
-╚════════════════════════════════════════╝
+╔════════════════════════════════════════════════════════════════╗
+║   🎨 Floss - Motion Design                                     ║
+║   Version: ${VERSION.number.padEnd(10)} Date: ${VERSION.date} ${VERSION.time}        ║
+║   Last Commit: ${VERSION.commit.padEnd(47)}║
+╚════════════════════════════════════════════════════════════════╝
         `);
 
         // Clear old localStorage if needed (one-time migration)
         const storedVersion = localStorage.getItem('appVersion');
-        if (storedVersion !== appVersion) {
+        if (storedVersion !== VERSION.number) {
             console.log('🔄 Clearing old cache and localStorage...');
             localStorage.clear();
-            localStorage.setItem('appVersion', appVersion);
+            localStorage.setItem('appVersion', VERSION.number);
             // Clear service worker cache
             if ('caches' in window) {
                 caches.keys().then(names => {
@@ -71,6 +68,12 @@ class App {
 
         // Initialize render loop
         this.renderLoop = new RenderLoop(this.sceneManager);
+
+        // Initialize video export manager
+        this.videoExportManager = new VideoExportManager(this, this.sceneManager);
+
+        // Expose for debugging
+        window.app = this;
 
         // Setup UI
         this.setupUI();
@@ -287,7 +290,14 @@ class App {
             switch (e.key.toLowerCase()) {
                 case ' ':
                     e.preventDefault();
-                    this.toggleUI();
+                    // Context-aware spacebar behavior
+                    if (state.get('exportMode') !== null) {
+                        // In Export Mode: Pan mode (TODO: Implement camera pan)
+                        console.log('Export Mode: Pan mode (not yet implemented)');
+                    } else {
+                        // In Normal Mode: Toggle UI
+                        this.toggleUI();
+                    }
                     break;
                 case 'g':
                     e.preventDefault();
@@ -312,9 +322,19 @@ class App {
                     }
                     break;
                 case 'e':
+                    e.preventDefault();
                     if (e.ctrlKey || e.metaKey) {
-                        e.preventDefault();
+                        // Ctrl+E / Cmd+E: Export settings
                         this.exportSettings();
+                    } else {
+                        // E alone: Toggle video export mode
+                        if (state.get('exportMode') === null) {
+                            // Not in export mode → Enter export mode
+                            this.videoExportManager.enter();
+                        } else {
+                            // Already in export mode → Exit export mode
+                            this.videoExportManager.exit();
+                        }
                     }
                     break;
                 case 'i':
@@ -324,7 +344,15 @@ class App {
                     }
                     break;
                 case 'escape':
-                    this.closeOverlays();
+                    // Context-aware escape behavior
+                    if (state.get('exportMode') !== null) {
+                        // In Export Mode: Exit export mode
+                        e.preventDefault();
+                        this.videoExportManager.exit();
+                    } else {
+                        // In Normal Mode: Close overlays
+                        this.closeOverlays();
+                    }
                     break;
                 case '1':
                 case '2':

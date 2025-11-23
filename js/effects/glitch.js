@@ -18,6 +18,16 @@ export class GlitchEffect extends EffectBase {
         };
     }
 
+    static get exportDefaults() {
+        return {
+            type: 'loop',
+            recommendedDuration: 3,    // Short loop for glitch effect
+            minDuration: 0.5,
+            maxDuration: 10,
+            seamlessLoop: true         // Glitch effect loops naturally
+        };
+    }
+
     getSettingsSchema() {
         return {
             ...super.getSettingsSchema(),
@@ -313,6 +323,30 @@ export class GlitchEffect extends EffectBase {
             }
         }
         return new THREE.Vector3(0, 0, 0);
+    }
+
+    /**
+     * Calculate export duration for glitch effect
+     * Glitch loops naturally, so any duration works
+     */
+    calculateExportSuggestion() {
+        const defaults = this.constructor.exportDefaults;
+
+        return {
+            duration: defaults.recommendedDuration,
+            loopPoint: defaults.recommendedDuration,
+            isSeamless: true,
+            confidence: 'high',
+            explanation: `Glitch effect loops naturally (${defaults.recommendedDuration}s recommended)`
+        };
+    }
+
+    /**
+     * Reset glitch effect to initial state
+     */
+    reset() {
+        // Glitch effect doesn't need explicit reset
+        // It loops naturally with time-based animation
     }
 
     resize(width, height) {

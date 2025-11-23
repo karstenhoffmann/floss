@@ -17,6 +17,16 @@ export class EndlessEffect extends EffectBase {
         };
     }
 
+    static get exportDefaults() {
+        return {
+            type: 'loop',
+            recommendedDuration: 2.5,   // One complete scroll at default speed (1.0 / 0.4)
+            minDuration: 0.5,
+            maxDuration: 10,
+            seamlessLoop: true
+        };
+    }
+
     getSettingsSchema() {
         return {
             ...super.getSettingsSchema(),
@@ -196,6 +206,32 @@ export class EndlessEffect extends EffectBase {
             }
         }
         return new THREE.Vector3(0, 0, 0);
+    }
+
+    /**
+     * Calculate perfect loop duration based on scrolling speed
+     * For seamless loop: time * uSpeed = 1.0
+     */
+    calculateExportSuggestion() {
+        const uSpeed = 0.4;  // Fixed speed from shader
+        const period = 1.0 / uSpeed;  // Perfect loop when time advances by 1.0
+
+        return {
+            duration: period,
+            loopPoint: period,
+            isSeamless: true,
+            confidence: 'high',
+            explanation: `One complete scroll cycle (${period.toFixed(1)}s at speed ${uSpeed})`
+        };
+    }
+
+    /**
+     * Reset animation to t=0 for export
+     */
+    reset() {
+        if (this.material && this.material.uniforms.uTime) {
+            this.material.uniforms.uTime.value = 0;
+        }
     }
 
     resize(width, height) {

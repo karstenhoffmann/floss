@@ -17,11 +17,21 @@ export class AppState {
             userPreferences: {
                 lastUsedFont: null,
                 defaultSettings: {}
+            },
+            // Video Export State (not persisted)
+            exportMode: null,  // null | 'setup' | 'recording' | 'complete'
+            exportProgress: {
+                currentFrame: 0,
+                totalFrames: 0,
+                percentage: 0
             }
         };
 
         this.listeners = new Map();
         this.persistTimer = null;
+
+        // Keys that should NOT be persisted to LocalStorage
+        this.nonPersistedKeys = new Set(['exportMode', 'exportProgress']);
 
         this.restore();
     }
@@ -90,12 +100,21 @@ export class AppState {
 
     /**
      * Persist state to LocalStorage (debounced)
+     * Excludes non-persisted keys like exportMode
      */
     persist() {
         clearTimeout(this.persistTimer);
         this.persistTimer = setTimeout(() => {
             try {
-                localStorage.setItem('tt-kinetic-v2-state', JSON.stringify(this.state));
+                // Filter out non-persisted keys
+                const stateToPersist = Object.entries(this.state)
+                    .filter(([key]) => !this.nonPersistedKeys.has(key))
+                    .reduce((obj, [key, value]) => {
+                        obj[key] = value;
+                        return obj;
+                    }, {});
+
+                localStorage.setItem('tt-kinetic-v2-state', JSON.stringify(stateToPersist));
             } catch (e) {
                 console.error('Failed to persist state:', e);
                 // Emit error event for UI notification
@@ -108,13 +127,23 @@ export class AppState {
 
     /**
      * Restore state from LocalStorage
+     * Non-persisted keys (like exportMode) are never restored
      */
     restore() {
         try {
             const saved = localStorage.getItem('tt-kinetic-v2-state');
             if (saved) {
                 const parsed = JSON.parse(saved);
-                this.state = { ...this.state, ...parsed };
+
+                // Filter out non-persisted keys (in case old data exists)
+                const stateToRestore = Object.entries(parsed)
+                    .filter(([key]) => !this.nonPersistedKeys.has(key))
+                    .reduce((obj, [key, value]) => {
+                        obj[key] = value;
+                        return obj;
+                    }, {});
+
+                this.state = { ...this.state, ...stateToRestore };
             }
         } catch (e) {
             console.error('Failed to restore state:', e);
@@ -137,6 +166,13 @@ export class AppState {
             userPreferences: {
                 lastUsedFont: null,
                 defaultSettings: {}
+            },
+            // Video Export State (not persisted)
+            exportMode: null,
+            exportProgress: {
+                currentFrame: 0,
+                totalFrames: 0,
+                percentage: 0
             }
         };
         this.persist();

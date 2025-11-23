@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v2.2.0'; // Add settings overlay and app settings
+const CACHE_NAME = 'floss-v5.1.1'; // Call stop() directly (step returns void)
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
@@ -14,20 +14,29 @@ const ASSETS_TO_CACHE = [
     './styles/help-overlay.css',
     './styles/settings-overlay.css',
     './styles/notifications.css',
+    './styles/video-export.css',
     './js/app.js',
+    './js/version.js',
     './js/core/state.js',
     './js/core/scene.js',
     './js/core/renderer.js',
     './js/core/effect-manager.js',
     './js/core/preset-manager.js',
     './js/core/app-settings.js',
+    './js/core/video-export.js',
     './js/effects/effect-base.js',
     './js/effects/endless.js',
+    './js/effects/glitch.js',
+    './js/effects/particles.js',
     './js/ui/notification.js',
     './js/ui/icons.js',
+    './js/ui/safe-frame.js',
+    './js/ui/export-panel.js',
     './js/utils/storage.js',
     './js/utils/text-texture.js',
     './js/utils/webgl-check.js',
+    // canvas-record library (vendored, will be cached on first load)
+    './lib/canvas-record/package/index.js',
     './manifest.json',
     // Three.js from CDN
     'https://unpkg.com/three@0.115.0/build/three.min.js',
