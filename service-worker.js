@@ -3,19 +3,23 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v5.5.0'; // All dependencies bundled with Rollup (MP4 export offline-ready)
+const CACHE_NAME = 'floss-v5.8.0'; // Phase 7.2: Password Gate + Session Management
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './styles/theme.css',
+    './styles/preloader.css',
+    './styles/password-gate.css',
     './styles/main-modern.css',
     './styles/help-overlay.css',
     './styles/settings-overlay.css',
     './styles/notifications.css',
     './styles/video-export.css',
     './js/app.js',
+    './js/floss-app.js',
+    './js/config.js',
     './js/version.js',
     './js/core/state.js',
     './js/core/scene.js',
@@ -35,6 +39,7 @@ const ASSETS_TO_CACHE = [
     './js/utils/storage.js',
     './js/utils/text-texture.js',
     './js/utils/webgl-check.js',
+    './js/utils/password-gate.js',
     // canvas-record library (vendored, will be cached on first load)
     './lib/canvas-record/package/index.js',
     './manifest.json',

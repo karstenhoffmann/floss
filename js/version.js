@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.7.0',
-    commit: 'feat: Add FlossApp.start() API (Phase 7.1)',
+    number: '5.8.0',
+    commit: 'fix: Correct password hash for "capy"',
     date: '2025-11-24',
-    time: '19:45'
+    time: '21:15'
 };
 
 export default VERSION;
