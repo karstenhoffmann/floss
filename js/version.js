@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.9.1',
-    commit: 'docs: Update status for Phase 7.3 complete',
+    number: '5.9.2',
+    commit: 'fix: Add shims for IIFE deps in file:// mode',
     date: '2025-11-24',
-    time: '22:20'
+    time: '22:30'
 };
 
 export default VERSION;

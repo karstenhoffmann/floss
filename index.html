@@ -474,6 +474,25 @@
             try {
                 // Load video export dependencies (UMD/IIFE)
                 await loadScript('./lib/canvas-record/h264-mp4-encoder.umd.js');
+
+                // Create shims for external dependencies:
+                // 1. h264-mp4-encoder exports as HME, but canvas-record expects H264MP4Encoder
+                window.H264MP4Encoder = window.HME;
+
+                // 2. gifenc is optional (CDN-only), provide empty stub to prevent errors
+                // GIF export won't work in file:// mode, but MP4 will
+                if (typeof window.gifenc === 'undefined') {
+                    window.gifenc = {};
+                }
+
+                // 3. FFmpeg dependencies (also CDN-only, provide stubs)
+                if (typeof window.FFmpeg === 'undefined') {
+                    window.FFmpeg = {};
+                }
+                if (typeof window.FFmpegUtil === 'undefined') {
+                    window.FFmpegUtil = {};
+                }
+
                 await loadScript('./lib/canvas-record/canvas-record.iife.js');
 
                 // Load main app bundle
