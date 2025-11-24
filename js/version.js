@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.4.6',
-    commit: 'fix: Coloris - clean standard config per docs',
+    number: '5.4.7',
+    commit: 'feat: Vendor canvas-record ES module dependencies (partial)',
     date: '2025-11-24',
-    time: '02:30'
+    time: '03:00'
 };
 
 export default VERSION;

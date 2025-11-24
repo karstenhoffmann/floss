@@ -392,16 +392,16 @@
     <!-- Coloris Color Picker (Vendored locally) -->
     <script src="./lib/coloris/coloris.min.js"></script>
 
-    <!-- Import Maps - Map bare module specifiers to CDN URLs -->
+    <!-- Import Maps - Map bare module specifiers to local/CDN URLs -->
     <!-- Required for canvas-record dependencies -->
     <script type="importmap">
     {
       "imports": {
-        "canvas-context": "https://esm.sh/canvas-context@3.3.1",
-        "canvas-screenshot": "https://esm.sh/canvas-screenshot@4.2.2",
+        "canvas-context": "./lib/esm/canvas-context.js",
+        "canvas-screenshot": "./lib/esm/canvas-screenshot.js",
+        "media-codecs": "./lib/esm/media-codecs.js",
+        "gifenc": "./lib/esm/gifenc.js",
         "mediabunny": "https://esm.sh/mediabunny@1.24.2",
-        "media-codecs": "https://esm.sh/media-codecs@2.0.2",
-        "gifenc": "https://esm.sh/gifenc@1.0.3",
         "h264-mp4-encoder": "https://esm.sh/h264-mp4-encoder@1.0.12",
         "@ffmpeg/ffmpeg": "https://esm.sh/@ffmpeg/ffmpeg@0.12.7",
         "@ffmpeg/util": "https://esm.sh/@ffmpeg/util@0.12.1"
