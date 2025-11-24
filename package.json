@@ -1,0 +1,37 @@
+{
+  "name": "floss",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A professional, browser-based kinetic typography motion design tool for creating stunning text animations in real-time. Built with Three.js, designed for motion designers.",
+  "main": "service-worker.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bundle:all": "rollup -c && npm run copy:h264",
+    "bundle:dev": "rollup -c --watch",
+    "copy:h264": "mkdir -p lib/esm/bundles && cp node_modules/h264-mp4-encoder/embuild/dist/h264-mp4-encoder.web.js lib/esm/bundles/h264-mp4-encoder.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://local_proxy@127.0.0.1:35947/git/karstenhoffmann/floss"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^29.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "rollup": "^4.53.3",
+    "rollup-plugin-node-polyfills": "^0.2.1"
+  },
+  "dependencies": {
+    "canvas-context": "^3.3.1",
+    "canvas-screenshot": "^4.2.2",
+    "h264-mp4-encoder": "^1.0.12",
+    "media-codecs": "^2.0.2",
+    "mediabunny": "^1.24.2"
+  }
+}
