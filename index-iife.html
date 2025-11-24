@@ -15,6 +15,7 @@
     <!-- Styles -->
     <link rel="stylesheet" href="./styles/theme.css">
     <link rel="stylesheet" href="./styles/preloader.css">
+    <link rel="stylesheet" href="./styles/password-gate.css">
     <link rel="stylesheet" href="./styles/main-modern.css">
     <link rel="stylesheet" href="./styles/help-overlay.css">
     <link rel="stylesheet" href="./styles/settings-overlay.css">
@@ -242,6 +243,37 @@
             <h1 class="preloader__logo">FLOSS</h1>
             <p class="preloader__tagline">Motion Design</p>
             <div class="preloader__spinner"></div>
+        </div>
+    </div>
+
+    <!-- Password Gate - App Shell Access Gate (online mode only) -->
+    <div id="password-gate" class="password-gate password-gate--hidden">
+        <div class="password-gate__content">
+            <div class="password-gate__icon">🔒</div>
+            <h1 class="password-gate__title">FLOSS</h1>
+            <p class="password-gate__subtitle">Enter Password</p>
+
+            <form class="password-gate__form" id="password-form">
+                <input
+                    type="password"
+                    id="password-input"
+                    class="password-gate__input"
+                    placeholder="Password"
+                    autocomplete="off"
+                    required
+                />
+                <button type="submit" class="password-gate__button" id="password-submit">
+                    Submit
+                </button>
+                <div class="password-gate__error" id="password-error">
+                    Incorrect password. Please try again.
+                </div>
+            </form>
+
+            <p class="password-gate__hint">
+                This is a client-side access gate.<br>
+                Session expires after 5 minutes.
+            </p>
         </div>
     </div>
 
@@ -823,23 +855,160 @@
         }
     };
 
-    // Auto-start with preloader
+    // Auto-start with preloader + password gate
     (function() {
+        // Password Gate Configuration (inline for IIFE version)
+        const CONFIG = {
+            passwordHash: "3acfb5bdbd33b642117c10e9f8555bc008d088a9d52de91f2364ce6da68e5832", // "capy"
+            sessionTimeout: 300000, // 5 minutes
+            sessionKey: 'floss-session-token'
+        };
+
         const preloader = document.getElementById('preloader');
+        const passwordGate = document.getElementById('password-gate');
+        const passwordForm = document.getElementById('password-form');
+        const passwordInput = document.getElementById('password-input');
+        const passwordSubmit = document.getElementById('password-submit');
+        const passwordError = document.getElementById('password-error');
 
-        // Wait for preloader animation to complete (1.5s)
-        setTimeout(() => {
-            // Fade out preloader
-            preloader.classList.add('preloader--hidden');
+        // Environment detection
+        function isOnlineMode() {
+            const protocol = window.location.protocol;
+            return protocol === 'https:' || protocol === 'http:';
+        }
 
-            // Start Floss app
-            window.FlossApp.start({ mode: 'offline' });
+        // Session management
+        function hasValidSession() {
+            try {
+                const sessionData = localStorage.getItem(CONFIG.sessionKey);
+                if (!sessionData) return false;
 
-            // Remove preloader from DOM after fade-out
+                const { timestamp } = JSON.parse(sessionData);
+                const now = Date.now();
+                const elapsed = now - timestamp;
+
+                return elapsed < CONFIG.sessionTimeout;
+            } catch (error) {
+                console.error('Error checking session:', error);
+                return false;
+            }
+        }
+
+        function createSession() {
+            try {
+                const sessionData = {
+                    timestamp: Date.now(),
+                    version: '1.0'
+                };
+                localStorage.setItem(CONFIG.sessionKey, JSON.stringify(sessionData));
+                console.log('✓ Session created (expires in', CONFIG.sessionTimeout / 1000, 'seconds)');
+            } catch (error) {
+                console.error('Error creating session:', error);
+            }
+        }
+
+        // Password validation
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password.toLowerCase());
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        async function validatePassword(password) {
+            try {
+                const inputHash = await hashPassword(password);
+                return inputHash === CONFIG.passwordHash;
+            } catch (error) {
+                console.error('Error validating password:', error);
+                return false;
+            }
+        }
+
+        function shouldShowPasswordGate() {
+            if (!isOnlineMode()) {
+                return false;
+            }
+            if (hasValidSession()) {
+                console.log('✓ Valid session found, skipping password gate');
+                return false;
+            }
+            console.log('⚠ No valid session, showing password gate');
+            return true;
+        }
+
+        // UI functions
+        function startApp() {
+            console.log('🚀 Starting Floss app...');
+            window.FlossApp.start({ mode: isOnlineMode() ? 'online' : 'offline' });
+        }
+
+        function showPasswordGate() {
+            passwordGate.classList.remove('password-gate--hidden');
+            passwordInput.focus();
+        }
+
+        function hidePasswordGate() {
+            passwordGate.classList.add('password-gate--hidden');
             setTimeout(() => {
-                preloader.remove();
-            }, 500); // Match CSS transition duration
-        }, 1500); // Preloader animation duration
+                passwordGate.remove();
+            }, 500);
+        }
+
+        async function handlePasswordSubmit(event) {
+            event.preventDefault();
+
+            const password = passwordInput.value.trim();
+            if (!password) return;
+
+            passwordSubmit.disabled = true;
+            passwordInput.disabled = true;
+
+            const isValid = await validatePassword(password);
+
+            if (isValid) {
+                createSession();
+                passwordError.classList.remove('password-gate__error--visible');
+                hidePasswordGate();
+                startApp();
+            } else {
+                passwordError.classList.add('password-gate__error--visible');
+                passwordInput.value = '';
+                passwordInput.focus();
+
+                passwordSubmit.disabled = false;
+                passwordInput.disabled = false;
+
+                setTimeout(() => {
+                    passwordError.classList.remove('password-gate__error--visible');
+                }, 3000);
+            }
+        }
+
+        // Initialize app shell
+        function initAppShell() {
+            setTimeout(() => {
+                preloader.classList.add('preloader--hidden');
+
+                setTimeout(() => {
+                    preloader.remove();
+                }, 500);
+
+                if (shouldShowPasswordGate()) {
+                    showPasswordGate();
+                } else {
+                    startApp();
+                }
+            }, 1500);
+        }
+
+        // Setup event handlers
+        passwordForm.addEventListener('submit', handlePasswordSubmit);
+
+        // Start initialization
+        initAppShell();
     })();
     </script>
 </body>
