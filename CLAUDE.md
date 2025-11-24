@@ -1844,6 +1844,81 @@ Priority features:
 
 ---
 
+## 🔐 App Shell & Auth Gate – Rules
+
+**Status:** Planned architecture for future implementation (post-v5.5.0)
+
+**Context:** Floss will eventually have a unified loading screen with optional password gate for online deployment. This section defines rules for how Claude should approach this feature when it's implemented.
+
+### Responsibilities
+
+**App Shell (Loading Screen) is responsible for:**
+- ✅ Preloader animation (Floss logo)
+- ✅ Environment detection (file:// vs https://)
+- ✅ Password gate UI (online mode only)
+- ✅ Password validation (client-side check)
+- ✅ Explicit call to `FlossApp.start({ mode: 'offline' | 'online' })`
+
+**Floss App is responsible for:**
+- ✅ Main application logic (effects, export, UI)
+- ✅ Remaining mode-agnostic (no auth logic)
+- ✅ Starting ONLY when shell calls start()
+- ❌ NO built-in password/auth flow
+- ❌ NO assumptions about security guarantees
+
+### Critical Rules for Claude
+
+**When implementing App Shell / Password Gate:**
+
+1. **No False Security Claims**
+   - ❌ NEVER claim password gate provides "secure authentication"
+   - ❌ NEVER claim it "protects confidential data"
+   - ❌ NEVER suggest it provides "access control" in a security sense
+   - ✅ ALWAYS clarify: "UX/access gate for casual users only"
+   - ✅ ALWAYS mention: "Client-side, can be bypassed by technical users"
+
+2. **Separation of Concerns**
+   - ❌ Don't mix auth logic into Floss App code
+   - ✅ Keep all password/gate logic in App Shell
+   - ✅ Use clean API boundary: `FlossApp.start(config)`
+   - ✅ App should work identically regardless of how it was started
+
+3. **Documentation Requirements**
+   - ✅ ALWAYS document limitations in user-facing docs
+   - ✅ Explain when password gate is appropriate (demos, private portfolios)
+   - ✅ Explain when it's NOT appropriate (confidential projects, client data)
+   - ✅ Provide examples of proper use cases
+
+4. **Testing Both Modes**
+   - ✅ Test file:// mode (no password gate)
+   - ✅ Test https:// mode (with password gate)
+   - ✅ Verify app functions identically in both modes
+   - ✅ Verify password gate can be easily bypassed (expected behavior)
+
+### Forbidden Assumptions
+
+When working on this feature, Claude MUST NOT:
+
+- ❌ Claim password gate provides "security"
+- ❌ Suggest storing sensitive data behind the gate
+- ❌ Implement complex auth flows (OAuth, JWT, etc.) - not in scope
+- ❌ Add server-side components (defeats offline-first philosophy)
+- ❌ Make password gate mandatory for file:// mode
+- ❌ Create different code paths for online/offline (defeats unified app goal)
+
+### Implementation Timeline
+
+- **Current Status:** Not implemented (planned for future)
+- **When to implement:** After Phase 6 complete, when user requests it
+- **Estimated effort:** 2-3 sessions
+- **Dependencies:** v5.5.0+ (offline architecture complete)
+
+**References:**
+- PHASE_OVERVIEW.md → "App Shell & Auth Gate (Planned Architecture)"
+- CURRENT_STATUS.md → "Potential Future Work" → "App Shell & Password Gate"
+
+---
+
 ## External Dependencies
 
 ### Vendoring Status (v5.5.0)

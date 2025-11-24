@@ -182,3 +182,48 @@ These are optional enhancements, not required for core functionality:
 1. **Add video export to index-iife.html** (requires IIFE build)
 2. **Bundle gifenc** for offline GIF export (currently uses CDN)
 3. **UX Polish** (see above) - color picker replacement, visual improvements
+4. **App Shell & Password Gate** - Unified loading screen with optional password protection
+
+---
+
+### 4. App Shell & Password Gate (Future Enhancement)
+
+**Goal:** Create a unified loading experience with optional password gate for online deployment.
+
+**Requirements:**
+- ✅ **One unified app** - Works in both file:// and https:// modes without code duplication
+- ✅ **file:// mode:** Preloader animation only, no password
+- ✅ **https:// mode:** Preloader + password gate, app starts after successful entry
+
+**Architecture:**
+- App Shell handles:
+  - Environment detection (file:// vs https://)
+  - Preloader animation (Floss logo)
+  - Password gate UI (online only)
+  - Explicit call to `FlossApp.start({ mode })`
+- Floss App:
+  - No built-in auth logic
+  - Starts only when shell invokes start()
+  - Mode-agnostic implementation
+
+**Security Clarification:**
+- ⚠️ Password gate is a **UX/access gate**, NOT a security measure
+- No server/backend = no real authentication
+- Client-side password can be bypassed by technical users
+- Acceptable for: Private demos, deterring casual users
+- NOT for: Protecting confidential data, security-critical access
+
+**Planned Scope:**
+- Define **Phase 7: App Shell & Loading/Password Screen** (placeholder)
+- Implement preloader animation
+- Implement password gate UI (online mode)
+- Refactor app initialization to use explicit start() API
+- Test both modes (file:// and https://)
+
+**Estimated Effort:** 2-3 sessions
+**Blockers:** None (can start after v5.5.0)
+**Priority:** LOW (optional enhancement)
+
+**References:**
+- PHASE_OVERVIEW.md → "App Shell & Auth Gate (Planned Architecture)"
+- CLAUDE.md → "App Shell & Auth Gate - Rules"
