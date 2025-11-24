@@ -119,3 +119,72 @@ These are optional enhancements, not required for core functionality:
 - CLAUDE.md → "Future Enhancements" → "index-iife.html Visual Polish"
 - CLAUDE.md → "Future Enhancements" → "Coloris Color Picker UX Issues"
 - README-IIFE.md → "Known Limitations & Future Improvements"
+
+---
+
+## 🔐 App Shell & Auth Gate (Planned Architecture)
+
+**Status:** Future work - not yet implemented (planned post-v5.5.0)
+
+### Vision: Unified App with Dual-Mode Operation
+
+**Goal:** One single app/bundle that works both offline (file://) and online (GitHub Pages) without code duplication.
+
+### App Shell Concept
+
+**Preloader / Loading Screen:**
+- Brief Floss logo animation on app startup
+- Same animation plays in both modes
+
+**file:// Mode:**
+- Preloader only (no password gate)
+- App starts immediately after animation
+
+**https:// Mode (GitHub Pages):**
+- Preloader + Password Gate
+- App starts only after successful password entry
+
+### Technical Approach
+
+**Central Entry Point:**
+- Expose unified API: `window.FlossApp.start({ mode: 'offline' | 'online' })`
+- App does NOT auto-initialize when bundle loads
+- Requires explicit start() call from App Shell
+
+**Shell Responsibilities:**
+- Detect environment (file:// vs https://)
+- Show preloader animation
+- (Online only) Show password gate, validate input
+- Call `FlossApp.start()` with appropriate mode
+
+**Floss App Responsibilities:**
+- Remain mode-agnostic
+- No built-in auth/password logic
+- Start only when explicitly invoked
+
+### Security Considerations
+
+**IMPORTANT: Password Gate is NOT a security measure**
+
+- ⚠️ This is a **UX/Access Gate**, not authentication
+- ⚠️ Client-side password check can be bypassed by technical users
+- ⚠️ No server/backend = no real security
+- ✅ Acceptable for: Deterring casual users, "private demo" scenarios
+- ❌ NOT acceptable for: Protecting confidential data, security-critical access
+
+**Design Principle:**
+- Password gate is a convenience feature, not a security boundary
+- Users must understand this limitation
+
+### Implementation Status
+
+- ❌ **Not yet implemented**
+- 📋 **Planned as:** Phase 7 (tentative)
+- 🔗 **References:** CURRENT_STATUS.md → "Potential Future Work" → "App Shell & Password Gate"
+- 🔗 **Development Rules:** CLAUDE.md → "App Shell & Auth Gate - Rules"
+
+### Dependencies
+
+- Requires: v5.5.0+ (offline MP4 export complete)
+- Blockers: None (can start anytime)
+- Estimated Effort: 2-3 sessions
