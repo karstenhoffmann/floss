@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v5.4.0'; // Three.js vendored locally
+const CACHE_NAME = 'floss-v5.4.2'; // Three.js + Open Props + Coloris vendored
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
@@ -45,12 +45,12 @@ const ASSETS_TO_CACHE = [
     './lib/three/examples/js/postprocessing/RenderPass.js',
     './lib/three/examples/js/postprocessing/ShaderPass.js',
     './lib/three/examples/js/shaders/CopyShader.js',
-    // Open Props (still on CDN for now)
-    'https://unpkg.com/open-props',
-    'https://unpkg.com/open-props/normalize.min.css',
-    // Coloris Color Picker
-    'https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css',
-    'https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js'
+    // Open Props (vendored locally - minimal subset)
+    './lib/open-props/open-props.min.css',
+    './lib/open-props/normalize.min.css',
+    // Coloris Color Picker (vendored locally)
+    './lib/coloris/coloris.min.css',
+    './lib/coloris/coloris.min.js'
 ];
 
 // Install event - cache assets
