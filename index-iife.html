@@ -117,6 +117,121 @@
             font-size: 13px;
             color: #8b5cf6;
         }
+
+        /* Export Modal Styles */
+        .export-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .export-modal-content {
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            padding: 30px;
+            min-width: 400px;
+            max-width: 500px;
+        }
+
+        .export-modal-content h2 {
+            margin: 0 0 20px 0;
+            color: #e5e5e5;
+            font-size: 20px;
+        }
+
+        .export-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .export-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .export-group label {
+            font-size: 12px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .export-group input,
+        .export-group select {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #e5e5e5;
+            font-size: 14px;
+        }
+
+        .export-info {
+            padding: 8px 12px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 6px;
+            color: #8b5cf6;
+            font-size: 14px;
+        }
+
+        .export-progress {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        .export-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .primary-btn {
+            background: rgba(139, 92, 246, 0.8);
+            border: 1px solid rgba(139, 92, 246, 0.5);
+        }
+
+        .primary-btn:hover {
+            background: rgba(139, 92, 246, 1);
+        }
+
+        .primary-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -148,10 +263,56 @@
         </div>
 
         <button id="reset-btn">Reset Camera</button>
+        <button id="export-btn">📹 Export Video</button>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="export-modal" class="export-modal" style="display: none;">
+        <div class="export-modal-content">
+            <h2>Export Video (MP4)</h2>
+
+            <div class="export-options">
+                <div class="export-group">
+                    <label>Duration (seconds)</label>
+                    <input type="number" id="export-duration" min="1" max="30" step="0.1" value="5">
+                </div>
+
+                <div class="export-group">
+                    <label>Frame Rate</label>
+                    <select id="export-fps">
+                        <option value="30" selected>30 FPS</option>
+                        <option value="60">60 FPS</option>
+                    </select>
+                </div>
+
+                <div class="export-group">
+                    <label>Resolution</label>
+                    <div class="export-info">1920×1080 (Full HD)</div>
+                </div>
+            </div>
+
+            <div id="export-progress" class="export-progress" style="display: none;">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <div id="progress-text" class="progress-text">Rendering...</div>
+            </div>
+
+            <div class="export-actions">
+                <button id="start-export-btn" class="primary-btn">Start Export</button>
+                <button id="cancel-export-btn">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <!-- Coloris Color Picker (Vendored locally) -->
     <script src="./lib/coloris/coloris.min.js"></script>
+
+    <!-- Video Export Libraries (IIFE bundles) -->
+    <!-- h264-mp4-encoder: WASM-based MP4 encoder (1.7 MB) -->
+    <script src="./lib/canvas-record/h264-mp4-encoder.umd.js"></script>
+    <!-- canvas-record: Recording library with all dependencies (424 KB) -->
+    <script src="./lib/canvas-record/canvas-record.iife.js"></script>
 
     <!-- Main App (IIFE) -->
     <script>
@@ -161,8 +322,8 @@
         console.log(`
 ╔════════════════════════════════════════════════════════════════╗
 ║   🎨 Floss - Motion Design (IIFE Version)                      ║
-║   Version: 5.4.8       Date: 2025-11-24 03:30                 ║
-║   Mode: file:// compatible (Three.js vendored)                ║
+║   Version: 5.6.0       Date: 2025-11-24 14:30                 ║
+║   Mode: file:// compatible + MP4 Export                       ║
 ╚════════════════════════════════════════════════════════════════╝
         `);
 
@@ -392,7 +553,243 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        console.log('✓ Floss IIFE initialized successfully');
+        // =====================================================================
+        // Video Export System
+        // =====================================================================
+        const exportModal = document.getElementById('export-modal');
+        const exportBtn = document.getElementById('export-btn');
+        const startExportBtn = document.getElementById('start-export-btn');
+        const cancelExportBtn = document.getElementById('cancel-export-btn');
+        const exportDurationInput = document.getElementById('export-duration');
+        const exportFpsSelect = document.getElementById('export-fps');
+        const exportProgress = document.getElementById('export-progress');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+
+        // Show export modal
+        exportBtn.addEventListener('click', () => {
+            exportModal.style.display = 'flex';
+            console.log('→ Export modal opened');
+        });
+
+        // Cancel export
+        cancelExportBtn.addEventListener('click', () => {
+            exportModal.style.display = 'none';
+            exportProgress.style.display = 'none';
+            startExportBtn.disabled = false;
+            console.log('← Export cancelled');
+        });
+
+        // Start export
+        startExportBtn.addEventListener('click', async () => {
+            const duration = parseFloat(exportDurationInput.value);
+            const fps = parseInt(exportFpsSelect.value);
+
+            console.log(`▶ Starting video export: ${duration}s @ ${fps}fps`);
+
+            // Disable button during export
+            startExportBtn.disabled = true;
+            exportProgress.style.display = 'block';
+            progressFill.style.width = '0%';
+            progressText.textContent = 'Initializing...';
+
+            try {
+                await startVideoExport({ duration, fps });
+            } catch (error) {
+                console.error('Export failed:', error);
+                alert('Export failed: ' + error.message);
+                startExportBtn.disabled = false;
+                exportProgress.style.display = 'none';
+            }
+        });
+
+        /**
+         * Start video export (offline rendering)
+         */
+        async function startVideoExport(options) {
+            const { duration, fps } = options;
+            const width = 1920;
+            const height = 1080;
+            const totalFrames = Math.ceil(duration * fps);
+
+            console.log(`  Resolution: ${width}×${height}`);
+            console.log(`  Total frames: ${totalFrames}`);
+
+            // 1. Create offscreen canvas and renderer
+            const offscreenCanvas = document.createElement('canvas');
+            offscreenCanvas.width = width;
+            offscreenCanvas.height = height;
+
+            const offscreenRenderer = new THREE.WebGLRenderer({
+                canvas: offscreenCanvas,
+                antialias: true,
+                alpha: false,
+                preserveDrawingBuffer: true
+            });
+
+            offscreenRenderer.setSize(width, height);
+            offscreenRenderer.setPixelRatio(1);
+
+            console.log('✓ Offscreen renderer created');
+
+            // 2. Create offscreen scene (clone of main scene)
+            const offscreenScene = new THREE.Scene();
+            offscreenScene.background = new THREE.Color(0x0a0a0a);
+
+            // Clone mesh to offscreen scene
+            const offscreenGeometry = mesh.geometry.clone();
+            const offscreenTexture = mesh.material.map.clone();
+            const offscreenMaterial = new THREE.MeshBasicMaterial({
+                map: offscreenTexture,
+                color: 0xffffff
+            });
+            const offscreenMesh = new THREE.Mesh(offscreenGeometry, offscreenMaterial);
+            offscreenMesh.scale.copy(mesh.scale);
+            offscreenScene.add(offscreenMesh);
+
+            console.log('✓ Offscreen scene created');
+
+            // 3. Setup camera for export (16:9 aspect)
+            const exportCamera = new THREE.PerspectiveCamera(
+                50,
+                width / height,
+                0.1,
+                1000
+            );
+            exportCamera.position.copy(camera.position);
+            exportCamera.rotation.copy(camera.rotation);
+
+            // 4. Initialize canvas-record Recorder
+            console.log('→ Initializing canvas-record Recorder...');
+
+            const gl = offscreenRenderer.context;
+
+            if (!gl) {
+                throw new Error('Failed to get WebGL context from offscreen renderer');
+            }
+
+            // Create MP4WasmEncoder explicitly
+            const encoder = new CanvasRecord.Encoders.MP4WasmEncoder({
+                extension: 'mp4'
+            });
+
+            console.log('  Using encoder:', encoder.constructor.name);
+
+            // Calculate bitrate manually
+            const motionRank = 4;
+            const bitrateMode = 'variable';
+            const bitrate = Math.round(
+                width * height * fps * motionRank * 0.07 * (bitrateMode === 'variable' ? 0.75 : 1)
+            );
+
+            console.log(`  Bitrate: ${(bitrate / 1_000_000).toFixed(1)} Mbps (${bitrateMode})`);
+
+            const recorder = new CanvasRecord.Recorder(gl, {
+                name: `floss-export-${Date.now()}.mp4`,
+                duration: duration,
+                frameRate: fps,
+                download: false,
+                extension: 'mp4',
+                encoder: encoder,
+                encoderOptions: {
+                    bitrateMode: bitrateMode,
+                    bitrate: bitrate
+                }
+            });
+
+            console.log('✓ Recorder initialized');
+
+            // 5. Start recording (initOnly - don't call first step yet)
+            await recorder.start({ initOnly: true });
+            console.log('✓ Recording started - rendering frames...');
+
+            progressText.textContent = 'Rendering frames...';
+
+            // 6. Render frames offline (frame-perfect, deterministic)
+            const startTime = performance.now();
+            const frameDuration = 1 / fps;
+
+            for (let frameNumber = 0; frameNumber < totalFrames; frameNumber++) {
+                const time = frameNumber * frameDuration;
+
+                // Update mesh rotation (deterministic)
+                offscreenMesh.rotation.x = time * settings.rotationSpeed * 0.3;
+                offscreenMesh.rotation.y = time * settings.rotationSpeed * 0.5;
+
+                // Render frame
+                offscreenRenderer.render(offscreenScene, exportCamera);
+
+                // Capture frame
+                await recorder.step();
+
+                // Update progress
+                const percentage = ((frameNumber + 1) / totalFrames) * 100;
+                progressFill.style.width = percentage + '%';
+                progressText.textContent = `Rendering frame ${frameNumber + 1}/${totalFrames} (${percentage.toFixed(0)}%)`;
+
+                // Log progress every second worth of frames
+                if ((frameNumber + 1) % fps === 0) {
+                    const elapsed = (performance.now() - startTime) / 1000;
+                    const speed = (frameNumber + 1) / elapsed;
+                    console.log(`  Frame ${frameNumber + 1}/${totalFrames} (${percentage.toFixed(1)}%) - ${speed.toFixed(1)}fps render speed`);
+                }
+            }
+
+            const elapsed = (performance.now() - startTime) / 1000;
+            const avgSpeed = totalFrames / elapsed;
+            console.log(`✓ All frames rendered in ${elapsed.toFixed(2)}s (${avgSpeed.toFixed(1)}× realtime)`);
+
+            // 7. Stop recording and get buffer
+            progressText.textContent = 'Finalizing video...';
+            console.log('→ Stopping recording...');
+
+            const buffer = await recorder.stop();
+            console.log('✓ Recording stopped, buffer size:', buffer ? buffer.byteLength : 0, 'bytes');
+
+            if (!buffer || buffer.byteLength === 0) {
+                throw new Error('Failed to generate video buffer');
+            }
+
+            // 8. Convert to Blob and download
+            const blob = new Blob([buffer], { type: 'video/mp4' });
+            const sizeMB = (blob.size / 1024 / 1024).toFixed(2);
+            console.log('✓ Blob created, size:', sizeMB, 'MB');
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `floss-export-${Date.now()}.mp4`;
+            document.body.appendChild(a);
+            a.click();
+
+            // Cleanup
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+
+            console.log(`✓ Download triggered: ${a.download}`);
+
+            // Cleanup offscreen resources
+            offscreenGeometry.dispose();
+            offscreenMaterial.dispose();
+            offscreenTexture.dispose();
+            offscreenRenderer.dispose();
+
+            // Success - close modal after short delay
+            progressFill.style.width = '100%';
+            progressText.textContent = `Export complete! (${sizeMB} MB)`;
+
+            setTimeout(() => {
+                exportModal.style.display = 'none';
+                exportProgress.style.display = 'none';
+                startExportBtn.disabled = false;
+                progressFill.style.width = '0%';
+            }, 2000);
+        }
+
+        console.log('✓ Floss IIFE initialized successfully (with video export)');
     })();
     </script>
 </body>

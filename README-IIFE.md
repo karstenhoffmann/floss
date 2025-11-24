@@ -8,9 +8,10 @@
 
 ✅ **file:// compatible** - Open directly in browser
 ✅ **No build step** - Pure HTML + inline JavaScript
-✅ **Fully vendored** - Three.js, Open Props, Coloris included locally
+✅ **Fully vendored** - Three.js, Open Props, Coloris, canvas-record included locally
 ✅ **Minimal IIFE bundle** - All code in self-executing function
 ✅ **Core functionality** - Text rendering, animation, camera controls
+✅ **MP4 video export** - 1920×1080 @ 30/60fps, PowerPoint compatible
 ✅ **100% offline** - No internet required after download
 
 ## Usage
@@ -31,21 +32,22 @@ python3 -m http.server 8080
 
 ## Included Features
 
-- ✅ 3D text rendering (torus knot geometry)
+- ✅ 3D text rendering (torus geometry)
 - ✅ Real-time text input
 - ✅ Rotation speed control
 - ✅ Scale control
 - ✅ Camera controls (OrbitControls)
+- ✅ **MP4 video export** (1920×1080, 30/60fps)
 - ✅ Responsive canvas
 
 ## Limitations (vs. full ES6 version)
 
-- ❌ No video export
 - ❌ No preset management
 - ❌ No multiple effects (only one built-in)
 - ❌ No LocalStorage persistence
-- ❌ No service worker / offline mode
-- ❌ Simplified UI (no panels, overlays)
+- ❌ No service worker / PWA features
+- ❌ Simplified UI (no settings panel, inspector)
+- ⚠️ Video export uses simplified UI (modal-based, not full export panel)
 
 ## Technical Details
 
@@ -55,8 +57,10 @@ python3 -m http.server 8080
 - **OrbitControls** - Camera interaction
 - **Open Props** (3 KB) - CSS design tokens (`/lib/open-props/`)
 - **Coloris** (22 KB) - Color picker library (`/lib/coloris/`)
+- **canvas-record IIFE** (424 KB) - Video recording library (`/lib/canvas-record/`)
+- **h264-mp4-encoder** (1.7 MB) - WASM MP4 encoder (`/lib/canvas-record/`)
 
-**Total:** ~671 KB, 100% offline-capable
+**Total:** ~2.8 MB, 100% offline-capable (including video export)
 
 ### Code Structure
 
@@ -118,11 +122,11 @@ To modify the IIFE version:
 | Module system | ✅ ES6 imports | ❌ IIFE bundle |
 | HTTP server | ✅ Required | ✅ Optional |
 | file:// protocol | ❌ Not supported | ✅ Supported |
-| Build process | ❌ None | ❌ None |
+| Build process | ❌ None | ✅ Rollup (for canvas-record) |
 | Full features | ✅ All effects | ❌ One effect |
-| Video export | ✅ Yes | ❌ No |
+| Video export | ✅ Yes (full UI) | ✅ Yes (simplified UI) |
 | Presets | ✅ Yes | ❌ No |
-| File size | 📦 Multiple files | 📄 Single file |
+| File size | 📦 3.5 MB (split) | 📄 2.8 MB (single page) |
 | Maintainability | ✅ High | ⚠️ Medium |
 
 ## When to Use
@@ -169,10 +173,10 @@ To modify the IIFE version:
 
 ## Version
 
-- **Version:** 5.4.8
+- **Version:** 5.6.0
 - **Date:** 2025-11-24
-- **Type:** Simplified IIFE bundle (PoC)
-- **Status:** All dependencies vendored, 100% offline-capable
+- **Type:** Full-featured IIFE bundle with MP4 export
+- **Status:** All dependencies vendored, 100% offline-capable (including video export)
 
 ## License
 
