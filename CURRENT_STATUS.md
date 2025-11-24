@@ -1,67 +1,67 @@
 # Current Status
 
-**Current Version:** 5.7.0
-**Last Major Milestone:** v5.7.0 - Phase 7.1: FlossApp Start API Complete
-**Status:** Phase 7.1 complete, ready for Phase 7.2 (App Shell UI)
+**Current Version:** 5.8.0
+**Last Major Milestone:** v5.8.0 - Phase 7.2: App Shell UI Complete (Preloader + Password Gate)
+**Status:** Phase 7.2 complete, ready for Phase 7.3 (IIFE → ESM Bundling)
 
 *Note: This file describes the project state on the main branch, independent of temporary feature branches.*
 
 ---
 
-## Last Merged Work (v5.7.0)
+## Last Merged Work (v5.8.0)
 
-### Completed: Phase 7.1 - FlossApp Start API
+### Completed: Phase 7.2 - App Shell UI (Preloader + Password Gate)
 
 **What was done:**
-1. Unified start API: `window.FlossApp.start({ mode: 'online' | 'offline' })`
-2. Core/Shell separation enforced:
-   - Core (js/app.js): No window globals, no startup logic, clean export
-   - Shell (js/floss-app.js, index-iife.html): Startup, environment, globals
-3. js/app.js: Auto-init removed, exports App class
-4. js/floss-app.js (NEW): Shell entry point for ES modules
-5. index.html: Loads js/floss-app.js, calls FlossApp.start({ mode: 'online' })
-6. index-iife.html: Wraps existing code in initializeApp(), calls FlossApp.start({ mode: 'offline' })
-7. Behavior unchanged: Both variants auto-start as before
+1. Preloader animation - Brief "FLOSS Motion Design" loading screen
+2. Password gate with session management (online mode only)
+3. Environment detection (file:// vs https://)
+4. Session tokens with 5-minute timeout
+5. SHA-256 password hashing (client-side)
+6. Both index.html and index-iife.html have preloader + password gate
 
-**Architecture Decision:**
-- Architecture Integrity Rule enforced (see CLAUDE.md)
-- Core files (js/app.js, js/core/*, js/effects/*) never define globals, never make startup decisions
-- Shell files (index.html, index-iife.html, js/floss-app.js) are the only place for startup, environment handling, globals
+**Key Features:**
+- **Preloader:** 1.5s animation with FLOSS logo and spinner
+- **Password Gate:** Only shown in online mode (https://)
+- **Session Management:** Valid session skips password gate
+- **file:// Mode:** Preloader only, no password required
+
+**Security Note:**
+- ⚠️ Password gate is a UX/access gate, NOT a security measure
+- Client-side password check can be bypassed by technical users
+- Acceptable for: Private demos, deterring casual users
+- NOT for: Protecting confidential data
 
 **Files Changed:**
-- js/app.js (modified)
-- js/floss-app.js (NEW)
-- index.html (modified)
-- index-iife.html (modified)
-- js/version.js (v5.7.0)
+- index.html (preloader + password gate)
+- index-iife.html (preloader + password gate inline)
+- styles/preloader.css (NEW)
+- styles/password-gate.css (NEW)
+- js/utils/password-gate.js (NEW)
+- js/version.js (v5.8.0)
 
 **Testing Status:**
-- ⏳ Pending: Needs testing on GitHub Pages after merge
+- ✅ Tested and merged to main
 
 **Next Steps:**
-- Phase 7.2: App Shell UI (preloader animation, password gate)
-- Phase 7.3: Code unification (IIFE → ESM bundling)
+- Phase 7.3: IIFE → ESM bundling (unify code paths)
 
 ---
 
 ## Recent Main Branch Commits
 
+### v5.8.0 (Phase 7.2)
+- `d9a9656` - Merge pull request #16 (Phase 7.2)
+- `5c4b4d2` - fix: Correct password hash for "capy"
+- `f2af308` - feat: Add password gate with session management (Phase 7.2 Part 2)
+- `ba92447` - fix: Center preloader spinner
+- `6f57f6e` - feat: Add preloader animation (Phase 7.2 Part 1)
+
 ### v5.7.0 (Phase 7.1)
 - `a8fa481` - feat: Add FlossApp.start() API (Phase 7.1)
-  - NEW: js/floss-app.js - Shell entry point for ESM
-  - MODIFIED: js/app.js - Removed auto-init, exports App class
-  - MODIFIED: index.html - Loads js/floss-app.js, calls FlossApp.start()
-  - MODIFIED: index-iife.html - Wraps code in initializeApp(), defines FlossApp.start()
 
-### v5.6.2 (Documentation)
-- `739cd1e` - docs: Add Architecture Integrity Rule (Core vs Shell)
-- `2841bd4` - docs: Restructure CLAUDE.md and create DETAILED_PITFALLS.md
-
-### v5.5.0 (MP4 Export Offline - Previous Milestone)
+### v5.5.0 (MP4 Export Offline)
 - `c68e352` - feat: Bundle MP4 export dependencies with Rollup
-- `42743d3` - fix: Add ES6 default export to h264-mp4-encoder
-- `88b2a8b` - docs: Update documentation for v5.5.0
-- `ca7a360` - docs: Add Session Bootstrapping & File-Awareness Policy
 
 ## Architecture Decisions
 
