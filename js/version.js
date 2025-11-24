@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.4.5',
-    commit: 'fix: Coloris stays open - handler before init',
+    number: '5.4.6',
+    commit: 'fix: Coloris - clean standard config per docs',
     date: '2025-11-24',
-    time: '02:00'
+    time: '02:30'
 };
 
 export default VERSION;

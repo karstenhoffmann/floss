@@ -728,18 +728,12 @@ class App {
             });
         }
 
-        // Coloris change event
+        // Coloris change event (fires when picker closes with OK)
         input.addEventListener('change', (e) => {
             const color = e.target.value;
             updatePreview(color);
             onChange(color);
-
-            // Track recently used colors
-            if (/^#[0-9A-F]{6}$/i.test(color)) {
-                appSettings.addRecentColor(color);
-                // Reinitialize Coloris with updated recent colors
-                this.initializeColoris();
-            }
+            // Note: Recent colors are tracked in Coloris's global onChange handler
         });
 
         // Manual text input (for typing HEX values)
@@ -748,11 +742,6 @@ class App {
             if (/^#[0-9A-F]{6}$/i.test(color)) {
                 updatePreview(color);
                 onChange(color);
-
-                // Track recently used colors
-                appSettings.addRecentColor(color);
-                // Reinitialize Coloris with updated recent colors
-                this.initializeColoris();
             }
         });
 
@@ -1470,44 +1459,24 @@ class App {
             // Row 3: Recent colors (up to 5 colors)
             const allSwatches = [...defaultSwatches, ...recentColors];
 
-            // Fix: Prevent picker from closing when clicking inside it
-            // This handler must be added BEFORE Coloris initialization
-            // so it runs BEFORE Coloris's document handler in the event queue
-            if (!window._colorisFixInstalled) {
-                window._colorisFixInstalled = true;
-                document.addEventListener('mousedown', function(e) {
-                    const picker = document.querySelector('.clr-picker.clr-open');
-                    if (picker && e.target.closest('.clr-picker')) {
-                        // Clicking inside picker - stop event from reaching Coloris's close handler
-                        e.stopPropagation();
-                    }
-                }, false);
-            }
-
+            // Initialize Coloris according to official documentation
+            // https://coloris.js.org/
             Coloris({
-                el: '.coloris',          // Only attach to elements with class 'coloris'
+                el: '.coloris',
                 theme: 'pill',
                 themeMode: 'dark',
-                alpha: false,
-                format: 'hex',
+                formatToggle: true,
+                alpha: true,
                 swatches: allSwatches,
-                clearButton: false,
-                closeButton: true,
-                closeLabel: 'OK',
-                selectInput: false,      // Don't auto-select text
-                focusInput: false,       // Don't auto-focus input (prevents interference)
-                inline: false,           // Use popup mode, not inline
-                defaultColor: '#000000',
-                a11y: {
-                    open: 'Open color picker',
-                    close: 'Close color picker',
-                    marker: 'Saturation: {s}. Brightness: {v}.',
-                    hueSlider: 'Hue slider',
-                    alphaSlider: 'Opacity slider',
-                    input: 'Color value field',
-                    format: 'Color format',
-                    swatch: 'Color swatch',
-                    instruction: 'Saturation and brightness selector. Use up, down, left and right arrow keys to select.'
+                onChange: (color, inputEl) => {
+                    if (!inputEl) return;
+
+                    // Track recently used colors
+                    if (/^#[0-9A-F]{6}$/i.test(color)) {
+                        appSettings.addRecentColor(color);
+                        // Reinitialize with updated swatches
+                        this.initializeColoris();
+                    }
                 }
             });
 
@@ -1650,21 +1619,16 @@ class App {
             return;
         }
 
-        // Reinitialize Coloris with current swatches
+        // Reinitialize Coloris with current swatches (for settings overlay)
         setTimeout(() => {
             const swatches = appSettings.getColorSwatches();
             Coloris({
                 el: '.color-swatch-input',
                 theme: 'pill',
                 themeMode: 'dark',
-                alpha: false,
-                format: 'hex',
-                swatches: swatches,
-                clearButton: false,
-                closeButton: true,
-                closeLabel: 'OK',
-                selectInput: true,
-                focusInput: true
+                formatToggle: true,
+                alpha: true,
+                swatches: swatches
             });
         }, 100);
     }
