@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v5.1.1'; // Call stop() directly (step returns void)
+const CACHE_NAME = 'floss-v5.4.0'; // Three.js vendored locally
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
@@ -38,10 +38,14 @@ const ASSETS_TO_CACHE = [
     // canvas-record library (vendored, will be cached on first load)
     './lib/canvas-record/package/index.js',
     './manifest.json',
-    // Three.js from CDN
-    'https://unpkg.com/three@0.115.0/build/three.min.js',
-    'https://unpkg.com/three@0.115.0/examples/js/controls/OrbitControls.js',
-    // Open Props
+    // Three.js (vendored locally)
+    './lib/three/three.min.js',
+    './lib/three/examples/js/controls/OrbitControls.js',
+    './lib/three/examples/js/postprocessing/EffectComposer.js',
+    './lib/three/examples/js/postprocessing/RenderPass.js',
+    './lib/three/examples/js/postprocessing/ShaderPass.js',
+    './lib/three/examples/js/shaders/CopyShader.js',
+    // Open Props (still on CDN for now)
     'https://unpkg.com/open-props',
     'https://unpkg.com/open-props/normalize.min.css',
     // Coloris Color Picker

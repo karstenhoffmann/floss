@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.3.5',
-    commit: 'docs: Document index-iife.html limitations and future',
+    number: '5.4.0',
+    commit: 'feat: Vendor Three.js r115 locally (646 KB)',
     date: '2025-11-23',
-    time: '21:00'
+    time: '21:15'
 };
 
 export default VERSION;
