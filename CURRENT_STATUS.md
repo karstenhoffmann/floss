@@ -1,55 +1,55 @@
 # Current Status
 
-**Current Version:** 5.8.1 (docs update) → targeting 5.9.0
-**Last Major Milestone:** v5.8.0 - Phase 7.2: App Shell UI Complete
-**Current Work:** Phase 7.3: Full Unification – One HTML Entry
-**Status:** Phase 7.3 in progress 🔄
+**Current Version:** 5.9.0
+**Last Major Milestone:** v5.9.0 - Phase 7.3: Single HTML Entry (IIFE Bundle)
+**Status:** Phase 7.3 complete ✅
 
 *Note: This file describes the project state on the main branch, independent of temporary feature branches.*
 
 ---
 
-## Current Work: Phase 7.3 - Full Unification
+## Last Merged Work (v5.9.0)
 
-### Goal: Single Entry Policy
+### Completed: Phase 7.3 - Single HTML Entry (IIFE Bundle)
 
-**ARCHITECTURE DECISION:** `index.html` is the ONLY long-term HTML entry point.
+**Architecture Decision:** `index.html` is the ONLY long-term HTML entry point.
 
 | Entry Point | Status | Description |
 |-------------|--------|-------------|
 | `index.html` | ✅ PRIMARY | Single entry for file:// and https:// |
 | `index-iife.html` | ⚠️ DEPRECATED | Redirect stub only, will be removed |
 
-### What's Being Done
+### What Was Done
 
-1. **IIFE Bundle Creation**
-   - `rollup.config.app.js` → builds `js/floss-app.iife.js`
+1. **IIFE Bundle Created**
+   - `rollup.config.app.js` → builds `js/floss-app.iife.js` (688KB)
    - Bundles entire app (core, effects, ui, utils)
-   - External: THREE.js, Coloris (globals)
+   - External: THREE.js, Coloris, h264-mp4-encoder (globals)
 
 2. **index.html Dual-Mode Loading**
-   - Detects `file://` vs `https://` protocol
-   - `file://` → loads IIFE bundle
-   - `https://` → uses ES modules (existing)
+   - Detects `file://` vs `https://` protocol automatically
+   - `file://` → loads IIFE bundle + video export IIFE
+   - `https://` → uses ES modules with import maps
 
-3. **index-iife.html Deprecation**
+3. **index-iife.html Deprecated**
    - Converted to minimal redirect stub
-   - Auto-redirects to index.html
+   - Auto-redirects to index.html after 3 seconds
    - Contains deprecation notice
 
-### Files to Change
+### Files Changed
 
-| File | Action |
-|------|--------|
-| `rollup.config.app.js` | NEW |
-| `js/floss-app.iife.js` | NEW (generated) |
-| `index.html` | MODIFY |
-| `index-iife.html` | REPLACE (stub) |
-| `package.json` | MODIFY |
+| File | Action | Size |
+|------|--------|------|
+| `rollup.config.app.js` | NEW | - |
+| `js/floss-app.iife.js` | NEW | 688KB |
+| `index.html` | MODIFIED | Dual-mode loading |
+| `index-iife.html` | REPLACED | Redirect stub |
+| `package.json` | MODIFIED | bundle:app script |
+| `js/floss-app.js` | MODIFIED | Export for bundling |
 
-### Architecture Policy (New in Phase 7.3)
+### Single Entry Policy (Enforced)
 
-**Single Entry Policy** (documented in CLAUDE.md):
+**Documented in CLAUDE.md:**
 - Only ONE permanent HTML entry point: `index.html`
 - Additional HTML files must be temporary and deprecated
 - No parallel implementations allowed
