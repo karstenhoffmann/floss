@@ -124,7 +124,40 @@ These are optional enhancements, not required for core functionality:
 
 ## 🔐 App Shell & Auth Gate (Planned Architecture)
 
-**Status:** Future work - not yet implemented (planned post-v5.5.0)
+**Status:** Phase 7.1 Complete ✅ | Phase 7.2+ Planned
+
+### Phase 7.1: FlossApp Start API (Complete ✅)
+
+**Implemented in:** v5.7.0
+**Goal:** Minimal-invasive API extraction - unified start API without behavior changes
+
+**What was implemented:**
+- ✅ `window.FlossApp.start({ mode: 'online' | 'offline' })` API
+- ✅ Core/Shell separation enforced:
+  - Core (js/app.js): No window globals, no startup decisions, clean export
+  - Shell (js/floss-app.js, index-iife.html): Startup, environment, globals
+- ✅ js/app.js: Auto-init removed, exports App class
+- ✅ js/floss-app.js: NEW shell entry point for ES modules
+- ✅ index.html: Loads js/floss-app.js, calls `FlossApp.start({ mode: 'online' })`
+- ✅ index-iife.html: Wraps code in initializeApp(), calls `FlossApp.start({ mode: 'offline' })`
+- ✅ Behavior unchanged: Both variants auto-start as before
+
+**Files Changed:**
+- js/app.js (modified)
+- js/floss-app.js (NEW)
+- index.html (modified)
+- index-iife.html (modified)
+
+**Architecture Invariant Enforced:**
+- Core files never define globals, never attach to window, never make startup decisions
+- Shell files are the only place where environment handling, startup wiring, globals may live
+
+---
+
+### Phase 7.2+: App Shell UI & Password Gate (Planned)
+
+**Status:** Not yet implemented
+**Depends on:** Phase 7.1 (Complete ✅)
 
 ### Vision: Unified App with Dual-Mode Operation
 
@@ -146,12 +179,12 @@ These are optional enhancements, not required for core functionality:
 
 ### Technical Approach
 
-**Central Entry Point:**
+**Central Entry Point (Already implemented in Phase 7.1):**
 - Expose unified API: `window.FlossApp.start({ mode: 'offline' | 'online' })`
 - App does NOT auto-initialize when bundle loads
 - Requires explicit start() call from App Shell
 
-**Shell Responsibilities:**
+**Shell Responsibilities (Phase 7.2):**
 - Detect environment (file:// vs https://)
 - Show preloader animation
 - (Online only) Show password gate, validate input
@@ -178,13 +211,14 @@ These are optional enhancements, not required for core functionality:
 
 ### Implementation Status
 
-- ❌ **Not yet implemented**
-- 📋 **Planned as:** Phase 7 (tentative)
+- ✅ **Phase 7.1 Complete:** Start API implemented
+- ❌ **Phase 7.2+ Pending:** App Shell UI, preloader, password gate
+- 📋 **Planned as:** Phase 7.2 (App Shell UI), Phase 7.3 (Code unification)
 - 🔗 **References:** CURRENT_STATUS.md → "Potential Future Work" → "App Shell & Password Gate"
 - 🔗 **Development Rules:** CLAUDE.md → "App Shell & Auth Gate - Rules"
 
 ### Dependencies
 
-- Requires: v5.5.0+ (offline MP4 export complete)
+- Requires: v5.7.0+ (FlossApp.start() API complete)
 - Blockers: None (can start anytime)
 - Estimated Effort: 2-3 sessions

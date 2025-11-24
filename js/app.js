@@ -1715,9 +1715,5 @@ class App {
     }
 }
 
-// Initialize app when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => new App());
-} else {
-    new App();
-}
+// Export App class for shell initialization
+export default App;

@@ -316,7 +316,11 @@
 
     <!-- Main App (IIFE) -->
     <script>
-    (function() {
+    /**
+     * Initialize Floss App (IIFE Version)
+     * Main app logic - called by window.FlossApp.start()
+     */
+    function initializeApp() {
         'use strict';
 
         console.log(`
@@ -790,7 +794,27 @@
         }
 
         console.log('✓ Floss IIFE initialized successfully (with video export)');
-    })();
+    }
+
+    /**
+     * FlossApp Start API (IIFE Version)
+     * Provides unified entry point matching ES modules version
+     */
+    window.FlossApp = {
+        /**
+         * Start the Floss application
+         * @param {Object} config - Configuration object
+         * @param {string} config.mode - 'online' | 'offline' (for logging/telemetry only)
+         */
+        start(config = {}) {
+            const { mode = 'offline' } = config;
+            console.log(`🚀 Floss starting in ${mode} mode (IIFE)`);
+            initializeApp();
+        }
+    };
+
+    // Auto-start in offline mode
+    window.FlossApp.start({ mode: 'offline' });
     </script>
 </body>
 </html>

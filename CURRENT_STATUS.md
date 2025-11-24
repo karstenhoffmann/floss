@@ -1,38 +1,75 @@
 # Current Status
 
-**Current Version:** 5.5.0
-**Last Major Milestone:** v5.5.0 - Offline MP4 Export Complete
-**Status:** All 6 phases complete, merged to main
+**Current Version:** 5.7.0
+**Last Major Milestone:** v5.7.0 - Phase 7.1: FlossApp Start API Complete
+**Status:** Phase 7.1 complete, ready for Phase 7.2 (App Shell UI)
 
 *Note: This file describes the project state on the main branch, independent of temporary feature branches.*
 
 ---
 
-## Last Merged Work (v5.5.0)
+## Last Merged Work (v5.7.0)
 
-### Completed: Phases 1-6 - MP4 Export Offline Implementation
+### Completed: Phase 7.1 - FlossApp Start API
 
 **What was done:**
-1. npm setup + Rollup configuration for bundling
-2. Bundled 5 ES modules (2.8 MB total) into /lib/esm/bundles/
-3. Updated Import Map to local bundles
-4. Service Worker v5.5.0 caching
-5. Fixed h264-mp4-encoder ES6 export issue
-6. Documentation updates
-7. Session Bootstrapping Policy added to CLAUDE.md
+1. Unified start API: `window.FlossApp.start({ mode: 'online' | 'offline' })`
+2. Core/Shell separation enforced:
+   - Core (js/app.js): No window globals, no startup logic, clean export
+   - Shell (js/floss-app.js, index-iife.html): Startup, environment, globals
+3. js/app.js: Auto-init removed, exports App class
+4. js/floss-app.js (NEW): Shell entry point for ES modules
+5. index.html: Loads js/floss-app.js, calls FlossApp.start({ mode: 'online' })
+6. index-iife.html: Wraps existing code in initializeApp(), calls FlossApp.start({ mode: 'offline' })
+7. Behavior unchanged: Both variants auto-start as before
 
-**Testing Results:**
-- ✅ GitHub Pages (index.html): v5.5.0, no errors
-- ✅ file:// (index-iife.html): v5.4.8, no errors
+**Architecture Decision:**
+- Architecture Integrity Rule enforced (see CLAUDE.md)
+- Core files (js/app.js, js/core/*, js/effects/*) never define globals, never make startup decisions
+- Shell files (index.html, index-iife.html, js/floss-app.js) are the only place for startup, environment handling, globals
 
-## Recent Main Branch Commits (v5.5.0 Milestone)
+**Files Changed:**
+- js/app.js (modified)
+- js/floss-app.js (NEW)
+- index.html (modified)
+- index-iife.html (modified)
+- js/version.js (v5.7.0)
 
-1. `c68e352` - feat: Bundle MP4 export dependencies with Rollup
-2. `42743d3` - fix: Add ES6 default export to h264-mp4-encoder
-3. `88b2a8b` - docs: Update documentation for v5.5.0
-4. `ca7a360` - docs: Add Session Bootstrapping & File-Awareness Policy
+**Testing Status:**
+- ⏳ Pending: Needs testing on GitHub Pages after merge
+
+**Next Steps:**
+- Phase 7.2: App Shell UI (preloader animation, password gate)
+- Phase 7.3: Code unification (IIFE → ESM bundling)
+
+---
+
+## Recent Main Branch Commits
+
+### v5.7.0 (Phase 7.1)
+- `a8fa481` - feat: Add FlossApp.start() API (Phase 7.1)
+  - NEW: js/floss-app.js - Shell entry point for ESM
+  - MODIFIED: js/app.js - Removed auto-init, exports App class
+  - MODIFIED: index.html - Loads js/floss-app.js, calls FlossApp.start()
+  - MODIFIED: index-iife.html - Wraps code in initializeApp(), defines FlossApp.start()
+
+### v5.6.2 (Documentation)
+- `739cd1e` - docs: Add Architecture Integrity Rule (Core vs Shell)
+- `2841bd4` - docs: Restructure CLAUDE.md and create DETAILED_PITFALLS.md
+
+### v5.5.0 (MP4 Export Offline - Previous Milestone)
+- `c68e352` - feat: Bundle MP4 export dependencies with Rollup
+- `42743d3` - fix: Add ES6 default export to h264-mp4-encoder
+- `88b2a8b` - docs: Update documentation for v5.5.0
+- `ca7a360` - docs: Add Session Bootstrapping & File-Awareness Policy
 
 ## Architecture Decisions
+
+### Core/Shell Separation (v5.7.0)
+- **Decision:** Strict separation between Core and Shell responsibilities
+- **Why:** Enables future App Shell (preloader, password gate) without touching core logic
+- **Impact:** Core stays clean, shell handles all startup/environment concerns
+- **Reference:** CLAUDE.md → "Architecture Integrity Rule (Core vs Shell)"
 
 ### Rollup Hybrid Approach (Approved)
 - **Decision:** Bundle 4 small modules, copy h264-mp4-encoder UMD

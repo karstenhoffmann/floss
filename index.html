@@ -409,8 +409,14 @@
     }
     </script>
 
-    <!-- Main App (ES6 Module) -->
-    <script type="module" src="./js/app.js"></script>
+    <!-- Main App Shell (ES6 Module) -->
+    <script type="module" src="./js/floss-app.js"></script>
+
+    <!-- Start Application -->
+    <script type="module">
+        // Start Floss in online mode (ES modules)
+        window.FlossApp.start({ mode: 'online' });
+    </script>
 
     <!-- Service Worker Registration -->
     <script>
