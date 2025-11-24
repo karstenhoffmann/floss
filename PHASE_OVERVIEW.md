@@ -1,8 +1,10 @@
 # Floss - Phase Overview
 
 **Project:** Offline MP4 Export Migration
-**Branch:** claude/convert-index-iife-01Jgt9CDmHh7NZUhYaW1SCoJ
-**Version:** 5.5.0
+**Current Version:** 5.5.0
+**Status:** All phases complete (last major update: v5.5.0)
+
+*Note: This file describes the project state on the main branch, independent of temporary feature branches.*
 
 ## Phases
 
@@ -32,12 +34,13 @@
 - CLAUDE.md: Vendoring status updated
 - README.md: Build instructions added
 
-## Current Status
-All phases complete! MP4 export is 100% offline-capable.
+## Overall Status
+✅ All phases complete! MP4 export is 100% offline-capable.
+✅ Merged to main in v5.5.0
 
-## Next Steps
-- Consider PR to main branch
-- Optional: Add video export to index-iife.html
+## Potential Future Work
+These are optional enhancements, not required for core functionality:
+- Add video export to index-iife.html (requires IIFE build)
 - Optional: Bundle gifenc for offline GIF export
 
 ---

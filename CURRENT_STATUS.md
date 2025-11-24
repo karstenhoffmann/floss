@@ -1,16 +1,20 @@
 # Current Status
 
-**Last Updated:** 2025-11-24 09:30
-**Branch:** claude/convert-index-iife-01Jgt9CDmHh7NZUhYaW1SCoJ
-**Version:** 5.5.0
+**Current Version:** 5.5.0
+**Last Major Milestone:** v5.5.0 - Offline MP4 Export Complete
+**Status:** All 6 phases complete, merged to main
 
-## Recent Work (Last Session)
+*Note: This file describes the project state on the main branch, independent of temporary feature branches.*
 
-### Completed: Phase 4 - MP4 Export Offline Implementation
+---
+
+## Last Merged Work (v5.5.0)
+
+### Completed: Phases 1-6 - MP4 Export Offline Implementation
 
 **What was done:**
-1. npm setup + Rollup configuration
-2. Bundled 5 ES modules (2.8 MB total)
+1. npm setup + Rollup configuration for bundling
+2. Bundled 5 ES modules (2.8 MB total) into /lib/esm/bundles/
 3. Updated Import Map to local bundles
 4. Service Worker v5.5.0 caching
 5. Fixed h264-mp4-encoder ES6 export issue
@@ -21,7 +25,7 @@
 - ✅ GitHub Pages (index.html): v5.5.0, no errors
 - ✅ file:// (index-iife.html): v5.4.8, no errors
 
-## Recent Commits
+## Recent Main Branch Commits (v5.5.0 Milestone)
 
 1. `c68e352` - feat: Bundle MP4 export dependencies with Rollup
 2. `42743d3` - fix: Add ES6 default export to h264-mp4-encoder
@@ -91,9 +95,7 @@ None
 
 ## 🎨 UX Polish – Future Planned Tasks
 
-**Note:** Diese Aufgaben gehören nicht zur aktuellen Phase. Erst nach Abschluss von Phase 5 und 6 beginnen.
-
-**Phase: UX Polish (LOW PRIORITY - After Phase 6)**
+**Phase: UX Polish (LOW PRIORITY)**
 
 ### Task Group 1: Color Picker Replacement
 
@@ -161,7 +163,7 @@ None
 ---
 
 **UX Polish Total Estimated Effort:** 7-10 sessions
-**When to Start:** After Phase 5 & 6 complete, main branch stable, comprehensive testing done
+**When to Start:** Optional future work - core functionality is complete
 
 **References:**
 - CLAUDE.md (lines 1727-1774) - "Future Enhancements" sections
@@ -173,8 +175,10 @@ None
 ## Blockers
 None
 
-## Next Session
-Consider:
-- Pull Request to main branch
-- Add video export to index-iife.html (requires IIFE build)
-- Bundle gifenc for offline GIF export
+## Potential Future Work
+
+These are optional enhancements, not required for core functionality:
+
+1. **Add video export to index-iife.html** (requires IIFE build)
+2. **Bundle gifenc** for offline GIF export (currently uses CDN)
+3. **UX Polish** (see above) - color picker replacement, visual improvements

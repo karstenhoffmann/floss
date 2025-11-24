@@ -118,6 +118,76 @@ Ask yourself:
 
 ---
 
+### 6. Status Files Describe Main Branch State
+
+**CRITICAL RULE: Status files are branch-neutral and describe the main branch state**
+
+**Status files (PHASE_OVERVIEW.md, CURRENT_STATUS.md):**
+- ✅ Describe the **project state on the main branch**
+- ✅ Contain facts that are stable across sessions (version, phase progress, architecture decisions)
+- ❌ NEVER contain feature branch names or branch-specific context
+- ❌ NEVER contain session-specific details or timestamps
+
+**When starting a new session:**
+1. **Read status files:**
+   - PHASE_OVERVIEW.md (project phases, overall status)
+   - CURRENT_STATUS.md (current version, recent work, next steps)
+
+2. **Check current git branch:**
+   ```bash
+   git branch --show-current
+   ```
+
+3. **Understand the context:**
+   - If on `main`: Status files describe current state
+   - If on feature branch (e.g., `claude/my-feature-xyz`):
+     - Status files show main state (before your feature)
+     - Your work is in a temporary feature branch
+     - **This is NORMAL and EXPECTED**
+
+4. **If status files seem outdated:**
+   - **ASK user** if update is needed
+   - **NEVER update automatically**
+   - Propose specific changes, wait for approval
+
+**Branch-specific notes:**
+- ✅ Feature branches are temporary working contexts
+- ❌ Branch-specific details do NOT belong in global status files
+- ✅ If branch-specific tracking is needed:
+  - Create separate `BRANCH_NOTES.md` (only after user approval)
+  - Keep branch notes out of version control (add to `.gitignore`)
+  - Or: Use PR descriptions for branch-specific context
+
+**When to update status files:**
+- ✅ After merge to main (with user approval)
+- ✅ When architecture decisions are finalized
+- ✅ When major milestones/phases are completed and tested
+- ❌ NEVER during feature branch work
+- ❌ NEVER automatically without approval
+
+**Example session start on feature branch:**
+```
+✅ Status files loaded:
+  - PHASE_OVERVIEW.md: v5.5.0, Phases 1-6 complete
+  - CURRENT_STATUS.md: Last milestone v5.5.0
+  - Current git branch: claude/my-feature-01N77Qnp944BH7RpUjxFCCSA
+
+Note: You are working on a feature branch. Status files show main state.
+This is normal. Continue work on your feature.
+```
+
+**Example session start on main (after merge):**
+```
+✅ Status files loaded:
+  - PHASE_OVERVIEW.md: v5.5.0, Phases 1-6 complete
+  - CURRENT_STATUS.md: Last milestone v5.5.0
+  - Current git branch: main
+
+Status files are up-to-date with main branch. Ready to work.
+```
+
+---
+
 ## ⚠️ CRITICAL: Always Read This First
 
 ### 🌐 Claude Code for Web - Testing Requirements
