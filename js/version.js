@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.7.0',
-    commit: 'feat: Add FlossApp.start() API (Phase 7.1)',
+    number: '5.7.1',
+    commit: 'feat: Add preloader animation (Phase 7.2 Part 1)',
     date: '2025-11-24',
-    time: '19:45'
+    time: '20:15'
 };
 
 export default VERSION;

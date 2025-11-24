@@ -14,6 +14,7 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="./styles/theme.css">
+    <link rel="stylesheet" href="./styles/preloader.css">
     <link rel="stylesheet" href="./styles/main-modern.css">
     <link rel="stylesheet" href="./styles/help-overlay.css">
     <link rel="stylesheet" href="./styles/settings-overlay.css">
@@ -235,6 +236,15 @@
     </style>
 </head>
 <body>
+    <!-- Preloader - App Shell Loading Screen -->
+    <div id="preloader" class="preloader">
+        <div class="preloader__content">
+            <h1 class="preloader__logo">FLOSS</h1>
+            <p class="preloader__tagline">Motion Design</p>
+            <div class="preloader__spinner"></div>
+        </div>
+    </div>
+
     <!-- IIFE Version Notice -->
     <div class="iife-notice">
         IIFE Version (file:// compatible)
@@ -813,8 +823,24 @@
         }
     };
 
-    // Auto-start in offline mode
-    window.FlossApp.start({ mode: 'offline' });
+    // Auto-start with preloader
+    (function() {
+        const preloader = document.getElementById('preloader');
+
+        // Wait for preloader animation to complete (1.5s)
+        setTimeout(() => {
+            // Fade out preloader
+            preloader.classList.add('preloader--hidden');
+
+            // Start Floss app
+            window.FlossApp.start({ mode: 'offline' });
+
+            // Remove preloader from DOM after fade-out
+            setTimeout(() => {
+                preloader.remove();
+            }, 500); // Match CSS transition duration
+        }, 1500); // Preloader animation duration
+    })();
     </script>
 </body>
 </html>

@@ -25,6 +25,7 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="./styles/theme.css">
+    <link rel="stylesheet" href="./styles/preloader.css">
     <link rel="stylesheet" href="./styles/main-modern.css">
     <link rel="stylesheet" href="./styles/help-overlay.css">
     <link rel="stylesheet" href="./styles/settings-overlay.css">
@@ -48,6 +49,15 @@
     <!-- No script tag needed here - imported dynamically when needed -->
 </head>
 <body>
+    <!-- Preloader - App Shell Loading Screen -->
+    <div id="preloader" class="preloader">
+        <div class="preloader__content">
+            <h1 class="preloader__logo">FLOSS</h1>
+            <p class="preloader__tagline">Motion Design</p>
+            <div class="preloader__spinner"></div>
+        </div>
+    </div>
+
     <div id="app" class="app">
         <!-- Toolbar -->
         <header id="toolbar" class="toolbar">
@@ -412,10 +422,24 @@
     <!-- Main App Shell (ES6 Module) -->
     <script type="module" src="./js/floss-app.js"></script>
 
-    <!-- Start Application -->
+    <!-- Start Application with Preloader -->
     <script type="module">
-        // Start Floss in online mode (ES modules)
-        window.FlossApp.start({ mode: 'online' });
+        // Preloader animation + App start
+        const preloader = document.getElementById('preloader');
+
+        // Wait for preloader animation to complete (1.5s)
+        setTimeout(() => {
+            // Fade out preloader
+            preloader.classList.add('preloader--hidden');
+
+            // Start Floss app
+            window.FlossApp.start({ mode: 'online' });
+
+            // Remove preloader from DOM after fade-out
+            setTimeout(() => {
+                preloader.remove();
+            }, 500); // Match CSS transition duration
+        }, 1500); // Preloader animation duration
     </script>
 
     <!-- Service Worker Registration -->

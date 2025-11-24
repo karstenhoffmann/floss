@@ -3,19 +3,21 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v5.5.0'; // All dependencies bundled with Rollup (MP4 export offline-ready)
+const CACHE_NAME = 'floss-v5.7.1'; // Phase 7.2: Preloader + App Shell UI
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './styles/theme.css',
+    './styles/preloader.css',
     './styles/main-modern.css',
     './styles/help-overlay.css',
     './styles/settings-overlay.css',
     './styles/notifications.css',
     './styles/video-export.css',
     './js/app.js',
+    './js/floss-app.js',
     './js/version.js',
     './js/core/state.js',
     './js/core/scene.js',
