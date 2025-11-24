@@ -1479,8 +1479,8 @@ class App {
                 clearButton: false,
                 closeButton: true,
                 closeLabel: 'OK',
-                selectInput: true,
-                focusInput: false
+                selectInput: false,  // Don't auto-select text (prevents conflicts)
+                focusInput: true     // Keep input focused (prevents premature closing)
             });
 
             console.log(`✓ Coloris initialized (${defaultSwatches.length} default + ${recentColors.length} recent)`);
