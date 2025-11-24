@@ -171,6 +171,28 @@ export const VERSION = {
 
 ---
 
+## Architecture Integrity Rule (Core vs Shell)
+
+Before modifying any code related to startup, globals, app initialization, bundling, or where certain logic should live, Claude MUST:
+
+1. Check the existing architecture plan in:
+   - PHASE_OVERVIEW.md
+   - CURRENT_STATUS.md
+   - CLAUDE.md (Architecture Overview, Future Work, App Shell notes)
+
+2. Apply the following invariant rules:
+   - Core files (js/app.js, js/core/*, js/effects/*) never define globals, never attach to window, never make startup decisions.
+   - Shell files (index.html, index-iife.html, js/floss-app.js, future App Shell files) are the only place where environment handling, startup wiring, globals, preloaders or password gates may live.
+
+3. If the requested change affects Core/Shell boundaries, or could contradict the documented plan:
+   - Stop, summarize the existing architecture context,
+   - Propose the correct placement of the change,
+   - Ask for explicit confirmation before editing files.
+
+4. Never choose a solution only because it produces the smallest diff. Architecture consistency always has priority over diff size.
+
+---
+
 ## ✅ Session Start Checklist
 
 **Before starting work:**
