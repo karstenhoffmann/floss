@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.6.1',
-    commit: 'docs: Restructure CLAUDE.md, create DETAILED_PITFALLS.md',
+    number: '5.6.2',
+    commit: 'docs: Add Architecture Integrity Rule (Core vs Shell)',
     date: '2025-11-24',
-    time: '16:45'
+    time: '17:30'
 };
 
 export default VERSION;
