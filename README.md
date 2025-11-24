@@ -16,16 +16,15 @@ A professional, browser-based kinetic typography motion design tool for creating
 - **Professional UI**: Dark, minimal, After Effects-inspired interface
 - **Keyboard Shortcuts**: Fast workflow with comprehensive shortcuts
 
-## 📦 Two Usage Modes
+## 📦 Usage
 
-### Mode 1: Online (GitHub Pages) ⭐ Recommended
+### Online (GitHub Pages) ⭐ Recommended
 
 **Best for:** Regular use, development, testing
 
 ```
 URL: https://karstenhoffmann.github.io/floss/
 File: index.html
-Tech: ES6 Modules + CDN dependencies
 ```
 
 **Requirements:**
@@ -39,25 +38,25 @@ Tech: ES6 Modules + CDN dependencies
 3. Deploy from branch, **`/ (root)`** folder
 4. Access at: `https://yourusername.github.io/floss/`
 
-### Mode 2: Offline (file:// protocol)
+### Offline / file:// Protocol
 
-**Best for:** Air-gapped machines, complete offline use, copy-paste portability
+**Starting with v5.9.0**, `index.html` supports **both** protocols automatically:
 
-```
-File: index-iife.html
-Tech: IIFE bundle, all dependencies vendored locally
-```
+- **https://** → Uses ES6 modules
+- **file://** → Automatically loads IIFE bundle
 
 **Usage:**
 1. Download/clone this repository
-2. Double-click `index-iife.html`
+2. Double-click `index.html`
 3. Works immediately - no server, no internet required
 
 **Features:**
-- ✅ Simplified effect (Torus geometry)
+- ✅ Full app with all effects
 - ✅ All libraries vendored (Three.js, Open Props, Coloris)
-- ✅ No CDN dependencies
+- ✅ MP4 video export (offline)
 - ✅ Works on air-gapped machines
+
+> **Note:** `index-iife.html` is deprecated and only redirects to `index.html`.
 
 ## 🚀 Local Development
 
@@ -84,8 +83,8 @@ npx serve
 
 ```
 /
-├── index.html              # Main app (ES6 modules, CDN dependencies)
-├── index-iife.html         # Offline version (IIFE, vendored deps)
+├── index.html              # Main app (ES6 modules OR IIFE, auto-detected)
+├── index-iife.html         # DEPRECATED - redirects to index.html
 ├── js/                     # Application code (ES6 modules)
 │   ├── app.js             # Main controller
 │   ├── core/              # Core systems

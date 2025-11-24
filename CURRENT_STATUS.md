@@ -134,26 +134,6 @@ None
 
 ---
 
-### 2. index-iife.html Visual Simplifications
-
-**Severity:** N/A (intentional simplifications for PoC)
-**Status:** Documented for future visual polish phase
-
-**Current State:**
-- Torus geometry (not TorusKnot) - simpler UV mapping
-- MeshBasicMaterial (not MeshStandardMaterial) - no lighting
-- Canvas texture text (not shader-based) - lower quality
-- Single effect only
-
-**Rationale:**
-- index-iife.html is a Proof of Concept for file:// compatibility
-- Core architecture takes priority over visual finesse
-- Full visual effects are in index.html (ES6 modules version)
-
-**Future Action:** See "UX Polish – Future Planned Tasks" below
-
----
-
 ## 🎨 UX Polish – Future Planned Tasks
 
 **Phase: UX Polish (LOW PRIORITY)**
@@ -173,31 +153,7 @@ None
 
 ---
 
-### Task Group 2: index-iife.html Visual Polish
-
-- [ ] Replace Torus with TorusKnot geometry
-  - Match original Codrops demo visual quality
-  - Improve UV mapping for complex geometry
-- [ ] Implement shader-based text rendering
-  - GPU-accelerated, higher quality
-  - Better performance for large text
-- [ ] Upgrade to advanced materials
-  - MeshStandardMaterial with lighting
-  - Reflections, post-processing effects
-- [ ] Add multiple effects
-  - Effect switcher UI component
-  - 2-3 effect presets (Torus, TorusKnot, Sphere)
-- [ ] Expand parameter controls
-  - Color controls (background, text, fog)
-  - Animation presets
-  - More geometry parameters
-
-**Estimated Effort:** 3-4 sessions
-**Blockers:** None (can start anytime after Phase 6)
-
----
-
-### Task Group 3: General UI/UX Improvements
+### Task Group 2: General UI/UX Improvements
 
 - [ ] Slider controls audit
   - Consistent styling across all sliders
@@ -223,13 +179,12 @@ None
 
 ---
 
-**UX Polish Total Estimated Effort:** 7-10 sessions
+**UX Polish Total Estimated Effort:** 4-6 sessions
 **When to Start:** Optional future work - core functionality is complete
 
 **References:**
-- CLAUDE.md (lines 1727-1774) - "Future Enhancements" sections
-- README-IIFE.md (lines 142-169) - "Known Limitations & Future Improvements"
-- PLUGIN_SPEC.md - Effect development API (for visual polish implementation)
+- CLAUDE.md - "Future Enhancements" sections
+- PLUGIN_SPEC.md - Effect development API
 
 ---
 
@@ -240,10 +195,8 @@ None
 
 These are optional enhancements, not required for core functionality:
 
-1. **Add video export to index-iife.html** (requires IIFE build)
-2. **Bundle gifenc** for offline GIF export (currently uses CDN)
-3. **UX Polish** (see above) - color picker replacement, visual improvements
-4. **App Shell & Password Gate** - Unified loading screen with optional password protection
+1. **Bundle gifenc** for offline GIF export (currently uses CDN)
+2. **UX Polish** (see above) - color picker replacement, general UI improvements
 
 ---
 

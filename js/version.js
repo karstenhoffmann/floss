@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.9.4',
-    commit: 'fix: Add util shim for canvas-record FFmpeg',
+    number: '5.9.5',
+    commit: 'chore: Repo cleanup, consolidate docs',
     date: '2025-11-24',
-    time: '23:00'
+    time: '23:30'
 };
 
 export default VERSION;

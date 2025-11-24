@@ -40,7 +40,6 @@
 
 ## Potential Future Work
 These are optional enhancements, not required for core functionality:
-- Add video export to index-iife.html (requires IIFE build)
 - Optional: Bundle gifenc for offline GIF export
 
 ---
@@ -69,20 +68,6 @@ These are optional enhancements, not required for core functionality:
 
 ---
 
-### index-iife.html Visual Limitations (Priority: LOW)
-
-**Status:** Intentional simplifications for PoC - visual finesse comes later
-
-**Current Intentional Simplifications:**
-- Uses simple **Torus geometry** (not TorusKnot) for better text UV mapping
-- Basic **MeshBasicMaterial** (no lighting, no shaders)
-- Text rendered as **canvas texture** (not shader-based)
-- Single effect only (no effect switching)
-
-**Why:** Proof of Concept for file:// compatibility. Core architecture first, visuals later.
-
----
-
 ## 🎨 UX Polish – Future Planned Tasks
 
 ### Phase: UX Polish (Future - After Phase 6 Complete)
@@ -98,14 +83,6 @@ These are optional enhancements, not required for core functionality:
 - [ ] Ensure vendoring + offline-first compatibility
 - [ ] Update all color input components consistently
 
-**index-iife.html Visual Polish:**
-- [ ] Replace Torus with TorusKnot geometry (like original Codrops)
-- [ ] Shader-based text rendering (better quality, GPU-accelerated)
-- [ ] Advanced materials (lighting, reflections, post-processing)
-- [ ] Multiple effects (effect switcher UI)
-- [ ] More parameters (color controls, animation presets)
-- [ ] Better UV mapping (custom UV unwrapping for complex geometries)
-
 **UI/UX Improvements (General):**
 - [ ] Review slider controls for consistency
 - [ ] Improve text input responsiveness
@@ -116,9 +93,7 @@ These are optional enhancements, not required for core functionality:
 **Priority:** All items LOW - Only after core architecture (Phases 1-6) is complete and tested
 
 **References:**
-- CLAUDE.md → "Future Enhancements" → "index-iife.html Visual Polish"
 - CLAUDE.md → "Future Enhancements" → "Coloris Color Picker UX Issues"
-- README-IIFE.md → "Known Limitations & Future Improvements"
 
 ---
 
