@@ -182,7 +182,8 @@ Before modifying any code related to startup, globals, app initialization, bundl
 
 2. Apply the following invariant rules:
    - Core files (js/app.js, js/core/*, js/effects/*) never define globals, never attach to window, never make startup decisions.
-   - Shell files (index.html, index-iife.html, js/floss-app.js, future App Shell files) are the only place where environment handling, startup wiring, globals, preloaders or password gates may live.
+   - Shell files (index.html, js/floss-app.js, js/floss-app.iife.js) are the only place where environment handling, startup wiring, globals, preloaders or password gates may live.
+   - Note: index-iife.html is DEPRECATED (see Single Entry Policy below) - do not extend it.
 
 3. If the requested change affects Core/Shell boundaries, or could contradict the documented plan:
    - Stop, summarize the existing architecture context,
@@ -190,6 +191,46 @@ Before modifying any code related to startup, globals, app initialization, bundl
    - Ask for explicit confirmation before editing files.
 
 4. Never choose a solution only because it produces the smallest diff. Architecture consistency always has priority over diff size.
+
+---
+
+## 🚪 Single Entry Policy (Phase 7.3+)
+
+**CRITICAL: The project maintains exactly ONE long-term HTML entry point: `index.html`**
+
+### Policy Rules:
+
+1. **index.html is the ONLY permanent entry point**
+   - Works for both `file://` and `https://` protocols
+   - Contains Shell logic for environment detection
+   - Loads appropriate bundle (IIFE for file://, ESM for https://)
+
+2. **Additional HTML entry files are TEMPORARY only**
+   - Must be marked as `DEPRECATED` in comments and documentation
+   - Must have a documented decommission plan
+   - May NOT contain independent implementations
+   - Should redirect to index.html
+
+3. **index-iife.html Status: DEPRECATED (Phase 7.3)**
+   - Exists only as a redirect stub to index.html
+   - Will be removed in a future phase
+   - Do NOT add features to this file
+   - Do NOT use as a reference implementation
+
+### Before Editing Entry Points:
+
+Claude MUST:
+1. Check this Single Entry Policy
+2. Verify the change aligns with "one index.html" architecture
+3. If adding a new HTML file is proposed → STOP and discuss with user
+4. Never create parallel implementations in multiple HTML files
+
+### Why This Policy Exists:
+
+- **Code duplication** - Multiple entry points lead to divergent codebases
+- **Maintenance burden** - Bug fixes must be applied in multiple places
+- **Inconsistent behavior** - Features drift between versions
+- **Session confusion** - Claude may work on wrong entry point
 
 ---
 

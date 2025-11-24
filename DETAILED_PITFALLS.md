@@ -14,6 +14,7 @@ This file contains detailed versions of all common pitfalls and mistakes when wo
 2. [Video Export System Pitfalls](#video-export-system-pitfalls)
 3. [GitHub Pages & Deployment Pitfalls](#github-pages--deployment-pitfalls)
 4. [Documentation Pitfalls](#documentation-pitfalls)
+5. [Architecture Pitfalls](#architecture-pitfalls)
 
 ---
 
@@ -488,6 +489,66 @@ Version: 2.3.1"
 ```
 
 **Why it matters:** User can't tell which version is deployed, debugging becomes impossible, cache issues are invisible.
+
+---
+
+## Architecture Pitfalls
+
+### 1. Creating Multiple HTML Entry Points (Historical Mistake)
+
+**❌ WRONG: Creating parallel implementations**
+```
+index.html       → Full ESM implementation
+index-iife.html  → Different IIFE implementation (700 lines inline)
+```
+
+**Why this was wrong:**
+- Code duplication - same features implemented twice
+- Features drift between versions
+- Bug fixes must be applied in multiple places
+- Confuses Claude sessions about which file to edit
+
+**✅ CORRECT: Single Entry Policy (Phase 7.3+)**
+```
+index.html       → ONLY entry point (handles file:// and https://)
+                   Shell detects protocol, loads appropriate bundle
+```
+
+**Current state (Phase 7.3):**
+- `index.html` = single permanent entry point
+- `index-iife.html` = deprecated redirect stub (will be removed)
+
+**Reference:** CLAUDE.md → "Single Entry Policy (Phase 7.3+)"
+
+---
+
+### 2. Putting Shell Logic in Core Files
+
+**❌ WRONG: Environment detection in app.js**
+```javascript
+// js/app.js (CORE file)
+if (location.protocol === 'file:') {
+    // DON'T DO THIS - violates Core/Shell separation
+}
+window.FlossApp = { ... }; // DON'T attach globals in Core!
+```
+
+**✅ CORRECT: Keep environment logic in Shell only**
+```javascript
+// index.html (SHELL) or js/floss-app.js (SHELL)
+if (location.protocol === 'file:') {
+    loadScript('js/floss-app.iife.js');
+} else {
+    import('./js/floss-app.js');
+}
+```
+
+**Rule:** Core files NEVER:
+- Define globals
+- Attach to window
+- Make environment/startup decisions
+
+**Reference:** CLAUDE.md → "Architecture Integrity Rule (Core vs Shell)"
 
 ---
 

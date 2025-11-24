@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.8.1',
-    commit: 'docs: Update status files for Phase 7.2 complete',
+    number: '5.8.2',
+    commit: 'docs: Add Single Entry Policy for Phase 7.3',
     date: '2025-11-24',
-    time: '21:45'
+    time: '22:00'
 };
 
 export default VERSION;

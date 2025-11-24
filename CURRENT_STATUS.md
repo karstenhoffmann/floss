@@ -1,50 +1,74 @@
 # Current Status
 
-**Current Version:** 5.8.0
-**Last Major Milestone:** v5.8.0 - Phase 7.2: App Shell UI Complete (Preloader + Password Gate)
-**Status:** Phase 7.2 complete, ready for Phase 7.3 (IIFE → ESM Bundling)
+**Current Version:** 5.8.1 (docs update) → targeting 5.9.0
+**Last Major Milestone:** v5.8.0 - Phase 7.2: App Shell UI Complete
+**Current Work:** Phase 7.3: Full Unification – One HTML Entry
+**Status:** Phase 7.3 in progress 🔄
 
 *Note: This file describes the project state on the main branch, independent of temporary feature branches.*
 
 ---
 
-## Last Merged Work (v5.8.0)
+## Current Work: Phase 7.3 - Full Unification
+
+### Goal: Single Entry Policy
+
+**ARCHITECTURE DECISION:** `index.html` is the ONLY long-term HTML entry point.
+
+| Entry Point | Status | Description |
+|-------------|--------|-------------|
+| `index.html` | ✅ PRIMARY | Single entry for file:// and https:// |
+| `index-iife.html` | ⚠️ DEPRECATED | Redirect stub only, will be removed |
+
+### What's Being Done
+
+1. **IIFE Bundle Creation**
+   - `rollup.config.app.js` → builds `js/floss-app.iife.js`
+   - Bundles entire app (core, effects, ui, utils)
+   - External: THREE.js, Coloris (globals)
+
+2. **index.html Dual-Mode Loading**
+   - Detects `file://` vs `https://` protocol
+   - `file://` → loads IIFE bundle
+   - `https://` → uses ES modules (existing)
+
+3. **index-iife.html Deprecation**
+   - Converted to minimal redirect stub
+   - Auto-redirects to index.html
+   - Contains deprecation notice
+
+### Files to Change
+
+| File | Action |
+|------|--------|
+| `rollup.config.app.js` | NEW |
+| `js/floss-app.iife.js` | NEW (generated) |
+| `index.html` | MODIFY |
+| `index-iife.html` | REPLACE (stub) |
+| `package.json` | MODIFY |
+
+### Architecture Policy (New in Phase 7.3)
+
+**Single Entry Policy** (documented in CLAUDE.md):
+- Only ONE permanent HTML entry point: `index.html`
+- Additional HTML files must be temporary and deprecated
+- No parallel implementations allowed
+
+---
+
+## Previous Work (v5.8.0)
 
 ### Completed: Phase 7.2 - App Shell UI (Preloader + Password Gate)
 
 **What was done:**
-1. Preloader animation - Brief "FLOSS Motion Design" loading screen
-2. Password gate with session management (online mode only)
+1. Preloader animation (1.5s FLOSS logo + spinner)
+2. Password gate with session management (online only)
 3. Environment detection (file:// vs https://)
-4. Session tokens with 5-minute timeout
-5. SHA-256 password hashing (client-side)
-6. Both index.html and index-iife.html have preloader + password gate
-
-**Key Features:**
-- **Preloader:** 1.5s animation with FLOSS logo and spinner
-- **Password Gate:** Only shown in online mode (https://)
-- **Session Management:** Valid session skips password gate
-- **file:// Mode:** Preloader only, no password required
+4. Session tokens (5-minute timeout)
 
 **Security Note:**
-- ⚠️ Password gate is a UX/access gate, NOT a security measure
-- Client-side password check can be bypassed by technical users
-- Acceptable for: Private demos, deterring casual users
-- NOT for: Protecting confidential data
-
-**Files Changed:**
-- index.html (preloader + password gate)
-- index-iife.html (preloader + password gate inline)
-- styles/preloader.css (NEW)
-- styles/password-gate.css (NEW)
-- js/utils/password-gate.js (NEW)
-- js/version.js (v5.8.0)
-
-**Testing Status:**
-- ✅ Tested and merged to main
-
-**Next Steps:**
-- Phase 7.3: IIFE → ESM bundling (unify code paths)
+- ⚠️ Password gate is a UX/access gate, NOT security
+- Client-side, can be bypassed by technical users
 
 ---
 

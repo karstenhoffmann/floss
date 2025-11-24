@@ -201,40 +201,95 @@ These are optional enhancements, not required for core functionality:
 
 ---
 
-### Phase 7.3: IIFE → ESM Bundling (Planned)
+### Phase 7.3: Full Unification – One HTML Entry (In Progress)
 
-**Status:** Ready to start
+**Status:** In Progress 🔄
+**Version Target:** v5.9.0
 **Depends on:** Phase 7.2 (Complete ✅)
 
-### Goal
+### Architecture Goal: Single Entry Policy
 
-Unify index.html (ESM) and index-iife.html (IIFE) by:
-1. Creating a Rollup-built IIFE bundle from the ESM source
-2. Replacing inline IIFE code in index-iife.html with the bundled file
-3. Keeping behavior identical (offline mode, preloader only, no password gate)
-4. Maintaining the FlossApp.start(config) API
+**CRITICAL DECISION:** The project maintains exactly ONE long-term HTML entry point: `index.html`
 
-### Current State
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      index.html (Single Entry)                   │
+├─────────────────────────────────────────────────────────────────┤
+│  Shell detects protocol:                                        │
+│  • file:// → Load floss-app.iife.js (IIFE bundle)              │
+│  • https:// → Load floss-app.js (ES modules)                   │
+├─────────────────────────────────────────────────────────────────┤
+│  Same features in both modes:                                   │
+│  • Full app (5 effects, presets, export)                       │
+│  • Preloader animation                                         │
+│  • Password gate (https:// only)                               │
+└─────────────────────────────────────────────────────────────────┘
 
-**index.html (ESM):**
-- Full-featured app with 5 effects, presets, export
-- Loads js/floss-app.js (shell) → js/app.js (core)
-- Uses import maps for dependencies
+┌─────────────────────────────────────────────────────────────────┐
+│               index-iife.html (DEPRECATED)                       │
+├─────────────────────────────────────────────────────────────────┤
+│  Minimal stub with redirect to index.html                       │
+│  Will be removed in future phase                                │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-**index-iife.html (IIFE):**
-- Simplified demo with single torus effect (~700 lines inline)
-- Different code path, different features
-- Contains duplicated password gate logic
+### Why Single Entry?
+
+| Problem with Multiple Entries | Solution |
+|------------------------------|----------|
+| Code duplication | One codebase, one bundle |
+| Features drift between versions | Same app everywhere |
+| Bug fixes in multiple places | Fix once, works everywhere |
+| Confusing for developers | Clear entry point |
+
+### Technical Implementation
+
+**1. Rollup IIFE Bundle:**
+- Input: `js/floss-app.js` (shell entry)
+- Output: `js/floss-app.iife.js` (~200KB)
+- External: THREE.js, Coloris (loaded as globals)
+- Bundles: All core, effects, ui, utils modules
+
+**2. index.html Dual-Mode Loading:**
+```javascript
+// Shell detects environment
+if (location.protocol === 'file:') {
+    // Load IIFE bundle for file:// compatibility
+    loadScript('js/floss-app.iife.js');
+} else {
+    // Use ES modules for https://
+    import('./js/floss-app.js');
+}
+```
+
+**3. index-iife.html Deprecation:**
+- Reduced to minimal redirect stub
+- Auto-redirects to index.html after 3 seconds
+- Contains deprecation notice
 
 ### Deliverables
 
-- rollup.config.app.js (minimal config, bundles js/floss-app.js → IIFE)
-- js/floss-app.iife.js (generated bundle, committed to repo)
-- index-iife.html updated to load bundle via single script tag
-- Documentation updates
+| File | Action | Description |
+|------|--------|-------------|
+| `rollup.config.app.js` | NEW | Rollup config for app bundle |
+| `js/floss-app.iife.js` | NEW | Generated IIFE bundle |
+| `index.html` | MODIFY | Add dual-mode loading |
+| `index-iife.html` | REPLACE | Deprecated redirect stub |
+| `package.json` | MODIFY | Add `bundle:app` script |
+| Documentation | UPDATE | All status files |
+
+### Decommission Plan for index-iife.html
+
+**Phase 7.3 (Current):** Convert to redirect stub
+**Phase 7.4+ (Future):** Remove file entirely, update all references
 
 ### Dependencies
 
 - Requires: v5.8.0+ (Phase 7.2 complete)
 - Blockers: None
-- Estimated Effort: 1-2 sessions
+- Estimated Effort: 1 session
+
+### References
+
+- CLAUDE.md → "Single Entry Policy (Phase 7.3+)"
+- CLAUDE.md → "Architecture Integrity Rule"
