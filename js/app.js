@@ -1470,6 +1470,20 @@ class App {
             // Row 3: Recent colors (up to 5 colors)
             const allSwatches = [...defaultSwatches, ...recentColors];
 
+            // Fix: Prevent picker from closing when clicking inside it
+            // This handler must be added BEFORE Coloris initialization
+            // so it runs BEFORE Coloris's document handler in the event queue
+            if (!window._colorisFixInstalled) {
+                window._colorisFixInstalled = true;
+                document.addEventListener('mousedown', function(e) {
+                    const picker = document.querySelector('.clr-picker.clr-open');
+                    if (picker && e.target.closest('.clr-picker')) {
+                        // Clicking inside picker - stop event from reaching Coloris's close handler
+                        e.stopPropagation();
+                    }
+                }, false);
+            }
+
             Coloris({
                 el: '.coloris',          // Only attach to elements with class 'coloris'
                 theme: 'pill',
@@ -1498,23 +1512,6 @@ class App {
             });
 
             console.log(`✓ Coloris initialized (${defaultSwatches.length} default + ${recentColors.length} recent)`);
-
-            // Use event delegation to prevent picker from closing on internal clicks
-            // This works even when picker is dynamically created
-            document.addEventListener('mousedown', (e) => {
-                // If clicking inside the color picker, prevent event from bubbling
-                if (e.target.closest('.clr-picker')) {
-                    e.stopPropagation();
-                }
-            }, true);
-
-            document.addEventListener('click', (e) => {
-                // Allow close button to work, stop propagation for everything else in picker
-                const picker = e.target.closest('.clr-picker');
-                if (picker && !e.target.closest('.clr-close')) {
-                    e.stopPropagation();
-                }
-            }, true);
         } catch (err) {
             console.warn('⚠️ Coloris initialization failed:', err);
         }
