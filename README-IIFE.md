@@ -8,9 +8,10 @@
 
 ✅ **file:// compatible** - Open directly in browser
 ✅ **No build step** - Pure HTML + inline JavaScript
-✅ **CDN dependencies** - Three.js, Coloris loaded from CDN
+✅ **Fully vendored** - Three.js, Open Props, Coloris included locally
 ✅ **Minimal IIFE bundle** - All code in self-executing function
 ✅ **Core functionality** - Text rendering, animation, camera controls
+✅ **100% offline** - No internet required after download
 
 ## Usage
 
@@ -48,12 +49,14 @@ python3 -m http.server 8080
 
 ## Technical Details
 
-### Dependencies (CDN)
+### Dependencies (Vendored Locally)
 
-- **Three.js r115** - WebGL rendering
+- **Three.js r115** (646 KB) - WebGL rendering library (`/lib/three/`)
 - **OrbitControls** - Camera interaction
-- **Coloris** - Color picker (loaded but not used in minimal version)
-- **Open Props** - CSS design tokens
+- **Open Props** (3 KB) - CSS design tokens (`/lib/open-props/`)
+- **Coloris** (22 KB) - Color picker library (`/lib/coloris/`)
+
+**Total:** ~671 KB, 100% offline-capable
 
 ### Code Structure
 
@@ -88,10 +91,11 @@ ES6 modules (`<script type="module">`) don't work with `file://` protocol due to
 - Check if hardware acceleration is enabled
 - Try a different browser
 
-### CDN resources not loading
-- Requires internet connection for first load
-- Browser caches resources afterward
-- Check browser console for network errors
+### Libraries not loading
+- All libraries are vendored locally in `/lib/` directory
+- No internet connection required
+- Check browser console for file path errors
+- Ensure you downloaded the complete repository
 
 ### Black screen / no rendering
 - Open browser console (F12)
@@ -137,13 +141,14 @@ To modify the IIFE version:
 
 ## Known Limitations & Future Improvements
 
-### Current State (v5.3.4)
+### Current State (v5.4.8)
 
 **Intentional Simplifications:**
 - ✅ Uses simple **Torus geometry** (not TorusKnot) for better text UV mapping
 - ✅ Basic **MeshBasicMaterial** (no lighting, no shaders)
 - ✅ Text rendered as **canvas texture** (not shader-based)
 - ✅ Single effect only (no effect switching)
+- ✅ All dependencies vendored locally (Three.js, Open Props, Coloris)
 
 **Why:** This is a **Proof of Concept** for file:// compatibility. Visual finesse comes after core architecture migration.
 
@@ -164,9 +169,10 @@ To modify the IIFE version:
 
 ## Version
 
-- **Version:** 5.3.4
-- **Date:** 2025-11-23
+- **Version:** 5.4.8
+- **Date:** 2025-11-24
 - **Type:** Simplified IIFE bundle (PoC)
+- **Status:** All dependencies vendored, 100% offline-capable
 
 ## License
 
