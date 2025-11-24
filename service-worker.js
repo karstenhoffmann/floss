@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v5.4.7'; // Three.js + Open Props + Coloris + partial ESM vendored
+const CACHE_NAME = 'floss-v5.4.8'; // Three.js + Open Props + Coloris vendored, ESM on CDN
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
@@ -50,12 +50,9 @@ const ASSETS_TO_CACHE = [
     './lib/open-props/normalize.min.css',
     // Coloris Color Picker (vendored locally)
     './lib/coloris/coloris.min.css',
-    './lib/coloris/coloris.min.js',
-    // ES Modules (partially vendored - complex modules still on CDN)
-    './lib/esm/canvas-context.js',
-    './lib/esm/canvas-screenshot.js',
-    './lib/esm/media-codecs.js',
-    './lib/esm/gifenc.js'
+    './lib/coloris/coloris.min.js'
+    // Note: canvas-record ES module dependencies loaded from esm.sh CDN
+    // (Service Worker will cache them on first load)
 ];
 
 // Install event - cache assets
