@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.9.2',
-    commit: 'fix: Add shims for IIFE deps in file:// mode',
+    number: '5.9.3',
+    commit: 'fix: Add lowercase ffmpeg shim for canvas-record',
     date: '2025-11-24',
-    time: '22:30'
+    time: '22:45'
 };
 
 export default VERSION;

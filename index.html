@@ -486,6 +486,10 @@
                 }
 
                 // 3. FFmpeg dependencies (also CDN-only, provide stubs)
+                // canvas-record expects lowercase 'ffmpeg', not 'FFmpeg'
+                if (typeof window.ffmpeg === 'undefined') {
+                    window.ffmpeg = {};
+                }
                 if (typeof window.FFmpeg === 'undefined') {
                     window.FFmpeg = {};
                 }
