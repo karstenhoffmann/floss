@@ -1665,9 +1665,9 @@ Priority features:
 
 ## External Dependencies
 
-### Vendoring Status (v5.4.8)
+### Vendoring Status (v5.5.0)
 
-**Philosophy:** All dependencies SHOULD be vendored locally for offline-first, copy-paste portability. However, ES modules with complex internal dependencies require bundling tools.
+**Philosophy:** All dependencies SHOULD be vendored locally for offline-first, copy-paste portability. ES modules with complex internal dependencies are bundled using Rollup.
 
 **✅ Fully Vendored (Offline-Ready):**
 - **Three.js r115** (646 KB) - `/lib/three/`
@@ -1676,69 +1676,53 @@ Priority features:
   - open-props.min.css, normalize.min.css
 - **Coloris Color Picker** (22 KB) - `/lib/coloris/`
   - coloris.min.css, coloris.min.js
-
-**❌ ES Module Vendoring Attempt Failed (v5.4.7):**
-- **Problem:** Attempted to vendor canvas-record dependencies by downloading individual index files
-- **Issue:** ES modules have internal relative imports (`./types.js`, `./src/av.js`, etc.) that weren't included
-- **Errors:**
-  ```
-  GET .../lib/esm/types.js 404 (Not Found)
-  GET .../lib/esm/src/av.js 404 (Not Found)
-  GET .../lib/esm/src/vp.js 404 (Not Found)
-  ```
-- **Root Cause:** Downloading only main index files doesn't include the complete module dependency tree
-- **Lesson Learned:** ES modules require either:
-  1. Complete directory tree vendoring (all files + subdirectories)
-  2. Bundling with tools like esbuild/rollup to create single-file bundles
-  3. Using esm.sh CDN which handles bundling automatically
-
-**⏳ On CDN (canvas-record dependencies via esm.sh):**
-- All 8 canvas-record ES module dependencies loaded from esm.sh CDN
-- Service Worker caches them on first load for offline use
-- Import Map: `https://esm.sh/[package]@[version]`
+- **MP4 Export Dependencies (Rollup-bundled)** (2.8 MB) - `/lib/esm/bundles/`
+  - canvas-context.js (2.1 KB)
+  - canvas-screenshot.js (3.0 KB)
+  - media-codecs.js (15 KB)
+  - mediabunny.js (1.1 MB - includes Node.js polyfills for Stream/Buffer)
+  - h264-mp4-encoder.js (1.7 MB - UMD bundle with embedded WASM + ES6 export wrapper)
 
 **Current Import Map (index.html):**
 ```javascript
 {
   "imports": {
-    "canvas-context": "https://esm.sh/canvas-context@3.3.1",
-    "canvas-screenshot": "https://esm.sh/canvas-screenshot@4.2.2",
-    "mediabunny": "https://esm.sh/mediabunny@1.24.2",
-    "media-codecs": "https://esm.sh/media-codecs@2.0.2",
+    "canvas-context": "./lib/esm/bundles/canvas-context.js",
+    "canvas-screenshot": "./lib/esm/bundles/canvas-screenshot.js",
+    "mediabunny": "./lib/esm/bundles/mediabunny.js",
+    "media-codecs": "./lib/esm/bundles/media-codecs.js",
+    "h264-mp4-encoder": "./lib/esm/bundles/h264-mp4-encoder.js",
     "gifenc": "https://esm.sh/gifenc@1.0.3",
-    "h264-mp4-encoder": "https://esm.sh/h264-mp4-encoder@1.0.12",
     "@ffmpeg/ffmpeg": "https://esm.sh/@ffmpeg/ffmpeg@0.12.7",
     "@ffmpeg/util": "https://esm.sh/@ffmpeg/util@0.12.1"
   }
 }
 ```
 
+**⏳ Still on CDN (Optional Features):**
+- **gifenc** (1.0.3) - GIF export (optional, rarely used)
+- **@ffmpeg/ffmpeg** (0.12.7) - Advanced video formats (requires SharedArrayBuffer → HTTPS only, not file://)
+- **@ffmpeg/util** (0.12.1) - FFmpeg utilities
+
+**Bundling Process (Rollup):**
+1. Install dependencies: `npm install`
+2. Run bundler: `npm run bundle:all`
+3. Rollup creates single-file ES6 bundles with:
+   - All internal dependencies resolved
+   - Node.js polyfills (Stream, Buffer) for mediabunny
+   - Browser-specific builds
+4. h264-mp4-encoder requires special handling:
+   - Pre-built UMD bundle copied from node_modules
+   - ES6 `export default` wrapper appended for compatibility
+
 **Impact:**
-- ✅ Basic app functionality: **100% offline** (Three.js, Open Props, Coloris vendored)
-- ⏳ Video export: **Requires CDN on first load**, then cached by Service Worker
-- ⏳ Complete offline: Requires bundling ES modules (future task)
+- ✅ Basic app functionality: **100% offline** (Three.js, Open Props, Coloris)
+- ✅ MP4 video export: **100% offline** (h264-mp4-encoder with embedded WASM)
+- ⏳ GIF export: Requires CDN on first load, then cached
+- ⏳ Advanced formats (FFmpeg): CDN only, not available via file://
 
-**TODO: Complete Vendoring (Future):**
-Proper approach requires bundling:
-```bash
-# Option 1: Use esbuild to bundle each module
-npx esbuild node_modules/canvas-context/index.js --bundle --format=esm --outfile=lib/esm/canvas-context.js
-
-# Option 2: Use rollup
-npx rollup -c --format=esm
-
-# Then update Import Map to local paths
-```
-
-**Pragmatic Decision (v5.4.8):**
-- Core dependencies (Three.js, Open Props, Coloris) 100% vendored = **671 KB**
-- canvas-record dependencies on CDN (esm.sh handles bundling + caching)
-- Service Worker caches CDN modules after first load
-- App works offline after first visit
-- True 100% offline vendoring deferred until build tools are set up
-
-**Total Vendored:** ~671 KB
-**Files in /lib/esm/:** Kept for reference but not used (Import Map points to CDN)
+**Total Vendored:** ~3.5 MB (671 KB + 2.8 MB bundles)
+**Build Required:** Yes - run `npm run bundle:all` after `npm install`
 
 ---
 

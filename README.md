@@ -260,19 +260,47 @@ Infinite scrolling text mapped onto a torus knot geometry with depth fog. Inspir
 3. ✅ Three.js loaded? (check Network tab)
 4. ✅ WebGL supported? (visit https://get.webgl.org)
 
+## 🔨 Building from Source
+
+If you need to rebuild the bundled dependencies (e.g., after updating versions):
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Bundle ES modules with Rollup
+npm run bundle:all
+
+# 3. Bundles are created in lib/esm/bundles/
+# - canvas-context.js (2.1 KB)
+# - canvas-screenshot.js (3.0 KB)
+# - media-codecs.js (15 KB)
+# - mediabunny.js (1.1 MB)
+# - h264-mp4-encoder.js (1.7 MB)
+```
+
+**Note:** The bundled files are already committed to the repository, so building is only needed if you modify dependencies.
+
 ## 💾 Dependencies
 
 **Fully Vendored (Offline-Ready):**
 - **Three.js r115** (646 KB) - 3D WebGL library
 - **Open Props** (3 KB) - CSS design tokens
 - **Coloris** (22 KB) - Modern color picker
-- **canvas-record** - Video export library
+- **canvas-record** (137 KB) - Video export library
+- **MP4 Export Dependencies** (2.8 MB, Rollup-bundled):
+  - canvas-context (2.1 KB)
+  - canvas-screenshot (3.0 KB)
+  - media-codecs (15 KB)
+  - mediabunny (1.1 MB - with Node.js polyfills)
+  - h264-mp4-encoder (1.7 MB - UMD + WASM)
 
-**CDN (Cached by Service Worker):**
-- canvas-record ES module dependencies (esm.sh)
+**CDN (Optional Features, Cached by Service Worker):**
+- gifenc (GIF export - rarely used)
+- @ffmpeg/ffmpeg (Advanced formats - HTTPS only)
 - Fonts (Google Fonts CDN)
 
-**Total Vendored:** ~671 KB
+**Total Vendored:** ~3.5 MB (100% offline MP4 export support)
 
 ## 🔮 Coming Soon
 
