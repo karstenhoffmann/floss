@@ -3,1013 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Floss - Motion Design (IIFE Version)</title>
+    <!--
+    ============================================================================
+    DEPRECATED - Phase 7.3
+    ============================================================================
+    This file is deprecated and exists only as a redirect stub.
 
-    <!-- Open Props - Modern CSS Design Tokens (Vendored locally) -->
-    <link rel="stylesheet" href="./lib/open-props/open-props.min.css" />
-    <link rel="stylesheet" href="./lib/open-props/normalize.min.css" />
+    DO NOT add features to this file.
+    DO NOT use as a reference implementation.
 
-    <!-- Coloris - Modern Color Picker (Vendored locally) -->
-    <link rel="stylesheet" href="./lib/coloris/coloris.min.css"/>
+    Use index.html instead - it works for both file:// and https:// modes.
 
-    <!-- Styles -->
-    <link rel="stylesheet" href="./styles/theme.css">
-    <link rel="stylesheet" href="./styles/preloader.css">
-    <link rel="stylesheet" href="./styles/password-gate.css">
-    <link rel="stylesheet" href="./styles/main-modern.css">
-    <link rel="stylesheet" href="./styles/help-overlay.css">
-    <link rel="stylesheet" href="./styles/settings-overlay.css">
-    <link rel="stylesheet" href="./styles/notifications.css">
-
-    <!-- Three.js (v0.115.0) - Vendored locally -->
-    <script src="./lib/three/three.min.js"></script>
-    <!-- OrbitControls for camera interaction -->
-    <script src="./lib/three/examples/js/controls/OrbitControls.js"></script>
-
+    This file will be removed in a future phase.
+    See: CLAUDE.md → "Single Entry Policy (Phase 7.3+)"
+    ============================================================================
+    -->
+    <meta http-equiv="refresh" content="3;url=index.html">
+    <title>Floss - Redirecting...</title>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
-            overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #0a0a0a;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
             color: #e5e5e5;
-        }
-
-        .iife-notice {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(139, 92, 246, 0.2);
-            border: 1px solid rgba(139, 92, 246, 0.5);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            z-index: 10000;
-        }
-
-        #canvas-container {
-            width: 100vw;
-            height: 100vh;
-        }
-
-        .controls {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(20, 20, 20, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 20px;
+            min-height: 100vh;
             display: flex;
-            gap: 20px;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .control-group label {
-            font-size: 12px;
-            color: #9ca3af;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .control-group input[type="range"] {
-            width: 150px;
-        }
-
-        .control-group input[type="text"] {
-            padding: 6px 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            color: #e5e5e5;
-            font-size: 14px;
-        }
-
-        button {
-            padding: 8px 16px;
-            background: rgba(139, 92, 246, 0.2);
-            border: 1px solid rgba(139, 92, 246, 0.5);
-            border-radius: 6px;
-            color: #e5e5e5;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        button:hover {
-            background: rgba(139, 92, 246, 0.3);
-            border-color: rgba(139, 92, 246, 0.7);
-        }
-
-        .value-display {
-            display: inline-block;
-            min-width: 40px;
-            text-align: center;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            color: #8b5cf6;
-        }
-
-        /* Export Modal Styles */
-        .export-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
             justify-content: center;
-            z-index: 10000;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
         }
-
-        .export-modal-content {
-            background: rgba(20, 20, 20, 0.95);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 12px;
-            padding: 30px;
-            min-width: 400px;
+        .container {
             max-width: 500px;
         }
-
-        .export-modal-content h2 {
-            margin: 0 0 20px 0;
-            color: #e5e5e5;
-            font-size: 20px;
-        }
-
-        .export-options {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .export-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .export-group label {
+        .badge {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            color: #f59e0b;
+            padding: 6px 16px;
+            border-radius: 20px;
             font-size: 12px;
-            color: #9ca3af;
+            font-weight: 600;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            margin-bottom: 24px;
         }
-
-        .export-group input,
-        .export-group select {
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            color: #e5e5e5;
-            font-size: 14px;
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-
-        .export-info {
-            padding: 8px 12px;
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 6px;
-            color: #8b5cf6;
-            font-size: 14px;
-        }
-
-        .export-progress {
-            margin: 20px 0;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #8b5cf6, #a78bfa);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .progress-text {
-            margin-top: 10px;
-            text-align: center;
-            font-size: 14px;
+        .subtitle {
+            font-size: 18px;
             color: #9ca3af;
+            margin-bottom: 32px;
         }
-
-        .export-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
+        .message {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #d1d5db;
+            margin-bottom: 24px;
         }
-
-        .primary-btn {
-            background: rgba(139, 92, 246, 0.8);
+        .redirect-notice {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 24px;
+        }
+        .link {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.2);
             border: 1px solid rgba(139, 92, 246, 0.5);
+            color: #a78bfa;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
-
-        .primary-btn:hover {
-            background: rgba(139, 92, 246, 1);
+        .link:hover {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.7);
+            transform: translateY(-1px);
         }
-
-        .primary-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-top-color: #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 16px auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .note {
+            margin-top: 32px;
+            padding: 16px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            font-size: 13px;
+            color: #93c5fd;
         }
     </style>
 </head>
 <body>
-    <!-- Preloader - App Shell Loading Screen -->
-    <div id="preloader" class="preloader">
-        <div class="preloader__content">
-            <h1 class="preloader__logo">FLOSS</h1>
-            <p class="preloader__tagline">Motion Design</p>
-            <div class="preloader__spinner"></div>
+    <div class="container">
+        <div class="badge">⚠️ Deprecated</div>
+        <h1>FLOSS</h1>
+        <p class="subtitle">Motion Design</p>
+
+        <p class="message">
+            <strong>index-iife.html</strong> has been deprecated.<br>
+            Please use <strong>index.html</strong> instead.
+        </p>
+
+        <div class="spinner"></div>
+        <p class="redirect-notice">Redirecting in 3 seconds...</p>
+
+        <a href="index.html" class="link">Go to index.html now →</a>
+
+        <div class="note">
+            <strong>Why this change?</strong><br>
+            index.html now supports both file:// and https:// modes automatically.
+            No separate IIFE version needed anymore.
         </div>
     </div>
-
-    <!-- Password Gate - App Shell Access Gate (online mode only) -->
-    <div id="password-gate" class="password-gate password-gate--hidden">
-        <div class="password-gate__content">
-            <div class="password-gate__icon">🔒</div>
-            <h1 class="password-gate__title">FLOSS</h1>
-            <p class="password-gate__subtitle">Enter Password</p>
-
-            <form class="password-gate__form" id="password-form">
-                <input
-                    type="password"
-                    id="password-input"
-                    class="password-gate__input"
-                    placeholder="Password"
-                    autocomplete="off"
-                    required
-                />
-                <button type="submit" class="password-gate__button" id="password-submit">
-                    Submit
-                </button>
-                <div class="password-gate__error" id="password-error">
-                    Incorrect password. Please try again.
-                </div>
-            </form>
-
-            <p class="password-gate__hint">
-                This is a client-side access gate.<br>
-                Session expires after 5 minutes.
-            </p>
-        </div>
-    </div>
-
-    <!-- IIFE Version Notice -->
-    <div class="iife-notice">
-        IIFE Version (file:// compatible)
-    </div>
-
-    <!-- Canvas Container -->
-    <div id="canvas-container"></div>
-
-    <!-- Controls -->
-    <div class="controls">
-        <div class="control-group">
-            <label>Text</label>
-            <input type="text" id="text-input" value="FLOSS" maxlength="10">
-        </div>
-
-        <div class="control-group">
-            <label>Rotation Speed</label>
-            <input type="range" id="rotation-speed" min="0" max="5" step="0.1" value="1">
-            <span class="value-display" id="rotation-speed-value">1.0</span>
-        </div>
-
-        <div class="control-group">
-            <label>Scale</label>
-            <input type="range" id="scale-slider" min="0.5" max="3" step="0.1" value="1">
-            <span class="value-display" id="scale-value">1.0</span>
-        </div>
-
-        <button id="reset-btn">Reset Camera</button>
-        <button id="export-btn">📹 Export Video</button>
-    </div>
-
-    <!-- Export Modal -->
-    <div id="export-modal" class="export-modal" style="display: none;">
-        <div class="export-modal-content">
-            <h2>Export Video (MP4)</h2>
-
-            <div class="export-options">
-                <div class="export-group">
-                    <label>Duration (seconds)</label>
-                    <input type="number" id="export-duration" min="1" max="30" step="0.1" value="5">
-                </div>
-
-                <div class="export-group">
-                    <label>Frame Rate</label>
-                    <select id="export-fps">
-                        <option value="30" selected>30 FPS</option>
-                        <option value="60">60 FPS</option>
-                    </select>
-                </div>
-
-                <div class="export-group">
-                    <label>Resolution</label>
-                    <div class="export-info">1920×1080 (Full HD)</div>
-                </div>
-            </div>
-
-            <div id="export-progress" class="export-progress" style="display: none;">
-                <div class="progress-bar">
-                    <div id="progress-fill" class="progress-fill"></div>
-                </div>
-                <div id="progress-text" class="progress-text">Rendering...</div>
-            </div>
-
-            <div class="export-actions">
-                <button id="start-export-btn" class="primary-btn">Start Export</button>
-                <button id="cancel-export-btn">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Coloris Color Picker (Vendored locally) -->
-    <script src="./lib/coloris/coloris.min.js"></script>
-
-    <!-- Video Export Libraries (IIFE bundles) -->
-    <!-- h264-mp4-encoder: WASM-based MP4 encoder (1.7 MB) -->
-    <script src="./lib/canvas-record/h264-mp4-encoder.umd.js"></script>
-    <!-- canvas-record: Recording library with all dependencies (424 KB) -->
-    <script src="./lib/canvas-record/canvas-record.iife.js"></script>
-
-    <!-- Main App (IIFE) -->
-    <script>
-    /**
-     * Initialize Floss App (IIFE Version)
-     * Main app logic - called by window.FlossApp.start()
-     */
-    function initializeApp() {
-        'use strict';
-
-        console.log(`
-╔════════════════════════════════════════════════════════════════╗
-║   🎨 Floss - Motion Design (IIFE Version)                      ║
-║   Version: 5.6.0       Date: 2025-11-24 14:30                 ║
-║   Mode: file:// compatible + MP4 Export                       ║
-╚════════════════════════════════════════════════════════════════╝
-        `);
-
-        // Check WebGL
-        if (!isWebGLAvailable()) {
-            document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;"><h1>WebGL not supported</h1></div>';
-            return;
-        }
-
-        function isWebGLAvailable() {
-            try {
-                const canvas = document.createElement('canvas');
-                return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
-            } catch (e) {
-                return false;
-            }
-        }
-
-        // =====================================================================
-        // Scene Setup
-        // =====================================================================
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0a0a0a);
-
-        const camera = new THREE.PerspectiveCamera(
-            50,
-            window.innerWidth / window.innerHeight,
-            0.1,
-            1000
-        );
-        camera.position.set(0, 0, 5);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        container.appendChild(renderer.domElement);
-
-        // OrbitControls
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-
-        // Save initial state for reset
-        const initialCameraPosition = camera.position.clone();
-        const initialControlsTarget = new THREE.Vector3(0, 0, 0);
-
-        // =====================================================================
-        // Text Texture Generator
-        // =====================================================================
-        function createTextTexture(text) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 1024;
-            canvas.height = 1024;
-            const ctx = canvas.getContext('2d');
-
-            // Background
-            ctx.fillStyle = '#000000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Text (repeated pattern for better tiling)
-            ctx.fillStyle = '#8b5cf6';  // Violet color
-            ctx.font = 'bold 120px Arial Black, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
-            // Tile text multiple times for better coverage
-            const cols = 3;
-            const rows = 3;
-            const cellWidth = canvas.width / cols;
-            const cellHeight = canvas.height / rows;
-
-            for (let row = 0; row < rows; row++) {
-                for (let col = 0; col < cols; col++) {
-                    const x = cellWidth * (col + 0.5);
-                    const y = cellHeight * (row + 0.5);
-                    ctx.fillText(text, x, y);
-                }
-            }
-
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.wrapS = THREE.RepeatWrapping;
-            texture.wrapT = THREE.RepeatWrapping;
-            texture.repeat.set(2, 2);
-            texture.needsUpdate = true;
-            return texture;
-        }
-
-        // =====================================================================
-        // Create Endless Effect (Torus)
-        // =====================================================================
-        let mesh;
-        let settings = {
-            text: 'FLOSS',
-            rotationSpeed: 1.0,
-            scale: 1.0
-        };
-
-        function createEffect() {
-            // Save old rotation to preserve animation state
-            let oldRotation = null;
-            if (mesh) {
-                oldRotation = {
-                    x: mesh.rotation.x,
-                    y: mesh.rotation.y,
-                    z: mesh.rotation.z
-                };
-            }
-
-            // Remove old mesh
-            if (mesh) {
-                scene.remove(mesh);
-                mesh.geometry.dispose();
-                mesh.material.dispose();
-                if (mesh.material.map) {
-                    mesh.material.map.dispose();
-                }
-            }
-
-            // Create geometry (Torus has simpler UVs than TorusKnot)
-            const geometry = new THREE.TorusGeometry(1.2, 0.4, 32, 64);
-
-            // Create material with text texture
-            const texture = createTextTexture(settings.text);
-            const material = new THREE.MeshBasicMaterial({
-                map: texture,
-                color: 0xffffff
-            });
-
-            mesh = new THREE.Mesh(geometry, material);
-            mesh.scale.setScalar(settings.scale);
-
-            // Restore rotation to preserve animation continuity
-            if (oldRotation) {
-                mesh.rotation.set(oldRotation.x, oldRotation.y, oldRotation.z);
-            }
-
-            scene.add(mesh);
-        }
-
-        createEffect();
-
-        // =====================================================================
-        // Animation Loop
-        // =====================================================================
-        let lastTime = performance.now();
-        function animate(currentTime) {
-            requestAnimationFrame(animate);
-
-            // Calculate delta time in seconds
-            const deltaTime = (currentTime - lastTime) / 1000;
-            lastTime = currentTime;
-
-            // Incremental rotation (no jumps when settings change)
-            if (mesh) {
-                mesh.rotation.x += deltaTime * settings.rotationSpeed * 0.3;
-                mesh.rotation.y += deltaTime * settings.rotationSpeed * 0.5;
-            }
-
-            controls.update();
-            renderer.render(scene, camera);
-        }
-
-        animate(performance.now());
-
-        // =====================================================================
-        // UI Controls
-        // =====================================================================
-        const textInput = document.getElementById('text-input');
-        const rotationSpeedSlider = document.getElementById('rotation-speed');
-        const rotationSpeedValue = document.getElementById('rotation-speed-value');
-        const scaleSlider = document.getElementById('scale-slider');
-        const scaleValue = document.getElementById('scale-value');
-        const resetBtn = document.getElementById('reset-btn');
-
-        textInput.addEventListener('input', (e) => {
-            settings.text = e.target.value || 'FLOSS';
-            createEffect();
-        });
-
-        rotationSpeedSlider.addEventListener('input', (e) => {
-            settings.rotationSpeed = parseFloat(e.target.value);
-            rotationSpeedValue.textContent = settings.rotationSpeed.toFixed(1);
-        });
-
-        scaleSlider.addEventListener('input', (e) => {
-            settings.scale = parseFloat(e.target.value);
-            scaleValue.textContent = settings.scale.toFixed(1);
-            if (mesh) {
-                mesh.scale.setScalar(settings.scale);
-            }
-        });
-
-        resetBtn.addEventListener('click', () => {
-            // Reset camera position
-            camera.position.copy(initialCameraPosition);
-
-            // Reset controls target (orbit center)
-            controls.target.copy(initialControlsTarget);
-
-            // Reset camera rotation
-            camera.rotation.set(0, 0, 0);
-
-            // Reset mesh rotation (visual feedback that reset happened)
-            if (mesh) {
-                mesh.rotation.set(0, 0, 0);
-            }
-
-            // Force update controls
-            controls.update();
-
-            console.log('✓ Camera and mesh reset');
-
-            // Visual feedback: flash the button
-            resetBtn.style.background = 'rgba(139, 92, 246, 0.5)';
-            setTimeout(() => {
-                resetBtn.style.background = 'rgba(139, 92, 246, 0.2)';
-            }, 200);
-        });
-
-        // =====================================================================
-        // Window Resize
-        // =====================================================================
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        // =====================================================================
-        // Video Export System
-        // =====================================================================
-        const exportModal = document.getElementById('export-modal');
-        const exportBtn = document.getElementById('export-btn');
-        const startExportBtn = document.getElementById('start-export-btn');
-        const cancelExportBtn = document.getElementById('cancel-export-btn');
-        const exportDurationInput = document.getElementById('export-duration');
-        const exportFpsSelect = document.getElementById('export-fps');
-        const exportProgress = document.getElementById('export-progress');
-        const progressFill = document.getElementById('progress-fill');
-        const progressText = document.getElementById('progress-text');
-
-        // Show export modal
-        exportBtn.addEventListener('click', () => {
-            exportModal.style.display = 'flex';
-            console.log('→ Export modal opened');
-        });
-
-        // Cancel export
-        cancelExportBtn.addEventListener('click', () => {
-            exportModal.style.display = 'none';
-            exportProgress.style.display = 'none';
-            startExportBtn.disabled = false;
-            console.log('← Export cancelled');
-        });
-
-        // Start export
-        startExportBtn.addEventListener('click', async () => {
-            const duration = parseFloat(exportDurationInput.value);
-            const fps = parseInt(exportFpsSelect.value);
-
-            console.log(`▶ Starting video export: ${duration}s @ ${fps}fps`);
-
-            // Disable button during export
-            startExportBtn.disabled = true;
-            exportProgress.style.display = 'block';
-            progressFill.style.width = '0%';
-            progressText.textContent = 'Initializing...';
-
-            try {
-                await startVideoExport({ duration, fps });
-            } catch (error) {
-                console.error('Export failed:', error);
-                alert('Export failed: ' + error.message);
-                startExportBtn.disabled = false;
-                exportProgress.style.display = 'none';
-            }
-        });
-
-        /**
-         * Start video export (offline rendering)
-         */
-        async function startVideoExport(options) {
-            const { duration, fps } = options;
-            const width = 1920;
-            const height = 1080;
-            const totalFrames = Math.ceil(duration * fps);
-
-            console.log(`  Resolution: ${width}×${height}`);
-            console.log(`  Total frames: ${totalFrames}`);
-
-            // 1. Create offscreen canvas and renderer
-            const offscreenCanvas = document.createElement('canvas');
-            offscreenCanvas.width = width;
-            offscreenCanvas.height = height;
-
-            const offscreenRenderer = new THREE.WebGLRenderer({
-                canvas: offscreenCanvas,
-                antialias: true,
-                alpha: false,
-                preserveDrawingBuffer: true
-            });
-
-            offscreenRenderer.setSize(width, height);
-            offscreenRenderer.setPixelRatio(1);
-
-            console.log('✓ Offscreen renderer created');
-
-            // 2. Create offscreen scene (clone of main scene)
-            const offscreenScene = new THREE.Scene();
-            offscreenScene.background = new THREE.Color(0x0a0a0a);
-
-            // Clone mesh to offscreen scene
-            const offscreenGeometry = mesh.geometry.clone();
-            const offscreenTexture = mesh.material.map.clone();
-            const offscreenMaterial = new THREE.MeshBasicMaterial({
-                map: offscreenTexture,
-                color: 0xffffff
-            });
-            const offscreenMesh = new THREE.Mesh(offscreenGeometry, offscreenMaterial);
-            offscreenMesh.scale.copy(mesh.scale);
-            offscreenScene.add(offscreenMesh);
-
-            console.log('✓ Offscreen scene created');
-
-            // 3. Setup camera for export (16:9 aspect)
-            const exportCamera = new THREE.PerspectiveCamera(
-                50,
-                width / height,
-                0.1,
-                1000
-            );
-            exportCamera.position.copy(camera.position);
-            exportCamera.rotation.copy(camera.rotation);
-
-            // 4. Initialize canvas-record Recorder
-            console.log('→ Initializing canvas-record Recorder...');
-
-            const gl = offscreenRenderer.context;
-
-            if (!gl) {
-                throw new Error('Failed to get WebGL context from offscreen renderer');
-            }
-
-            // Create MP4WasmEncoder explicitly
-            const encoder = new CanvasRecord.Encoders.MP4WasmEncoder({
-                extension: 'mp4'
-            });
-
-            console.log('  Using encoder:', encoder.constructor.name);
-
-            // Calculate bitrate manually
-            const motionRank = 4;
-            const bitrateMode = 'variable';
-            const bitrate = Math.round(
-                width * height * fps * motionRank * 0.07 * (bitrateMode === 'variable' ? 0.75 : 1)
-            );
-
-            console.log(`  Bitrate: ${(bitrate / 1_000_000).toFixed(1)} Mbps (${bitrateMode})`);
-
-            const recorder = new CanvasRecord.Recorder(gl, {
-                name: `floss-export-${Date.now()}.mp4`,
-                duration: duration,
-                frameRate: fps,
-                download: false,
-                extension: 'mp4',
-                encoder: encoder,
-                encoderOptions: {
-                    bitrateMode: bitrateMode,
-                    bitrate: bitrate
-                }
-            });
-
-            console.log('✓ Recorder initialized');
-
-            // 5. Start recording (initOnly - don't call first step yet)
-            await recorder.start({ initOnly: true });
-            console.log('✓ Recording started - rendering frames...');
-
-            progressText.textContent = 'Rendering frames...';
-
-            // 6. Render frames offline (frame-perfect, deterministic)
-            const startTime = performance.now();
-            const frameDuration = 1 / fps;
-
-            for (let frameNumber = 0; frameNumber < totalFrames; frameNumber++) {
-                const time = frameNumber * frameDuration;
-
-                // Update mesh rotation (deterministic)
-                offscreenMesh.rotation.x = time * settings.rotationSpeed * 0.3;
-                offscreenMesh.rotation.y = time * settings.rotationSpeed * 0.5;
-
-                // Render frame
-                offscreenRenderer.render(offscreenScene, exportCamera);
-
-                // Capture frame
-                await recorder.step();
-
-                // Update progress
-                const percentage = ((frameNumber + 1) / totalFrames) * 100;
-                progressFill.style.width = percentage + '%';
-                progressText.textContent = `Rendering frame ${frameNumber + 1}/${totalFrames} (${percentage.toFixed(0)}%)`;
-
-                // Log progress every second worth of frames
-                if ((frameNumber + 1) % fps === 0) {
-                    const elapsed = (performance.now() - startTime) / 1000;
-                    const speed = (frameNumber + 1) / elapsed;
-                    console.log(`  Frame ${frameNumber + 1}/${totalFrames} (${percentage.toFixed(1)}%) - ${speed.toFixed(1)}fps render speed`);
-                }
-            }
-
-            const elapsed = (performance.now() - startTime) / 1000;
-            const avgSpeed = totalFrames / elapsed;
-            console.log(`✓ All frames rendered in ${elapsed.toFixed(2)}s (${avgSpeed.toFixed(1)}× realtime)`);
-
-            // 7. Stop recording and get buffer
-            progressText.textContent = 'Finalizing video...';
-            console.log('→ Stopping recording...');
-
-            const buffer = await recorder.stop();
-            console.log('✓ Recording stopped, buffer size:', buffer ? buffer.byteLength : 0, 'bytes');
-
-            if (!buffer || buffer.byteLength === 0) {
-                throw new Error('Failed to generate video buffer');
-            }
-
-            // 8. Convert to Blob and download
-            const blob = new Blob([buffer], { type: 'video/mp4' });
-            const sizeMB = (blob.size / 1024 / 1024).toFixed(2);
-            console.log('✓ Blob created, size:', sizeMB, 'MB');
-
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = `floss-export-${Date.now()}.mp4`;
-            document.body.appendChild(a);
-            a.click();
-
-            // Cleanup
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }, 100);
-
-            console.log(`✓ Download triggered: ${a.download}`);
-
-            // Cleanup offscreen resources
-            offscreenGeometry.dispose();
-            offscreenMaterial.dispose();
-            offscreenTexture.dispose();
-            offscreenRenderer.dispose();
-
-            // Success - close modal after short delay
-            progressFill.style.width = '100%';
-            progressText.textContent = `Export complete! (${sizeMB} MB)`;
-
-            setTimeout(() => {
-                exportModal.style.display = 'none';
-                exportProgress.style.display = 'none';
-                startExportBtn.disabled = false;
-                progressFill.style.width = '0%';
-            }, 2000);
-        }
-
-        console.log('✓ Floss IIFE initialized successfully (with video export)');
-    }
-
-    /**
-     * FlossApp Start API (IIFE Version)
-     * Provides unified entry point matching ES modules version
-     */
-    window.FlossApp = {
-        /**
-         * Start the Floss application
-         * @param {Object} config - Configuration object
-         * @param {string} config.mode - 'online' | 'offline' (for logging/telemetry only)
-         */
-        start(config = {}) {
-            const { mode = 'offline' } = config;
-            console.log(`🚀 Floss starting in ${mode} mode (IIFE)`);
-            initializeApp();
-        }
-    };
-
-    // Auto-start with preloader + password gate
-    (function() {
-        // Password Gate Configuration (inline for IIFE version)
-        const CONFIG = {
-            passwordHash: "a4a194de8888ee539ae670f2241cb86df8c607a3a5dc7554c806dc214fe3587c", // "capy"
-            sessionTimeout: 300000, // 5 minutes
-            sessionKey: 'floss-session-token'
-        };
-
-        const preloader = document.getElementById('preloader');
-        const passwordGate = document.getElementById('password-gate');
-        const passwordForm = document.getElementById('password-form');
-        const passwordInput = document.getElementById('password-input');
-        const passwordSubmit = document.getElementById('password-submit');
-        const passwordError = document.getElementById('password-error');
-
-        // Environment detection
-        function isOnlineMode() {
-            const protocol = window.location.protocol;
-            return protocol === 'https:' || protocol === 'http:';
-        }
-
-        // Session management
-        function hasValidSession() {
-            try {
-                const sessionData = localStorage.getItem(CONFIG.sessionKey);
-                if (!sessionData) return false;
-
-                const { timestamp } = JSON.parse(sessionData);
-                const now = Date.now();
-                const elapsed = now - timestamp;
-
-                return elapsed < CONFIG.sessionTimeout;
-            } catch (error) {
-                console.error('Error checking session:', error);
-                return false;
-            }
-        }
-
-        function createSession() {
-            try {
-                const sessionData = {
-                    timestamp: Date.now(),
-                    version: '1.0'
-                };
-                localStorage.setItem(CONFIG.sessionKey, JSON.stringify(sessionData));
-                console.log('✓ Session created (expires in', CONFIG.sessionTimeout / 1000, 'seconds)');
-            } catch (error) {
-                console.error('Error creating session:', error);
-            }
-        }
-
-        // Password validation
-        async function hashPassword(password) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(password.toLowerCase());
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-            return hashHex;
-        }
-
-        async function validatePassword(password) {
-            try {
-                const inputHash = await hashPassword(password);
-                return inputHash === CONFIG.passwordHash;
-            } catch (error) {
-                console.error('Error validating password:', error);
-                return false;
-            }
-        }
-
-        function shouldShowPasswordGate() {
-            if (!isOnlineMode()) {
-                return false;
-            }
-            if (hasValidSession()) {
-                console.log('✓ Valid session found, skipping password gate');
-                return false;
-            }
-            console.log('⚠ No valid session, showing password gate');
-            return true;
-        }
-
-        // UI functions
-        function startApp() {
-            console.log('🚀 Starting Floss app...');
-            window.FlossApp.start({ mode: isOnlineMode() ? 'online' : 'offline' });
-        }
-
-        function showPasswordGate() {
-            passwordGate.classList.remove('password-gate--hidden');
-            passwordInput.focus();
-        }
-
-        function hidePasswordGate() {
-            passwordGate.classList.add('password-gate--hidden');
-            setTimeout(() => {
-                passwordGate.remove();
-            }, 500);
-        }
-
-        async function handlePasswordSubmit(event) {
-            event.preventDefault();
-
-            const password = passwordInput.value.trim();
-            if (!password) return;
-
-            passwordSubmit.disabled = true;
-            passwordInput.disabled = true;
-
-            const isValid = await validatePassword(password);
-
-            if (isValid) {
-                createSession();
-                passwordError.classList.remove('password-gate__error--visible');
-                hidePasswordGate();
-                startApp();
-            } else {
-                passwordError.classList.add('password-gate__error--visible');
-                passwordInput.value = '';
-                passwordInput.focus();
-
-                passwordSubmit.disabled = false;
-                passwordInput.disabled = false;
-
-                setTimeout(() => {
-                    passwordError.classList.remove('password-gate__error--visible');
-                }, 3000);
-            }
-        }
-
-        // Initialize app shell
-        function initAppShell() {
-            setTimeout(() => {
-                preloader.classList.add('preloader--hidden');
-
-                setTimeout(() => {
-                    preloader.remove();
-                }, 500);
-
-                if (shouldShowPasswordGate()) {
-                    showPasswordGate();
-                } else {
-                    startApp();
-                }
-            }, 1500);
-        }
-
-        // Setup event handlers
-        passwordForm.addEventListener('submit', handlePasswordSubmit);
-
-        // Start initialization
-        initAppShell();
-    })();
-    </script>
 </body>
 </html>

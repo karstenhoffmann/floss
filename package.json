@@ -13,6 +13,7 @@
     "bundle:all": "npx rollup -c && npm run copy:h264",
     "bundle:dev": "npx rollup -c --watch",
     "bundle:iife": "npx rollup -c rollup.config.iife.js && npm run copy:h264-iife",
+    "bundle:app": "npx rollup -c rollup.config.app.js",
     "copy:h264": "mkdir -p lib/esm/bundles && cp node_modules/h264-mp4-encoder/embuild/dist/h264-mp4-encoder.web.js lib/esm/bundles/h264-mp4-encoder.js",
     "copy:h264-iife": "cp node_modules/h264-mp4-encoder/embuild/dist/h264-mp4-encoder.web.js lib/canvas-record/h264-mp4-encoder.umd.js"
   },

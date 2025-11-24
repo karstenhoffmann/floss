@@ -7,6 +7,10 @@
  * - Environment-specific wiring
  *
  * Core app logic lives in js/app.js - this file only handles startup.
+ *
+ * This file is used in two ways:
+ * 1. ESM: Loaded directly via <script type="module">
+ * 2. IIFE: Bundled by Rollup into floss-app.iife.js
  */
 
 import App from './app.js';
@@ -15,7 +19,7 @@ import App from './app.js';
  * FlossApp Start API
  * Provides unified entry point for both online (ES modules) and offline (IIFE) modes
  */
-window.FlossApp = {
+const FlossApp = {
     /**
      * Start the Floss application
      * @param {Object} config - Configuration object
@@ -24,7 +28,7 @@ window.FlossApp = {
     start(config = {}) {
         const { mode = 'online' } = config;
 
-        console.log(`🚀 Floss starting in ${mode} mode (ES modules)`);
+        console.log(`🚀 Floss starting in ${mode} mode`);
 
         // Initialize app when DOM is ready
         if (document.readyState === 'loading') {
@@ -38,3 +42,9 @@ window.FlossApp = {
         }
     }
 };
+
+// Expose on window for ESM usage
+window.FlossApp = FlossApp;
+
+// Export for IIFE bundle (Rollup will use this)
+export { FlossApp };
