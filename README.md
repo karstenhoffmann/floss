@@ -1,103 +1,107 @@
-# floss
+# Floss - Professional Kinetic Typography Motion Design
 
-A professional, browser-based kinetic typography motion design tool for creating stunning text animations in real-time. No build step required – just open and create!
+A professional, browser-based kinetic typography motion design tool for creating stunning text animations in real-time. Built with Three.js, designed for motion designers.
+
+**🌐 Live Demo:** https://karstenhoffmann.github.io/floss/
 
 ## 🌟 Features
 
-- **Real-time Effects**: Beautiful 3D kinetic typography effects powered by Three.js
-- **Live Parameter Controls**: Adjust text, colors, animation speed, and more in real-time
-- **Preset Management**: Save, load, export, and import your favorite designs
-- **Offline Support**: Works completely offline after first load (via Service Worker)
-- **No Build Step**: Pure ES6 modules – runs directly in the browser
-- **60fps+ Performance**: Buttery smooth animations on modern hardware
-- **Dark Professional UI**: Minimal, After Effects-inspired interface
+- **Real-time 3D Effects**: Beautiful kinetic typography powered by Three.js r115
+- **Live Parameter Controls**: Adjust text, colors, animation speed in real-time
+- **Preset Management**: Save, load, export, and import your designs
+- **Video Export**: Export MP4 videos (1920×1080, 30/60fps) - PowerPoint compatible
+- **Offline-First**: Works completely offline after first load (Service Worker)
+- **No Build Step**: Pure ES6 modules - runs directly in browser
+- **60fps+ Performance**: Smooth animations on modern desktop hardware
+- **Professional UI**: Dark, minimal, After Effects-inspired interface
 - **Keyboard Shortcuts**: Fast workflow with comprehensive shortcuts
-- **Export/Import**: Save settings as JSON files for sharing and backup
-- **Video Export**: Export high-quality MP4 videos (1920×1080, 30/60fps) for PowerPoint presentations
 
-## 📦 Quick Start
+## 📦 Two Usage Modes
 
-### ⚠️ IMPORTANT: Local Server Required
+### Mode 1: Online (GitHub Pages) ⭐ Recommended
 
-This app **requires a local web server** to run (due to ES6 modules and Service Worker). **Do NOT open `index.html` directly by double-clicking!**
+**Best for:** Regular use, development, testing
 
-Choose one of the methods below:
-
-### Option A: VS Code Live Server (⭐ Recommended)
-
-1. Install the [Live Server extension](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) in VS Code
-2. Open the `/app` folder in VS Code
-3. Right-click on `index.html` → **"Open with Live Server"**
-4. The app opens at `http://localhost:5500` with auto-reload on save
-
-### Option B: Python SimpleHTTPServer (No installation on macOS/Linux)
-
-```bash
-cd app
-python3 -m http.server 8000
+```
+URL: https://karstenhoffmann.github.io/floss/
+File: index.html
+Tech: ES6 Modules + CDN dependencies
 ```
 
-Then open in your browser: **http://localhost:8000**
+**Requirements:**
+- Modern browser (Chrome, Firefox, Safari)
+- Internet connection on first load (CDN downloads)
+- Offline capable after first load (Service Worker caches everything)
 
-### Option C: Node.js (if installed)
-
-```bash
-cd app
-npx serve
-```
-
-The app will open automatically in your browser.
-
-### Option D: PHP Built-in Server (if PHP installed)
-
-```bash
-cd app
-php -S localhost:8000
-```
-
-Then open: **http://localhost:8000**
-
-## 🚀 First Load
-
-On the first load:
-- The app will download Three.js from CDN
-- Service Worker will cache all assets for offline use
-- After the first load, the app works **100% offline**
-
-You should see:
-- ✓ Three.js scene initialized
-- ✓ Effect registered: Endless
-- ✓ ServiceWorker registered
-- ✓ Render loop started
-- ✓ App initialized
-
-## 📱 Testing on Mobile (iPhone/iPad)
-
-### Option 1: GitHub Pages (Easiest)
-
-1. Push this repo to GitHub
+**To deploy your own:**
+1. Fork this repository
 2. Go to **Settings** → **Pages**
-3. Deploy from `main` branch, `/app` folder
-4. Access via: `https://yourusername.github.io/repo-name/`
-5. On iPhone: Tap **Share** → **Add to Home Screen** for full-screen experience
+3. Deploy from branch, **`/ (root)`** folder
+4. Access at: `https://yourusername.github.io/floss/`
 
-### Option 2: Local Network
+### Mode 2: Offline (file:// protocol)
 
-1. Start local server (see above)
-2. Find your computer's local IP:
-   - **macOS**: System Settings → Network
-   - **Windows**: `ipconfig` in Command Prompt
-   - **Linux**: `ip addr` or `ifconfig`
-3. On iPhone, open Safari: `http://YOUR-LOCAL-IP:8000`
-4. Both devices must be on the same WiFi network
+**Best for:** Air-gapped machines, complete offline use, copy-paste portability
 
-## ⌨️ Keyboard Shortcuts
+```
+File: index-iife.html
+Tech: IIFE bundle, all dependencies vendored locally
+```
 
-### Navigation
-- **Space** - Toggle UI visibility (show/hide all panels)
-- **H** - Show/hide help overlay
-- **F** - Toggle FPS counter
-- **Esc** - Close modals/overlays
+**Usage:**
+1. Download/clone this repository
+2. Double-click `index-iife.html`
+3. Works immediately - no server, no internet required
+
+**Features:**
+- ✅ Simplified effect (Torus geometry)
+- ✅ All libraries vendored (Three.js, Open Props, Coloris)
+- ✅ No CDN dependencies
+- ✅ Works on air-gapped machines
+
+## 🚀 Local Development
+
+### Option A: Python SimpleHTTPServer (macOS/Linux)
+
+```bash
+python3 -m http.server 8080
+# Open http://localhost:8080
+```
+
+### Option B: VS Code Live Server
+
+1. Install [Live Server extension](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)
+2. Right-click `index.html` → **"Open with Live Server"**
+
+### Option C: Node.js
+
+```bash
+npx serve
+# Opens automatically in browser
+```
+
+## 📂 Repository Structure
+
+```
+/
+├── index.html              # Main app (ES6 modules, CDN dependencies)
+├── index-iife.html         # Offline version (IIFE, vendored deps)
+├── js/                     # Application code (ES6 modules)
+│   ├── app.js             # Main controller
+│   ├── core/              # Core systems
+│   ├── effects/           # Effect implementations
+│   ├── ui/                # UI components
+│   └── utils/             # Utilities
+├── styles/                # CSS stylesheets
+├── lib/                   # Vendored dependencies
+│   ├── three/             # Three.js r115 (646 KB)
+│   ├── open-props/        # CSS design tokens (3 KB)
+│   ├── coloris/           # Color picker (22 KB)
+│   └── canvas-record/     # Video export library
+├── manifest.json          # PWA manifest
+├── service-worker.js      # Offline support
+└── reference/             # Original Codrops tutorial (read-only)
+```
 
 ### Effects
 - **1-9** - Quick-switch between effects
@@ -256,23 +260,19 @@ Infinite scrolling text mapped onto a torus knot geometry with depth fog. Inspir
 3. ✅ Three.js loaded? (check Network tab)
 4. ✅ WebGL supported? (visit https://get.webgl.org)
 
-## 📁 Project Structure
+## 💾 Dependencies
 
-```
-/app/
-├── index.html              # Entry point
-├── manifest.json           # PWA manifest
-├── service-worker.js       # Offline support
-├── README.md               # This file
-├── styles/                 # All CSS files
-├── js/
-│   ├── app.js              # Main application
-│   ├── core/               # Core systems (state, scene, renderer, managers)
-│   ├── effects/            # Effect plugins
-│   ├── ui/                 # UI components
-│   └── utils/              # Utilities
-└── fonts/                  # (Future: bundled fonts)
-```
+**Fully Vendored (Offline-Ready):**
+- **Three.js r115** (646 KB) - 3D WebGL library
+- **Open Props** (3 KB) - CSS design tokens
+- **Coloris** (22 KB) - Modern color picker
+- **canvas-record** - Video export library
+
+**CDN (Cached by Service Worker):**
+- canvas-record ES module dependencies (esm.sh)
+- Fonts (Google Fonts CDN)
+
+**Total Vendored:** ~671 KB
 
 ## 🔮 Coming Soon
 
