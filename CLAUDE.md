@@ -1,9 +1,120 @@
 # Claude Code Session Context
 
-**Last Updated:** 2025-11-23
+**Last Updated:** 2025-11-24
 **Project:** Floss - Professional Kinetic Typography Motion Design Tool
 **Repository:** https://github.com/karstenhoffmann/floss
 **Deployment:** https://karstenhoffmann.github.io/floss/
+
+---
+
+## 🚀 CRITICAL: Session Bootstrapping & File-Awareness Policy
+
+**MANDATORY FOR EVERY NEW SESSION:**
+
+### 1. Session Start Protocol
+
+**When starting a new Claude Code session, ALWAYS do this FIRST:**
+
+```
+Step 1: Check for status files
+  - Read PHASE_OVERVIEW.md (if exists)
+  - Read CURRENT_STATUS.md (if exists)
+
+Step 2: Summarize loaded context
+  - Briefly confirm what phase/status was loaded
+  - Show current branch, version, recent work
+  - Demonstrate that context is correctly understood
+
+Step 3: DO NOT assume chat history is current
+  - NEVER rely on information from previous chat messages
+  - ALWAYS use the status files as source of truth
+  - If files don't exist, acknowledge and proceed normally
+```
+
+**Example Session Start:**
+```
+✅ Status files loaded:
+  - PHASE_OVERVIEW.md: Phase 4 (MP4 Export) - Complete
+  - CURRENT_STATUS.md: Branch claude/convert-index-iife-XXX, v5.5.0
+  - Last work: Rollup bundling for offline MP4 export
+
+Ready to continue. What would you like to work on?
+```
+
+### 2. Status File Update Protocol
+
+**When to propose updates:**
+- ✅ Phase completed (e.g., "Phase 4: Bundling - Complete")
+- ✅ New branch created or switched
+- ✅ Architecture decision made (e.g., "Use Rollup instead of esbuild")
+- ✅ Major milestone reached (e.g., "100% offline MP4 export working")
+- ✅ Significant blocker encountered (e.g., "FFmpeg requires HTTPS, not file://")
+
+**How to propose updates:**
+```
+🔄 Suggest: "Should I update PHASE_OVERVIEW.md with:
+   - Phase 4: Complete (Rollup bundling, 2.8 MB bundles)
+   - Phase 5: Next (Testing on GitHub Pages)"
+
+Wait for user approval: "Yes" / "No" / "Later"
+```
+
+**CRITICAL RULES:**
+- ❌ NEVER update status files automatically
+- ❌ NEVER overwrite files without explicit permission
+- ✅ ALWAYS propose changes, then wait for approval
+- ✅ ALWAYS show what will be written before writing
+
+### 3. File Modification Policy
+
+**Before modifying ANY status/tracking file:**
+
+1. **Show proposed changes:**
+   ```
+   I propose updating CURRENT_STATUS.md with:
+
+   [Show exact content that will be written]
+
+   Proceed? (yes/no)
+   ```
+
+2. **Wait for explicit approval:**
+   - User says "yes" → Proceed with write
+   - User says "no" → Don't write, offer alternatives
+   - User says "later" → Make note, don't write now
+
+3. **Never guess or assume:**
+   - Don't reorganize files without asking
+   - Don't delete sections without confirmation
+   - Don't merge information without approval
+
+### 4. File Awareness Best Practices
+
+**Status files are the source of truth:**
+- PHASE_OVERVIEW.md → What phases exist, which are done, what's next
+- CURRENT_STATUS.md → Current branch, version, recent commits, blockers
+- CLAUDE.md (this file) → Project rules, architecture, workflows
+
+**When files conflict with chat history:**
+- ✅ Trust the files (they persist across sessions)
+- ❌ Don't trust chat history (it's session-specific)
+- 🔄 If unsure, ask user to clarify
+
+**File naming conventions:**
+- Use UPPERCASE for status files (PHASE_OVERVIEW.md, CURRENT_STATUS.md)
+- Keep them in repository root for easy access
+- Don't create new status file types without discussing first
+
+### 5. Self-Check Before Every Response
+
+Ask yourself:
+- [ ] Did I read status files at session start?
+- [ ] Is my understanding based on files, not old chat context?
+- [ ] Did I propose (not execute) status file updates?
+- [ ] Did I wait for approval before writing?
+- [ ] Did I explain what I'm about to write?
+
+**If ANY checkbox is unchecked → Fix before proceeding!**
 
 ---
 
