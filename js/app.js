@@ -1471,6 +1471,7 @@ class App {
             const allSwatches = [...defaultSwatches, ...recentColors];
 
             Coloris({
+                el: '.coloris',          // Only attach to elements with class 'coloris'
                 theme: 'pill',
                 themeMode: 'dark',
                 alpha: false,
@@ -1479,11 +1480,41 @@ class App {
                 clearButton: false,
                 closeButton: true,
                 closeLabel: 'OK',
-                selectInput: false,  // Don't auto-select text (prevents conflicts)
-                focusInput: true     // Keep input focused (prevents premature closing)
+                selectInput: false,      // Don't auto-select text
+                focusInput: false,       // Don't auto-focus input (prevents interference)
+                inline: false,           // Use popup mode, not inline
+                defaultColor: '#000000',
+                a11y: {
+                    open: 'Open color picker',
+                    close: 'Close color picker',
+                    marker: 'Saturation: {s}. Brightness: {v}.',
+                    hueSlider: 'Hue slider',
+                    alphaSlider: 'Opacity slider',
+                    input: 'Color value field',
+                    format: 'Color format',
+                    swatch: 'Color swatch',
+                    instruction: 'Saturation and brightness selector. Use up, down, left and right arrow keys to select.'
+                }
             });
 
             console.log(`✓ Coloris initialized (${defaultSwatches.length} default + ${recentColors.length} recent)`);
+
+            // Use event delegation to prevent picker from closing on internal clicks
+            // This works even when picker is dynamically created
+            document.addEventListener('mousedown', (e) => {
+                // If clicking inside the color picker, prevent event from bubbling
+                if (e.target.closest('.clr-picker')) {
+                    e.stopPropagation();
+                }
+            }, true);
+
+            document.addEventListener('click', (e) => {
+                // Allow close button to work, stop propagation for everything else in picker
+                const picker = e.target.closest('.clr-picker');
+                if (picker && !e.target.closest('.clr-close')) {
+                    e.stopPropagation();
+                }
+            }, true);
         } catch (err) {
             console.warn('⚠️ Coloris initialization failed:', err);
         }
