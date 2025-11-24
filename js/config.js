@@ -19,7 +19,7 @@ export const CONFIG = {
     passwordGate: {
         // Current password: "capy"
         // SHA-256 hash of password (lowercase, no salt for simplicity)
-        passwordHash: "3acfb5bdbd33b642117c10e9f8555bc008d088a9d52de91f2364ce6da68e5832",
+        passwordHash: "a4a194de8888ee539ae670f2241cb86df8c607a3a5dc7554c806dc214fe3587c",
 
         /**
          * Session timeout in milliseconds
