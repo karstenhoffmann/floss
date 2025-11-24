@@ -1630,6 +1630,39 @@ Priority features:
 
 ---
 
+### Coloris Color Picker UX Issues (Post-Migration)
+
+**Context:** Coloris color picker (vendored v1.0+) has persistent UX issues where the picker UI behaves inconsistently - sometimes closing immediately on click, sometimes staying open but not responding to interactions.
+
+**Known Issues:**
+- Picker sometimes disappears immediately on first mousedown
+- Gradient selector occasionally non-responsive
+- Hue/alpha sliders sometimes don't register clicks
+- Inconsistent behavior across different sessions
+- Multiple attempts to fix with event handlers caused regressions
+
+**TODO (Future Phase - UX Polish):**
+- [ ] Evaluate alternative color picker libraries:
+  - [ ] Pickr (https://github.com/Simonwep/pickr) - Modern, well-maintained
+  - [ ] vanilla-picker (https://github.com/Sphinxxxx/vanilla-picker) - Lightweight
+  - [ ] iro.js (https://iro.js.org/) - HSV color picker with great UX
+  - [ ] Custom implementation using native `<input type="color">` + enhancement layer
+- [ ] Test alternative libraries for stability and UX
+- [ ] Replace Coloris if better option found
+- [ ] Ensure vendoring + offline-first compatibility
+- [ ] Update all color input components consistently
+
+**Priority:** LOW - Color picker is functional enough for PoC, focus on core architecture first
+
+**Rationale:** Coloris works but has edge-case UX issues. Don't spend more time debugging - evaluate alternatives in future UX polish phase. Current functionality is "good enough" for development/testing.
+
+**Version History:**
+- v5.4.0-5.4.6: Multiple attempts to fix picker closing issues
+- Tried: Custom event handlers, stopPropagation, event delegation, timing fixes
+- Result: Functional but still buggy - move on for now
+
+---
+
 ## External Dependencies
 
 ### CDN Resources
