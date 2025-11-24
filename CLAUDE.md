@@ -1665,24 +1665,69 @@ Priority features:
 
 ## External Dependencies
 
-### CDN Resources
+### Vendoring Status (v5.4.7)
 
-All loaded from CDN, cached by Service Worker:
+**Philosophy:** All dependencies MUST be vendored locally for offline-first, copy-paste portability.
 
-```html
-<!-- Open Props -->
-<link rel="stylesheet" href="https://unpkg.com/open-props" />
+**✅ Fully Vendored (Offline-Ready):**
+- **Three.js r115** (646 KB) - `/lib/three/`
+  - three.min.js, OrbitControls.js, EffectComposer.js, RenderPass.js, ShaderPass.js, CopyShader.js
+- **Open Props** (3 KB minimal subset) - `/lib/open-props/`
+  - open-props.min.css, normalize.min.css
+- **Coloris Color Picker** (22 KB) - `/lib/coloris/`
+  - coloris.min.css, coloris.min.js
 
-<!-- THREE.js r115 -->
-<script src="https://unpkg.com/three@0.115.0/build/three.min.js"></script>
-<script src="https://unpkg.com/three@0.115.0/examples/js/controls/OrbitControls.js"></script>
+**🔄 Partially Vendored (50%):**
+- **canvas-record ES Module Dependencies** (13 KB vendored) - `/lib/esm/`
+  - ✅ canvas-context (2.1 KB)
+  - ✅ canvas-screenshot (2.1 KB)
+  - ✅ media-codecs (418 bytes)
+  - ✅ gifenc (8.9 KB) - GIF encoder
+  - ⏳ mediabunny - Still on CDN (complex build)
+  - ⏳ h264-mp4-encoder - Still on CDN (WASM binaries)
+  - ⏳ @ffmpeg/ffmpeg - Still on CDN (large, complex)
+  - ⏳ @ffmpeg/util - Still on CDN (FFmpeg dependency)
 
-<!-- Coloris -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css"/>
-<script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
+**Current Import Map (index.html):**
+```javascript
+{
+  "imports": {
+    "canvas-context": "./lib/esm/canvas-context.js",        // ✅ Local
+    "canvas-screenshot": "./lib/esm/canvas-screenshot.js",  // ✅ Local
+    "media-codecs": "./lib/esm/media-codecs.js",            // ✅ Local
+    "gifenc": "./lib/esm/gifenc.js",                        // ✅ Local
+    "mediabunny": "https://esm.sh/mediabunny@1.24.2",       // ⏳ CDN
+    "h264-mp4-encoder": "https://esm.sh/h264-mp4-encoder@1.0.12", // ⏳ CDN
+    "@ffmpeg/ffmpeg": "https://esm.sh/@ffmpeg/ffmpeg@0.12.7",     // ⏳ CDN
+    "@ffmpeg/util": "https://esm.sh/@ffmpeg/util@0.12.1"          // ⏳ CDN
+  }
+}
 ```
 
-**Fallback Strategy:** Service Worker caches for offline use. No runtime fallbacks currently.
+**Impact:**
+- ✅ Basic app functionality: **100% offline**
+- ✅ GIF video export: **100% offline** (gifenc vendored)
+- ⏳ MP4 video export: **Requires CDN** (h264-mp4-encoder, mediabunny on CDN)
+- ⏳ FFmpeg features: **Requires CDN**
+
+**TODO: Complete Vendoring (Future):**
+To vendor remaining 4 modules, need npm/build approach:
+```bash
+# Future approach (requires build tools)
+npm install mediabunny h264-mp4-encoder @ffmpeg/ffmpeg @ffmpeg/util
+# Copy built dist files to /lib/esm/
+# Update Import Map to local paths
+```
+
+**Blocker:** Remaining modules have complex build processes, WASM binaries, or are not available as simple ES6 modules on GitHub. Manual curl downloads fail. Requires npm + proper build setup.
+
+**Pragmatic Decision (v5.4.7):**
+- Core dependencies 100% vendored
+- Video export partially offline (GIF works)
+- MP4 export requires CDN (acceptable for now)
+- Future: Complete vendoring when build tools are set up
+
+**Total Vendored:** ~684 KB (Three.js 646 KB + others 38 KB)
 
 ---
 
