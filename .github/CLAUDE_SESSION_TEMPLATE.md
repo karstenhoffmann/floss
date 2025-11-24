@@ -12,7 +12,7 @@ I'm working on **Floss**, a professional kinetic typography tool.
 **Quick Context:**
 - Project: Offline-first WebGL kinetic typography app
 - Tech: THREE.js, GSAP, Native ESM (no build step)
-- Deployment: GitHub Pages (master branch)
+- Deployment: GitHub Pages (main branch)
 - Architecture: Hybrid UMD+ESM with sequential loading
 
 **Read these files for full context:**
@@ -96,7 +96,7 @@ Before starting work, Claude should:
 - [ ] Understand the hybrid UMD+ESM architecture
 - [ ] Know that script loading order is critical
 - [ ] Understand Service Worker cache versioning
-- [ ] Know the deployment process (master → GitHub Pages)
+- [ ] Know the deployment process (main → GitHub Pages)
 
 ---
 
@@ -106,14 +106,14 @@ Before starting work, Claude should:
 1. **Script Loading:** ESM modules MUST load after UMD globals (index.html:232-275)
 2. **Service Worker:** Bump `CACHE_VERSION` in sw.js when updating cached files
 3. **Import Maps:** Must be defined before any `<script type="module">`
-4. **GitHub Pages:** Deploys from master root, takes ~1 minute, caches aggressively
+4. **GitHub Pages:** Deploys from main root, takes ~1 minute, caches aggressively
 
 ### Development Workflow
 1. Test locally with `python3 -m http.server 8080`
 2. Test offline: DevTools → Application → Service Workers → Offline
 3. Clear cache when testing SW changes
 4. Commit to feature branch (`claude/*`)
-5. PR to master when ready
+5. PR to main when ready
 6. Wait ~1 min for GitHub Pages deployment
 
 ---
@@ -187,7 +187,7 @@ Before marking task complete:
 ### Deployment
 - [ ] Changes committed with clear message
 - [ ] Pushed to appropriate branch
-- [ ] PR created if ready for master
+- [ ] PR created if ready for main
 - [ ] Tested on GitHub Pages after deployment
 
 ---
@@ -202,7 +202,7 @@ Before marking task complete:
 2. **Revert:** Create revert PR
    ```bash
    git revert <bad-commit>
-   git push origin master
+   git push origin main
    ```
 
 3. **Investigate:** Start new Claude session with:
