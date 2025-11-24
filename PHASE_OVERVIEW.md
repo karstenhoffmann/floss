@@ -1,8 +1,8 @@
 # Floss - Phase Overview
 
-**Project:** Offline MP4 Export Migration
-**Current Version:** 5.5.0
-**Status:** All phases complete (last major update: v5.5.0)
+**Project:** Floss App Shell & Unification
+**Current Version:** 5.8.0
+**Status:** Phase 7.2 complete, Phase 7.3 ready to start
 
 *Note: This file describes the project state on the main branch, independent of temporary feature branches.*
 
@@ -154,20 +154,18 @@ These are optional enhancements, not required for core functionality:
 
 ---
 
-### Phase 7.2+: App Shell UI & Password Gate (Planned)
+### ✅ Phase 7.2: App Shell UI & Password Gate (Complete)
 
-**Status:** Not yet implemented
+**Status:** Complete ✅
+**Version:** v5.8.0
 **Depends on:** Phase 7.1 (Complete ✅)
 
-### Vision: Unified App with Dual-Mode Operation
-
-**Goal:** One single app/bundle that works both offline (file://) and online (GitHub Pages) without code duplication.
-
-### App Shell Concept
+### What Was Implemented
 
 **Preloader / Loading Screen:**
-- Brief Floss logo animation on app startup
+- Brief Floss logo animation on app startup (1.5s)
 - Same animation plays in both modes
+- CSS spinner animation
 
 **file:// Mode:**
 - Preloader only (no password gate)
@@ -177,23 +175,11 @@ These are optional enhancements, not required for core functionality:
 - Preloader + Password Gate
 - App starts only after successful password entry
 
-### Technical Approach
-
-**Central Entry Point (Already implemented in Phase 7.1):**
-- Expose unified API: `window.FlossApp.start({ mode: 'offline' | 'online' })`
-- App does NOT auto-initialize when bundle loads
-- Requires explicit start() call from App Shell
-
-**Shell Responsibilities (Phase 7.2):**
-- Detect environment (file:// vs https://)
-- Show preloader animation
-- (Online only) Show password gate, validate input
-- Call `FlossApp.start()` with appropriate mode
-
-**Floss App Responsibilities:**
-- Remain mode-agnostic
-- No built-in auth/password logic
-- Start only when explicitly invoked
+**Password Gate Features:**
+- SHA-256 password hashing (client-side)
+- Session tokens (5-minute timeout)
+- Valid session skips password gate
+- Error handling with visual feedback
 
 ### Security Considerations
 
@@ -205,20 +191,105 @@ These are optional enhancements, not required for core functionality:
 - ✅ Acceptable for: Deterring casual users, "private demo" scenarios
 - ❌ NOT acceptable for: Protecting confidential data, security-critical access
 
-**Design Principle:**
-- Password gate is a convenience feature, not a security boundary
-- Users must understand this limitation
+### Files Created/Modified
 
-### Implementation Status
+- index.html (preloader + password gate)
+- index-iife.html (preloader + password gate inline)
+- styles/preloader.css (NEW)
+- styles/password-gate.css (NEW)
+- js/utils/password-gate.js (NEW)
 
-- ✅ **Phase 7.1 Complete:** Start API implemented
-- ❌ **Phase 7.2+ Pending:** App Shell UI, preloader, password gate
-- 📋 **Planned as:** Phase 7.2 (App Shell UI), Phase 7.3 (Code unification)
-- 🔗 **References:** CURRENT_STATUS.md → "Potential Future Work" → "App Shell & Password Gate"
-- 🔗 **Development Rules:** CLAUDE.md → "App Shell & Auth Gate - Rules"
+---
+
+### ✅ Phase 7.3: Full Unification – One HTML Entry (Complete)
+
+**Status:** Complete ✅
+**Version:** v5.9.0
+**Depends on:** Phase 7.2 (Complete ✅)
+
+### Architecture Goal: Single Entry Policy
+
+**CRITICAL DECISION:** The project maintains exactly ONE long-term HTML entry point: `index.html`
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      index.html (Single Entry)                   │
+├─────────────────────────────────────────────────────────────────┤
+│  Shell detects protocol:                                        │
+│  • file:// → Load floss-app.iife.js (IIFE bundle)              │
+│  • https:// → Load floss-app.js (ES modules)                   │
+├─────────────────────────────────────────────────────────────────┤
+│  Same features in both modes:                                   │
+│  • Full app (5 effects, presets, export)                       │
+│  • Preloader animation                                         │
+│  • Password gate (https:// only)                               │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│               index-iife.html (DEPRECATED)                       │
+├─────────────────────────────────────────────────────────────────┤
+│  Minimal stub with redirect to index.html                       │
+│  Will be removed in future phase                                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Why Single Entry?
+
+| Problem with Multiple Entries | Solution |
+|------------------------------|----------|
+| Code duplication | One codebase, one bundle |
+| Features drift between versions | Same app everywhere |
+| Bug fixes in multiple places | Fix once, works everywhere |
+| Confusing for developers | Clear entry point |
+
+### Technical Implementation
+
+**1. Rollup IIFE Bundle:**
+- Input: `js/floss-app.js` (shell entry)
+- Output: `js/floss-app.iife.js` (~200KB)
+- External: THREE.js, Coloris (loaded as globals)
+- Bundles: All core, effects, ui, utils modules
+
+**2. index.html Dual-Mode Loading:**
+```javascript
+// Shell detects environment
+if (location.protocol === 'file:') {
+    // Load IIFE bundle for file:// compatibility
+    loadScript('js/floss-app.iife.js');
+} else {
+    // Use ES modules for https://
+    import('./js/floss-app.js');
+}
+```
+
+**3. index-iife.html Deprecation:**
+- Reduced to minimal redirect stub
+- Auto-redirects to index.html after 3 seconds
+- Contains deprecation notice
+
+### Deliverables
+
+| File | Action | Description |
+|------|--------|-------------|
+| `rollup.config.app.js` | NEW | Rollup config for app bundle |
+| `js/floss-app.iife.js` | NEW | Generated IIFE bundle |
+| `index.html` | MODIFY | Add dual-mode loading |
+| `index-iife.html` | REPLACE | Deprecated redirect stub |
+| `package.json` | MODIFY | Add `bundle:app` script |
+| Documentation | UPDATE | All status files |
+
+### Decommission Plan for index-iife.html
+
+**Phase 7.3 (Current):** Convert to redirect stub
+**Phase 7.4+ (Future):** Remove file entirely, update all references
 
 ### Dependencies
 
-- Requires: v5.7.0+ (FlossApp.start() API complete)
-- Blockers: None (can start anytime)
-- Estimated Effort: 2-3 sessions
+- Requires: v5.8.0+ (Phase 7.2 complete)
+- Blockers: None
+- Estimated Effort: 1 session
+
+### References
+
+- CLAUDE.md → "Single Entry Policy (Phase 7.3+)"
+- CLAUDE.md → "Architecture Integrity Rule"

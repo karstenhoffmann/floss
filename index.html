@@ -434,8 +434,103 @@
     <!-- Coloris Color Picker (Vendored locally) -->
     <script src="./lib/coloris/coloris.min.js"></script>
 
-    <!-- Import Maps - Map bare module specifiers to local bundles -->
-    <!-- MP4 Export dependencies bundled with Rollup (v5.5.0) -->
+    <!--
+    ============================================================================
+    Phase 7.3: Dual-Mode Loading (Single Entry Policy)
+    ============================================================================
+    This page works in both file:// and https:// modes:
+    - file://  → Loads IIFE bundle (no ES modules due to CORS)
+    - https:// → Uses ES modules with import maps
+    ============================================================================
+    -->
+
+    <!-- Environment Detection (runs first) -->
+    <script>
+        window.FLOSS_ENV = {
+            isFileProtocol: location.protocol === 'file:',
+            isOnlineMode: location.protocol === 'https:' || location.protocol === 'http:'
+        };
+        console.log('📋 Floss environment:', window.FLOSS_ENV.isFileProtocol ? 'file://' : 'online');
+    </script>
+
+    <!-- ==================== FILE:// MODE (IIFE) ==================== -->
+    <script>
+    if (window.FLOSS_ENV.isFileProtocol) {
+        console.log('📦 Loading IIFE bundle for file:// mode...');
+
+        // Load scripts sequentially
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = () => reject(new Error('Failed to load: ' + src));
+                document.head.appendChild(script);
+            });
+        }
+
+        // Load IIFE bundles, then start app
+        (async function() {
+            try {
+                // Load video export dependencies (UMD/IIFE)
+                await loadScript('./lib/canvas-record/h264-mp4-encoder.umd.js');
+
+                // Create shims for external dependencies:
+                // 1. h264-mp4-encoder exports as HME, but canvas-record expects H264MP4Encoder
+                window.H264MP4Encoder = window.HME;
+
+                // 2. gifenc is optional (CDN-only), provide empty stub to prevent errors
+                // GIF export won't work in file:// mode, but MP4 will
+                if (typeof window.gifenc === 'undefined') {
+                    window.gifenc = {};
+                }
+
+                // 3. FFmpeg dependencies (also CDN-only, provide stubs)
+                // canvas-record expects various global names for FFmpeg
+                if (typeof window.ffmpeg === 'undefined') {
+                    window.ffmpeg = {};
+                }
+                if (typeof window.FFmpeg === 'undefined') {
+                    window.FFmpeg = {};
+                }
+                if (typeof window.FFmpegUtil === 'undefined') {
+                    window.FFmpegUtil = {};
+                }
+                // canvas-record also expects 'util' from @ffmpeg/util
+                if (typeof window.util === 'undefined') {
+                    window.util = {};
+                }
+
+                await loadScript('./lib/canvas-record/canvas-record.iife.js');
+
+                // Load main app bundle
+                await loadScript('./js/floss-app.iife.js');
+
+                console.log('✓ IIFE bundles loaded');
+
+                // Initialize with preloader (no password gate for file://)
+                const preloader = document.getElementById('preloader');
+
+                setTimeout(() => {
+                    // Fade out preloader
+                    preloader.classList.add('preloader--hidden');
+                    setTimeout(() => preloader.remove(), 500);
+
+                    // Start app in offline mode
+                    console.log('🚀 Starting Floss app (file:// mode)...');
+                    window.FlossApp.start({ mode: 'offline' });
+                }, 1500);
+
+            } catch (error) {
+                console.error('Failed to load IIFE bundles:', error);
+                document.body.innerHTML = '<div style="padding:20px;color:red;">Failed to load app. Please check console.</div>';
+            }
+        })();
+    }
+    </script>
+
+    <!-- ==================== HTTPS:// MODE (ES Modules) ==================== -->
+    <!-- Import Maps - Only used in online mode (ignored in file:// due to CORS) -->
     <script type="importmap">
     {
       "imports": {
@@ -451,115 +546,119 @@
     }
     </script>
 
-    <!-- Main App Shell (ES6 Module) -->
+    <!-- Main App Shell (ES6 Module) - Only runs in online mode -->
     <script type="module" src="./js/floss-app.js"></script>
 
-    <!-- Start Application with Preloader + Password Gate -->
+    <!-- Start Application with Preloader + Password Gate (ES Module version) -->
     <script type="module">
-        import { shouldShowPasswordGate, validatePassword, createSession } from './js/utils/password-gate.js';
+        // Skip if file:// mode (IIFE handles startup)
+        if (window.FLOSS_ENV.isFileProtocol) {
+            console.log('⏭️ Skipping ES module init (file:// mode uses IIFE)');
+        } else {
+            import('./js/utils/password-gate.js').then(({ shouldShowPasswordGate, validatePassword, createSession }) => {
 
-        const preloader = document.getElementById('preloader');
-        const passwordGate = document.getElementById('password-gate');
-        const passwordForm = document.getElementById('password-form');
-        const passwordInput = document.getElementById('password-input');
-        const passwordSubmit = document.getElementById('password-submit');
-        const passwordError = document.getElementById('password-error');
+                const preloader = document.getElementById('preloader');
+                const passwordGate = document.getElementById('password-gate');
+                const passwordForm = document.getElementById('password-form');
+                const passwordInput = document.getElementById('password-input');
+                const passwordSubmit = document.getElementById('password-submit');
+                const passwordError = document.getElementById('password-error');
 
-        /**
-         * Start the Floss application
-         */
-        function startApp() {
-            console.log('🚀 Starting Floss app...');
-            window.FlossApp.start({ mode: 'online' });
-        }
-
-        /**
-         * Show password gate
-         */
-        function showPasswordGate() {
-            passwordGate.classList.remove('password-gate--hidden');
-            passwordInput.focus();
-        }
-
-        /**
-         * Hide password gate
-         */
-        function hidePasswordGate() {
-            passwordGate.classList.add('password-gate--hidden');
-            setTimeout(() => {
-                passwordGate.remove();
-            }, 500);
-        }
-
-        /**
-         * Handle password submission
-         */
-        async function handlePasswordSubmit(event) {
-            event.preventDefault();
-
-            const password = passwordInput.value.trim();
-            if (!password) return;
-
-            // Disable form during validation
-            passwordSubmit.disabled = true;
-            passwordInput.disabled = true;
-
-            // Validate password
-            const isValid = await validatePassword(password);
-
-            if (isValid) {
-                // Success - create session and start app
-                createSession();
-                passwordError.classList.remove('password-gate__error--visible');
-                hidePasswordGate();
-                startApp();
-            } else {
-                // Error - show error message
-                passwordError.classList.add('password-gate__error--visible');
-                passwordInput.value = '';
-                passwordInput.focus();
-
-                // Re-enable form
-                passwordSubmit.disabled = false;
-                passwordInput.disabled = false;
-
-                // Hide error after 3 seconds
-                setTimeout(() => {
-                    passwordError.classList.remove('password-gate__error--visible');
-                }, 3000);
-            }
-        }
-
-        /**
-         * Initialize app shell
-         */
-        function initAppShell() {
-            // Wait for preloader animation to complete (1.5s)
-            setTimeout(() => {
-                // Fade out preloader
-                preloader.classList.add('preloader--hidden');
-
-                // Remove preloader from DOM after fade-out
-                setTimeout(() => {
-                    preloader.remove();
-                }, 500);
-
-                // Check if password gate should be shown
-                if (shouldShowPasswordGate()) {
-                    // Show password gate
-                    showPasswordGate();
-                } else {
-                    // Start app directly
-                    startApp();
+                /**
+                 * Start the Floss application
+                 */
+                function startApp() {
+                    console.log('🚀 Starting Floss app (online mode)...');
+                    window.FlossApp.start({ mode: 'online' });
                 }
-            }, 1500); // Preloader animation duration
+
+                /**
+                 * Show password gate
+                 */
+                function showPasswordGate() {
+                    passwordGate.classList.remove('password-gate--hidden');
+                    passwordInput.focus();
+                }
+
+                /**
+                 * Hide password gate
+                 */
+                function hidePasswordGate() {
+                    passwordGate.classList.add('password-gate--hidden');
+                    setTimeout(() => {
+                        passwordGate.remove();
+                    }, 500);
+                }
+
+                /**
+                 * Handle password submission
+                 */
+                async function handlePasswordSubmit(event) {
+                    event.preventDefault();
+
+                    const password = passwordInput.value.trim();
+                    if (!password) return;
+
+                    // Disable form during validation
+                    passwordSubmit.disabled = true;
+                    passwordInput.disabled = true;
+
+                    // Validate password
+                    const isValid = await validatePassword(password);
+
+                    if (isValid) {
+                        // Success - create session and start app
+                        createSession();
+                        passwordError.classList.remove('password-gate__error--visible');
+                        hidePasswordGate();
+                        startApp();
+                    } else {
+                        // Error - show error message
+                        passwordError.classList.add('password-gate__error--visible');
+                        passwordInput.value = '';
+                        passwordInput.focus();
+
+                        // Re-enable form
+                        passwordSubmit.disabled = false;
+                        passwordInput.disabled = false;
+
+                        // Hide error after 3 seconds
+                        setTimeout(() => {
+                            passwordError.classList.remove('password-gate__error--visible');
+                        }, 3000);
+                    }
+                }
+
+                /**
+                 * Initialize app shell (online mode)
+                 */
+                function initAppShell() {
+                    // Wait for preloader animation to complete (1.5s)
+                    setTimeout(() => {
+                        // Fade out preloader
+                        preloader.classList.add('preloader--hidden');
+
+                        // Remove preloader from DOM after fade-out
+                        setTimeout(() => {
+                            preloader.remove();
+                        }, 500);
+
+                        // Check if password gate should be shown (online mode only)
+                        if (shouldShowPasswordGate()) {
+                            showPasswordGate();
+                        } else {
+                            startApp();
+                        }
+                    }, 1500);
+                }
+
+                // Setup password form handler
+                passwordForm.addEventListener('submit', handlePasswordSubmit);
+
+                // Start initialization
+                initAppShell();
+            });
         }
-
-        // Setup password form handler
-        passwordForm.addEventListener('submit', handlePasswordSubmit);
-
-        // Start initialization
-        initAppShell();
     </script>
 
     <!-- Service Worker Registration -->
