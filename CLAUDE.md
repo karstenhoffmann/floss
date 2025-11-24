@@ -7,317 +7,116 @@
 
 ---
 
-## 🚀 CRITICAL: Session Bootstrapping & File-Awareness Policy
+# SECTION 1: CORE (Required Reading for Every Session)
+
+## 🚀 Session Start Protocol
 
 **MANDATORY FOR EVERY NEW SESSION:**
 
-### 1. Session Start Protocol
-
-**When starting a new Claude Code session, ALWAYS do this FIRST:**
-
+### Step 1: Load Status Files
 ```
-Step 1: Check for status files
-  - Read PHASE_OVERVIEW.md (if exists)
-  - Read CURRENT_STATUS.md (if exists)
-
-Step 2: Summarize loaded context
-  - Briefly confirm what phase/status was loaded
-  - Show current branch, version, recent work
-  - Demonstrate that context is correctly understood
-
-Step 3: DO NOT assume chat history is current
-  - NEVER rely on information from previous chat messages
-  - ALWAYS use the status files as source of truth
-  - If files don't exist, acknowledge and proceed normally
+Read PHASE_OVERVIEW.md and CURRENT_STATUS.md (if they exist)
 ```
 
-**Example Session Start:**
+### Step 2: Summarize Context
 ```
 ✅ Status files loaded:
-  - PHASE_OVERVIEW.md: Phase 4 (MP4 Export) - Complete
-  - CURRENT_STATUS.md: Branch claude/convert-index-iife-XXX, v5.5.0
-  - Last work: Rollup bundling for offline MP4 export
+  - PHASE_OVERVIEW.md: [phase info]
+  - CURRENT_STATUS.md: [version, recent work]
+  - Current git branch: [branch name]
 
 Ready to continue. What would you like to work on?
 ```
 
-### 2. Status File Update Protocol
+### Step 3: Verify Understanding
+- [ ] Status files describe **main branch state** (not feature branch)
+- [ ] If on feature branch, status files show main state (this is normal)
+- [ ] Never rely on chat history, always trust the files
+
+---
+
+## 📂 Status File Rules
+
+**CRITICAL: Status files are branch-neutral and describe the main branch state**
+
+### What Status Files Contain:
+- ✅ Project state on **main branch**
+- ✅ Stable facts (version, phase progress, architecture decisions)
+- ❌ NEVER feature branch names or branch-specific context
+- ❌ NEVER session-specific details
+
+### File Modification Policy:
+
+**Before modifying ANY status file:**
+1. Show proposed changes to user
+2. Wait for explicit approval ("yes" / "no" / "later")
+3. Never guess or assume
 
 **When to propose updates:**
-- ✅ Phase completed (e.g., "Phase 4: Bundling - Complete")
-- ✅ New branch created or switched
-- ✅ Architecture decision made (e.g., "Use Rollup instead of esbuild")
-- ✅ Major milestone reached (e.g., "100% offline MP4 export working")
-- ✅ Significant blocker encountered (e.g., "FFmpeg requires HTTPS, not file://")
+- Phase completed
+- Architecture decision made
+- Major milestone reached
+- After merge to main (with user approval)
 
-**How to propose updates:**
-```
-🔄 Suggest: "Should I update PHASE_OVERVIEW.md with:
-   - Phase 4: Complete (Rollup bundling, 2.8 MB bundles)
-   - Phase 5: Next (Testing on GitHub Pages)"
-
-Wait for user approval: "Yes" / "No" / "Later"
-```
-
-**CRITICAL RULES:**
-- ❌ NEVER update status files automatically
-- ❌ NEVER overwrite files without explicit permission
-- ✅ ALWAYS propose changes, then wait for approval
-- ✅ ALWAYS show what will be written before writing
-
-### 3. File Modification Policy
-
-**Before modifying ANY status/tracking file:**
-
-1. **Show proposed changes:**
-   ```
-   I propose updating CURRENT_STATUS.md with:
-
-   [Show exact content that will be written]
-
-   Proceed? (yes/no)
-   ```
-
-2. **Wait for explicit approval:**
-   - User says "yes" → Proceed with write
-   - User says "no" → Don't write, offer alternatives
-   - User says "later" → Make note, don't write now
-
-3. **Never guess or assume:**
-   - Don't reorganize files without asking
-   - Don't delete sections without confirmation
-   - Don't merge information without approval
-
-### 4. File Awareness Best Practices
-
-**Status files are the source of truth:**
-- PHASE_OVERVIEW.md → What phases exist, which are done, what's next
-- CURRENT_STATUS.md → Current branch, version, recent commits, blockers
-- CLAUDE.md (this file) → Project rules, architecture, workflows
-
-**When files conflict with chat history:**
-- ✅ Trust the files (they persist across sessions)
-- ❌ Don't trust chat history (it's session-specific)
-- 🔄 If unsure, ask user to clarify
-
-**File naming conventions:**
-- Use UPPERCASE for status files (PHASE_OVERVIEW.md, CURRENT_STATUS.md)
-- Keep them in repository root for easy access
-- Don't create new status file types without discussing first
-
-### 5. Self-Check Before Every Response
-
-Ask yourself:
-- [ ] Did I read status files at session start?
-- [ ] Is my understanding based on files, not old chat context?
-- [ ] Did I propose (not execute) status file updates?
-- [ ] Did I wait for approval before writing?
-- [ ] Did I explain what I'm about to write?
-
-**If ANY checkbox is unchecked → Fix before proceeding!**
+**NEVER update automatically!**
 
 ---
 
-### 6. Status Files Describe Main Branch State
-
-**CRITICAL RULE: Status files are branch-neutral and describe the main branch state**
-
-**Status files (PHASE_OVERVIEW.md, CURRENT_STATUS.md):**
-- ✅ Describe the **project state on the main branch**
-- ✅ Contain facts that are stable across sessions (version, phase progress, architecture decisions)
-- ❌ NEVER contain feature branch names or branch-specific context
-- ❌ NEVER contain session-specific details or timestamps
-
-**When starting a new session:**
-1. **Read status files:**
-   - PHASE_OVERVIEW.md (project phases, overall status)
-   - CURRENT_STATUS.md (current version, recent work, next steps)
-
-2. **Check current git branch:**
-   ```bash
-   git branch --show-current
-   ```
-
-3. **Understand the context:**
-   - If on `main`: Status files describe current state
-   - If on feature branch (e.g., `claude/my-feature-xyz`):
-     - Status files show main state (before your feature)
-     - Your work is in a temporary feature branch
-     - **This is NORMAL and EXPECTED**
-
-4. **If status files seem outdated:**
-   - **ASK user** if update is needed
-   - **NEVER update automatically**
-   - Propose specific changes, wait for approval
-
-**Branch-specific notes:**
-- ✅ Feature branches are temporary working contexts
-- ❌ Branch-specific details do NOT belong in global status files
-- ✅ If branch-specific tracking is needed:
-  - Create separate `BRANCH_NOTES.md` (only after user approval)
-  - Keep branch notes out of version control (add to `.gitignore`)
-  - Or: Use PR descriptions for branch-specific context
-
-**When to update status files:**
-- ✅ After merge to main (with user approval)
-- ✅ When architecture decisions are finalized
-- ✅ When major milestones/phases are completed and tested
-- ❌ NEVER during feature branch work
-- ❌ NEVER automatically without approval
-
-**Example session start on feature branch:**
-```
-✅ Status files loaded:
-  - PHASE_OVERVIEW.md: v5.5.0, Phases 1-6 complete
-  - CURRENT_STATUS.md: Last milestone v5.5.0
-  - Current git branch: claude/my-feature-01N77Qnp944BH7RpUjxFCCSA
-
-Note: You are working on a feature branch. Status files show main state.
-This is normal. Continue work on your feature.
-```
-
-**Example session start on main (after merge):**
-```
-✅ Status files loaded:
-  - PHASE_OVERVIEW.md: v5.5.0, Phases 1-6 complete
-  - CURRENT_STATUS.md: Last milestone v5.5.0
-  - Current git branch: main
-
-Status files are up-to-date with main branch. Ready to work.
-```
-
----
-
-## ⚠️ CRITICAL: Always Read This First
-
-### 🌐 Claude Code for Web - Testing Requirements
+## 🌐 Claude Code for Web - Deployment Context
 
 **THIS PROJECT USES CLAUDE CODE FOR WEB (not CLI)**
 
-This means:
-- ✅ User has NO local file access - only browser and GitHub
-- ✅ User can ONLY test via GitHub Pages deployment
-- ✅ **Claude MUST tell user to update GitHub Pages settings when switching branches**
-- ✅ **Testing requires GitHub Pages to be configured for the current working branch**
+### Critical Constraints:
+- User has NO local file access
+- User can ONLY test via GitHub Pages
+- Wrong branch in GitHub Pages = user tests old code
 
-**MANDATORY WORKFLOW:**
+### Mandatory Workflow:
 
-1. **When starting work on a branch:**
-   ```
-   🚨 TELL USER: "Please update GitHub Pages settings to deploy from branch: [branch-name]"
-   ```
+**1. At Session Start:**
+```
+🚨 TELL USER: "Please update GitHub Pages settings to deploy from branch: [branch-name]"
+```
 
-2. **After pushing commits:**
-   ```
-   🚨 REMIND USER: "Test at https://karstenhoffmann.github.io/floss/ (wait 1-2 min for deployment)"
-   ```
+**2. After Pushing Commits:**
+```
+🚨 REMIND USER: "Test at https://karstenhoffmann.github.io/floss/ (wait 1-2 min for deployment)"
+```
 
-3. **When creating a new branch:**
-   ```
-   🚨 TELL USER: "Update GitHub Pages: Settings → Pages → Branch: [new-branch-name] → Save"
-   ```
-
-**Why this matters:**
-- User cannot run `python3 -m http.server` locally
-- User cannot access files directly
-- GitHub Pages is the ONLY way to test changes
-- Wrong branch = user tests old code = wasted time
+**3. Branch Name Requirements:**
+- Must start with `claude/`
+- Must end with session ID: `claude/feature-name-[SESSION_ID]`
+- Push will fail with 403 if session ID is missing
 
 **GitHub Pages Configuration:**
 - Location: Repo Settings → Pages
 - Source: Deploy from branch
 - Branch: **[current working branch]** ← CRITICAL TO UPDATE
-- Folder: **`/ (root)`** after restructure
+- Folder: **`/ (root)`**
 
 ---
 
-## 🔢 CRITICAL: Version Management & Console Logging
+## 🔢 Version Management
 
 **MANDATORY: Update version WITH EVERY COMMIT!**
 
-### Version File Location
-
-**File:** `js/version.js`
+### Version File: `js/version.js`
 
 ```javascript
 export const VERSION = {
     number: '2.3.0',           // Semantic version (major.minor.patch)
-    commit: 'Brief commit message here',
+    commit: 'Brief commit message here',  // Max 47 chars
     date: '2025-11-21',        // YYYY-MM-DD
     time: '14:30'              // HH:MM (24-hour format)
 };
 ```
 
-### When to Update Version
+### Version Number Rules (Semantic Versioning):
+- **Major (X.0.0):** Breaking changes, architecture refactor
+- **Minor (2.X.0):** New features, new effects, significant additions
+- **Patch (2.3.X):** Bug fixes, minor improvements, documentation
 
-**ALWAYS update `js/version.js` BEFORE committing:**
-
-1. **Before EVERY commit:**
-   - Update `VERSION.number` (increment appropriately)
-   - Update `VERSION.commit` (brief description, max 47 chars)
-   - Update `VERSION.date` (today's date)
-   - Update `VERSION.time` (current time when committing)
-
-2. **Version Number Rules (Semantic Versioning):**
-   - **Major (X.0.0):** Breaking changes, architecture refactor
-   - **Minor (2.X.0):** New features, new effects, significant additions
-   - **Patch (2.3.X):** Bug fixes, minor improvements, documentation
-
-### Version Update Workflow
-
-**Step-by-step process:**
-
-```bash
-# 1. Make your code changes
-# ... edit files ...
-
-# 2. Update version.js
-# Edit js/version.js:
-#   - Increment version.number
-#   - Update commit message
-#   - Update date and time
-
-# 3. Commit with version in message
-git add .
-git commit -m "feat: [Your changes]
-
-Version: 2.3.1
-"
-
-# 4. Push
-git push -u origin [branch-name]
-```
-
-### Why This Matters
-
-**Benefits of version tracking:**
-- ✅ **Debug across sessions:** User can tell you "I'm seeing version 2.3.0, but documentation says 2.3.5"
-- ✅ **Session continuity:** Claude can immediately see what was changed last
-- ✅ **Cache debugging:** User can verify correct version loaded (not cached old code)
-- ✅ **Time tracking:** Know when changes were deployed
-- ✅ **Console visibility:** Version banner appears on every app start
-
-### Console Output
-
-When user loads the app, they see:
-
-```
-╔════════════════════════════════════════════════════════════════╗
-║   🎨 Floss - Motion Design                                     ║
-║   Version: 2.3.0       Date: 2025-11-21 14:30                 ║
-║   Last Commit: Context-aware keyboard shortcuts               ║
-╚════════════════════════════════════════════════════════════════╝
-```
-
-This makes it immediately clear:
-- What version is running
-- When it was built
-- What was changed last
-
-### Self-Check Before Committing
-
-Before `git commit`, ask yourself:
-
+### Self-Check Before Committing:
 - [ ] Did I update `js/version.js`?
 - [ ] Did I increment version number correctly?
 - [ ] Did I write a brief commit message (max 47 chars)?
@@ -325,252 +124,77 @@ Before `git commit`, ask yourself:
 
 **If ANY checkbox is unchecked → Update version.js before committing!**
 
-### Example Version Updates
+---
 
-```javascript
-// Bug fix (patch)
-2.3.0 → 2.3.1
-commit: 'Fix particle reset on export'
+## 📝 Documentation Maintenance
 
-// New feature (minor)
-2.3.1 → 2.4.0
-commit: 'Add VideoExportManager core implementation'
+**IMPORTANT:** Documentation is LIVING - not static! Claude must maintain docs as the project evolves.
 
-// Breaking change (major)
-2.4.0 → 3.0.0
-commit: 'Refactor effect system architecture'
-```
+### When to Update Documentation:
+- ✅ Adding new features → update relevant sections
+- ✅ Changing APIs → update PLUGIN_SPEC.md
+- ✅ Refactoring architecture → update CLAUDE.md
+- ✅ Modifying entry points or initialization → update architecture docs
+- ✅ Discovering inconsistencies → fix immediately
+
+### Architecture & Entry-Point Changes Rule:
+
+**Whenever modifying or reorganizing:**
+- Application entry points (index.html, app.js)
+- Initialization flows or startup logic
+- App shell or loading sequences
+- High-level architecture patterns
+
+**Claude MUST:**
+1. Update CLAUDE.md to reflect the new architecture
+2. Update PHASE_OVERVIEW.md and/or CURRENT_STATUS.md if this is a major milestone
+3. Document any new public APIs or integration patterns
+4. Ensure documentation remains branch-neutral (describes main state)
+5. Link to detailed specs rather than duplicating everything
+
+**Why:** Session continuity depends on accurate architecture documentation. Future Claude sessions need to understand how the app starts and how components integrate.
+
+### Documentation Hierarchy:
+
+1. **CLAUDE.md** - Session context, high-level architecture, critical workflows
+2. **PLUGIN_SPEC.md** - Effect development API documentation
+3. **docs/*.md** - Deep technical specifications
+4. **README.md** - User-facing GitHub landing page
+5. **DETAILED_PITFALLS.md** - Comprehensive common mistakes reference
+
+### Self-Check Before Finishing Session:
+- [ ] New features documented?
+- [ ] APIs updated in PLUGIN_SPEC.md?
+- [ ] Architecture changes reflected in CLAUDE.md?
+- [ ] Docs consistent with each other?
+- [ ] Examples updated?
 
 ---
 
-## 📝 CRITICAL: Documentation Maintenance Guidelines
+## ✅ Session Start Checklist
 
-**IMPORTANT:** This documentation is LIVING - not static! Claude Code sessions MUST maintain and update documentation as the project evolves.
+**Before starting work:**
+1. Read PHASE_OVERVIEW.md and CURRENT_STATUS.md
+2. Check current branch: `git branch --show-current`
+3. 🚨 Tell user to update GitHub Pages settings to current branch
+4. Verify repository structure (no `/app/` directory - old structure)
+5. Check for current version: See CURRENT_STATUS.md and js/version.js
 
-### When to Update Documentation
-
-**ALWAYS update docs when:**
-- ✅ Adding new features (add to relevant sections)
-- ✅ Changing APIs (update PLUGIN_SPEC.md)
-- ✅ Refactoring architecture (update CLAUDE.md)
-- ✅ Finding better practices (update examples)
-- ✅ Discovering inconsistencies (fix immediately)
-- ✅ Adding new effects (update reference list)
-- ✅ Changing workflows (update instructions)
-
-**Examples:**
-```
-Scenario: "Add new Effect method getVisualCenter()"
-→ Update PLUGIN_SPEC.md with method documentation
-→ Update example effects
-→ Update checklist if it's now required
-
-Scenario: "Refactor State Management"
-→ Update CLAUDE.md architecture section
-→ Update VIDEO_EXPORT_SPEC.md integration points
-→ Update code examples
-
-Scenario: "Find bug in export duration calculation"
-→ Fix code
-→ Update PLUGIN_SPEC.md with corrected example
-→ Add note about common mistake
-```
-
-### Documentation Hierarchy (Where to Document What)
-
-```
-1. CLAUDE.md (This File)
-   ├─ Purpose: Session Context & Project Overview
-   ├─ Update when: Architecture changes, new workflows, new major features
-   ├─ Audience: Claude Code sessions (automatic reading)
-   └─ Keep: High-level, links to other docs, critical workflows
-
-2. PLUGIN_SPEC.md
-   ├─ Purpose: Effect Development API Documentation
-   ├─ Update when: EffectBase API changes, new effect patterns, export config changes
-   ├─ Audience: Claude developing new effects (referenced from CLAUDE.md)
-   └─ Keep: Complete API, examples, checklists, best practices
-
-3. docs/*.md
-   ├─ Purpose: Deep Technical Specifications
-   ├─ Update when: Implementation details change, architecture decisions made
-   ├─ Audience: Deep dives, complex implementation details
-   └─ Keep: State machines, integration points, error handling, performance
-
-4. README.md
-   ├─ Purpose: User-facing GitHub landing page
-   ├─ Update when: Public-facing features change, project description changes
-   ├─ Audience: GitHub visitors, potential users
-   └─ Keep: What the app does, how to use it, screenshots
-```
-
-### How to Update Documentation
-
-**1. Identify what changed:**
-```javascript
-// Code change:
-+ static get exportDefaults() { ... }
-
-// Documentation impact:
-→ PLUGIN_SPEC.md: Add method to API section
-→ PLUGIN_SPEC.md: Update examples
-→ CLAUDE.md: Update checklist (if breaking)
-```
-
-**2. Update all affected docs:**
-- Don't just update one file - follow the hierarchy
-- Check if examples need updating
-- Verify links still work
-- Update "Last Updated" dates
-
-**3. Commit with clear message:**
-```bash
-git commit -m "docs: Update effect API documentation for exportDefaults
-
-- Add exportDefaults to PLUGIN_SPEC.md API section
-- Update all effect examples
-- Add to development checklist in CLAUDE.md
-
-Reason: New export configuration system requires this method"
-```
-
-### Documentation Quality Standards
-
-**MUST follow:**
-- ✅ **Clear examples** - Every API has code example
-- ✅ **Consistent formatting** - Follow existing style
-- ✅ **No outdated info** - Delete/update obsolete sections
-- ✅ **Cross-references** - Link related sections
-- ✅ **Checklists** - For multi-step processes
-- ✅ **Rationale** - Explain WHY not just WHAT
-
-**Common mistakes to avoid:**
-- ❌ Adding features without documenting them
-- ❌ Updating code but not examples
-- ❌ Leaving contradictory information in different files
-- ❌ Making docs too verbose (use hierarchy!)
-- ❌ Forgetting to update checklists
-
-### Self-Check Before Finishing Session
-
-Before user ends session, Claude should ask itself:
-
-**Did I...**
-- [ ] Add new features? → Are they documented?
-- [ ] Change APIs? → Is PLUGIN_SPEC.md updated?
-- [ ] Refactor architecture? → Is CLAUDE.md updated?
-- [ ] Find inconsistencies? → Did I fix them in docs?
-- [ ] Add examples? → Are they in the right place?
-- [ ] Update dependencies? → Is it noted in docs?
-
-**If ANY checkbox is unchecked → Update docs before committing code!**
-
-### Documentation Commit Messages
-
-Use these prefixes:
-
-```bash
-docs: Add <feature> documentation
-docs: Update <section> for <reason>
-docs: Fix inconsistency in <file>
-docs: Remove outdated <section>
-docs: Clarify <concept> with examples
-
-Example:
-"docs: Update PLUGIN_SPEC.md for export configuration
-
-- Add Export Configuration section
-- Update effect development checklist
-- Add loop vs oneshot examples
-- Link to VIDEO_EXPORT_SPEC.md
-
-Reason: Video export system requires effects to define export behavior"
-```
-
-### Meta-Documentation Rule
-
-**IMPORTANT:** If you find that these documentation guidelines are insufficient or unclear:
-1. **Update this section** with better guidelines
-2. **Explain why** in commit message
-3. This is self-modifying documentation!
-
-**Example:**
-```
-User: "Claude, you forgot to document the new feature!"
-Claude: "You're right! Let me:
-  1. Document the feature
-  2. Update this Documentation Guidelines section
-     to remind future sessions to check for this"
-```
+**After making changes:**
+1. Update `js/version.js` before committing
+2. Commit with clear message
+3. Push to branch with correct session ID
+4. 🚨 Remind user: "Update GitHub Pages to branch [branch-name] if not already done"
+5. 🚨 Remind user: "Wait 1-2 minutes, then test at https://karstenhoffmann.github.io/floss/"
 
 ---
 
-### Repository Structure (Updated Nov 2024)
-
-```
-/
-├── index.html              # Main app entry point (Floss app)
-├── js/                     # Application JavaScript
-│   ├── app.js             # Main application controller
-│   ├── core/              # Core systems
-│   │   ├── effect-manager.js   # Effect loading & switching
-│   │   ├── preset-manager.js   # Preset save/load
-│   │   ├── renderer.js         # Three.js renderer setup
-│   │   ├── scene.js            # Scene management
-│   │   └── state.js            # Application state
-│   ├── effects/           # Effect implementations
-│   │   ├── effect-base.js      # Base class for all effects
-│   │   └── endless.js          # Endless effect (torus knot)
-│   ├── ui/                # UI components
-│   │   ├── icons.js            # SVG icon definitions
-│   │   └── notification.js     # Toast notifications
-│   └── utils/             # Utility functions
-│       ├── storage.js          # LocalStorage wrapper
-│       ├── text-texture.js     # Canvas text rendering
-│       └── webgl-check.js      # WebGL capability check
-├── styles/                # CSS stylesheets
-├── lib/                   # Third-party libraries
-├── manifest.json          # PWA manifest
-├── service-worker.js      # PWA service worker
-├── reference/             # Original Codrops tutorial files (DO NOT MODIFY)
-│   ├── index.html         # Old tutorial entry point
-│   ├── js/                # Old tutorial code
-│   ├── css/               # Old tutorial styles
-│   └── assets/            # Old tutorial assets
-├── .clauderc              # Claude Code configuration
-├── CLAUDE.md              # This file - project context
-├── README.md              # Project overview (app-specific)
-├── PLUGIN_SPEC.md         # Effect plugin specification
-└── CHANGELOG.md           # Version history
-```
-
-### 🚨 Before Starting Any Task
-
-1. **Verify current branch:**
-   ```bash
-   git branch --show-current
-   ```
-   - Should be `main` or branched from `main`
-   - Branch name should start with `claude/`
-
-2. **Confirm correct structure:**
-   ```bash
-   ls -la
-   ```
-   - You should see `index.html`, `js/`, `styles/`, `lib/` in root
-   - You should see `reference/` containing old tutorial files
-   - **DO NOT** see `app/` directory (that was the old structure)
-
-3. **Check deployment URL:**
-   - Production: https://karstenhoffmann.github.io/floss/
-   - ~~Old URL: https://karstenhoffmann.github.io/floss/app/~~ (deprecated)
-
----
+# SECTION 2: PROJECT CONTEXT & ARCHITECTURE
 
 ## Quick Start for New Sessions
 
 ### Project Purpose
-Floss is a professional kinetic typography motion design tool for motion designers, featuring:
+Floss is a professional kinetic typography motion design tool featuring:
 - Modern effect system with plugin architecture
 - Real-time parameter controls with presets
 - WebGL-based kinetic text effects (THREE.js)
@@ -578,7 +202,7 @@ Floss is a professional kinetic typography motion design tool for motion designe
 - No build step required (pure ES6 modules)
 
 ### Target Users
-Professional motion designers creating kinetic typography animations for:
+Professional motion designers creating kinetic typography for:
 - Music videos
 - Title sequences
 - Social media content
@@ -587,58 +211,50 @@ Professional motion designers creating kinetic typography animations for:
 ### Design Philosophy
 - **Desktop-first**: Optimized for desktop Chrome workflow
 - **Offline-capable**: Full functionality without network
-- **No build tools**: Direct ES6 modules, no webpack/bundlers
+- **No build tools**: Direct ES6 modules (note: Rollup for vendoring bundles)
 - **Professional UX**: Inspired by After Effects and Rive
 
-###⚠️ **CRITICAL: Deployment Philosophy - Copy & Paste Portability**
+---
 
-**Core Requirement:** The app MUST be deployable by simply copying the entire directory to any location and opening `index.html` in a browser.
+## ⚠️ Copy & Paste Portability Philosophy
+
+**Core Requirement:** The app MUST be deployable by copying the directory and opening `index.html`.
 
 **Rules:**
-1. **ALL dependencies MUST be in the repository**
-   - ✅ Vendor third-party libraries in `/lib/` directory
-   - ✅ Include ALL files needed to run offline
-   - ❌ NO reliance on CDN for critical functionality
-   - ❌ NO build process required
+1. ALL dependencies in repository (vendored in `/lib/`)
+2. No CDN reliance for critical functionality
+3. Works offline on air-gapped machines
+4. No npm install, no build, no server setup required
+5. GitHub Pages deployment is automatic (just push)
 
-2. **Local-first, CDN optional**
-   - Libraries SHOULD be in `/lib/` (vendored)
-   - CDN imports only acceptable if:
-     - Service Worker caches them for offline use
-     - App still works if CDN is down (fallback)
-   - Prefer: `import from './lib/library.js'`
-   - Avoid: `import from 'https://cdn.../library.js'`
+**When adding dependencies:**
+- [ ] Download library files to `/lib/`
+- [ ] Update imports to use local path
+- [ ] Test offline (DevTools → Offline mode)
+- [ ] Document what was added and why
+- [ ] Commit library files to repo
 
-3. **Why this matters:**
-   - User can zip the repo and send it to someone
-   - Works on air-gapped machines (no internet)
-   - No npm install, no build, no server setup
-   - Open `index.html` → works immediately
-   - GitHub Pages deployment is automatic (just push)
+---
 
-4. **Current vendored libraries:**
-   - `/lib/` - Third-party libraries (vendored)
-   - Three.js, OrbitControls - **TODO: Should be vendored!**
-   - Open Props, Coloris - **TODO: Should be vendored!**
-   - canvas-record - **TODO: Must be vendored!**
+## Repository Structure
 
-5. **When adding new dependencies:**
-   - [ ] Download library files to `/lib/`
-   - [ ] Update imports to use local path
-   - [ ] Test that app works offline (DevTools → Offline mode)
-   - [ ] Document in this file what was added and why
-   - [ ] Commit library files to repo
-
-**Example:**
-```javascript
-// ❌ WRONG - CDN dependency
-import { Recorder } from 'https://esm.sh/canvas-record@5.0.0';
-
-// ✅ CORRECT - Vendored in repo
-import { Recorder } from './lib/canvas-record/index.js';
 ```
-
-**For new Claude sessions:** If user says "add library X", your FIRST step is to vendor it in `/lib/`, NOT import from CDN!
+/
+├── index.html              # Main app entry point
+├── js/                     # Application JavaScript
+│   ├── app.js             # Main application controller
+│   ├── core/              # Core systems (effect-manager, renderer, scene, state)
+│   ├── effects/           # Effect implementations
+│   ├── ui/                # UI components
+│   └── utils/             # Utility functions
+├── styles/                # CSS stylesheets
+├── lib/                   # Third-party libraries (vendored)
+├── reference/             # Original Codrops tutorial (DO NOT MODIFY)
+├── CLAUDE.md              # This file - project context
+├── PLUGIN_SPEC.md         # Effect plugin specification
+├── DETAILED_PITFALLS.md   # Comprehensive pitfalls reference
+└── CHANGELOG.md           # Version history
+```
 
 ---
 
@@ -648,10 +264,9 @@ import { Recorder } from './lib/canvas-record/index.js';
 |-----------|-----------|-----|
 | UI Framework | Vanilla JS ES6 Modules | No build step, standards-based |
 | 3D Engine | THREE.js (r115) | Industry standard WebGL |
-| Text Rendering | Canvas 2D → WebGL Texture | High-quality, flexible rendering |
+| Text Rendering | Canvas 2D → WebGL Texture | High-quality, flexible |
 | Design System | Open Props | CSS design tokens |
 | Color Picker | Coloris | Modern, eyedropper support |
-| Icons | Inline SVG | Offline-first, no external deps |
 | Offline | Service Worker | True offline capability |
 | State | LocalStorage | Persistent settings & presets |
 
@@ -661,582 +276,76 @@ import { Recorder } from './lib/canvas-record/index.js';
 
 ### Effect System
 
-Floss uses a **plugin-based effect architecture**:
+**Plugin-based architecture:**
 
-1. **EffectBase** (`js/effects/effect-base.js`): Base class all effects extend
-2. **Effect Implementations** (`js/effects/*.js`): Individual effect classes
-3. **EffectManager** (`js/core/effect-manager.js`): Loads and switches effects
-4. **Settings Schema**: Each effect defines its own settings
+1. **EffectBase** (`js/effects/effect-base.js`) - Base class
+2. **Effect Implementations** (`js/effects/*.js`) - Individual effects
+3. **EffectManager** (`js/core/effect-manager.js`) - Loads and switches effects
+4. **Settings Schema** - Each effect defines its own settings
 
-**Creating a New Effect:**
-```javascript
-import EffectBase from './effect-base.js';
-
-export class MyEffect extends EffectBase {
-    static get metadata() {
-        return {
-            id: 'my-effect',
-            name: 'My Effect',
-            icon: '✨',
-            description: 'Description here'
-        };
-    }
-
-    getSettingsSchema() {
-        return {
-            ...super.getSettingsSchema(),
-            myParam: {
-                type: 'number',
-                label: 'My Parameter',
-                default: 1.0,
-                min: 0,
-                max: 2,
-                step: 0.1
-            }
-        };
-    }
-
-    init(scene, camera, renderer) {
-        super.init(scene, camera, renderer);
-        // Create geometry, material, mesh
-        // Add to scene
-    }
-
-    update(deltaTime) {
-        // Update animation
-    }
-
-    updateSettings(settings) {
-        super.updateSettings(settings);
-        // React to settings changes
-    }
-
-    dispose() {
-        // Clean up resources
-    }
-}
-```
-
-See `PLUGIN_SPEC.md` for complete documentation.
+**See PLUGIN_SPEC.md for complete effect development documentation.**
 
 ### State Management
 
-- **AppSettings** (`js/core/app-settings.js`): Global app settings
-- **Effect State**: Each effect manages its own settings
-- **PresetManager** (`js/core/preset-manager.js`): Save/load presets
-- **Storage** (`js/utils/storage.js`): LocalStorage abstraction
+- **AppSettings** - Global app settings
+- **Effect State** - Each effect manages its own settings
+- **PresetManager** - Save/load presets
+- **Storage** - LocalStorage abstraction
 
 ### Rendering Pipeline
 
-1. **Scene Setup** (`js/core/scene.js`): Initialize THREE.js scene
-2. **Renderer** (`js/core/renderer.js`): WebGL renderer with animation loop
-3. **Text Texture** (`js/utils/text-texture.js`): Generate text on canvas
-4. **Effect Shader**: Map texture to 3D geometry with custom shaders
-5. **Camera Controls**: OrbitControls for interaction
+1. **Scene Setup** - Initialize THREE.js scene
+2. **Renderer** - WebGL renderer with animation loop
+3. **Text Texture** - Generate text on canvas
+4. **Effect Shader** - Map texture to 3D geometry
+5. **Camera Controls** - OrbitControls for interaction
 
 ---
 
-## 🎨 Developing New Effects
+# SECTION 3: DEVELOPMENT WORKFLOWS
 
-**CRITICAL:** When developing a new effect, read these documents in order:
+## 🎨 Effect Development
 
-### Required Reading
+### Required Reading (in order):
 
-1. **`PLUGIN_SPEC.md`** ⭐ - **READ THIS FIRST**
+1. **PLUGIN_SPEC.md** ⭐ - READ THIS FIRST
    - Complete effect development guide
    - Effect API (EffectBase methods & properties)
    - Settings schema system
-   - **Export configuration** (REQUIRED for video export)
-   - Complete examples (loop vs oneshot effects)
-   - Testing checklist
+   - Export configuration (REQUIRED for video export)
+   - Complete examples
 
-2. **`js/effects/endless.js`** - Reference implementation
+2. **js/effects/endless.js** - Reference implementation
    - Production-ready example
    - Perfect loop calculation
-   - Export configuration in action
 
-3. **`docs/VIDEO_EXPORT_SPEC.md`** - Export system deep-dive (optional)
-   - Technical architecture details
+3. **docs/VIDEO_EXPORT_SPEC.md** - Export system deep-dive (optional)
 
 ### Effect Development Checklist
 
-When Claude creates a new effect, MUST implement:
-
 **Required (Basic Effect):**
 - ✅ `static get metadata()` - ID, name, icon, description
-- ✅ `getSettingsSchema()` - Define parameters (inherits from EffectBase)
+- ✅ `getSettingsSchema()` - Define parameters
 - ✅ `init(scene, camera, renderer)` - Create Three.js scene
 - ✅ `update(deltaTime, elapsedTime)` - Animation loop
 - ✅ `onSettingChanged(key, value)` - Reactive updates
 - ✅ `destroy()` - Cleanup resources
 
 **Required (Video Export Support):**
-- ✅ `static get exportDefaults()` - Export behavior (type: 'loop'|'oneshot', duration)
+- ✅ `static get exportDefaults()` - Export behavior (type: 'loop'|'oneshot')
 - ✅ `calculateExportSuggestion()` - Smart duration based on CURRENT settings
-- ⚠️ `reset()` - Optional, reset to t=0 for export (if effect needs it)
+- ⚠️ `reset()` - Optional, reset to t=0 for export
 
 **Optional (Advanced):**
 - `resize(width, height)` - Handle window resize
-- `isComplete()` - For oneshot effects, detect when done
-- `getVisualCenter()` - Custom camera pivot point
-
-### Example Prompt for New Effect
-
-When user says: "Create a new wave effect"
-
-Claude should:
-1. Read PLUGIN_SPEC.md (especially Export Configuration section)
-2. Analyze if effect is 'loop' or 'oneshot'
-3. Implement `calculateExportSuggestion()` to calculate perfect loop point
-4. Follow the checklist above
-5. Test with Export Mode
-
-**Good Prompt:**
-> "Create a new effect called 'wave' that animates text with a sine wave displacement. It should loop seamlessly. Calculate the perfect loop duration based on wave frequency. See PLUGIN_SPEC.md for the complete API, especially the Export Configuration section."
-
----
-
-## ⚠️ Common Pitfalls (Avoid These Mistakes!)
-
-This section documents common mistakes that waste time. Read this BEFORE starting development.
-
-### Effect Development Pitfalls
-
-**1. Forgetting Export Configuration**
-```javascript
-// ❌ WRONG: No export configuration
-export class MyEffect extends EffectBase {
-    static get metadata() { ... }
-    getSettingsSchema() { ... }
-    // Missing exportDefaults and calculateExportSuggestion!
-}
-
-// ✅ CORRECT: Always include export configuration
-export class MyEffect extends EffectBase {
-    static get exportDefaults() {
-        return { type: 'loop', recommendedDuration: 5, ... };
-    }
-
-    calculateExportSuggestion() {
-        const speed = this.settings.rotationSpeed;
-        const period = (2 * Math.PI) / speed;
-        return { duration: period, ... };
-    }
-}
-```
-
-**Why it matters:** Video export won't work without these methods. User will see errors when trying to export.
-
----
-
-**2. Static Export Duration Instead of Dynamic Calculation**
-```javascript
-// ❌ WRONG: Hardcoded duration
-calculateExportSuggestion() {
-    return {
-        duration: 5,  // Always 5 seconds, regardless of settings
-        loopPoint: 5,
-        isSeamless: true
-    };
-}
-
-// ✅ CORRECT: Calculate based on CURRENT settings
-calculateExportSuggestion() {
-    const rotSpeed = this.settings.rotationSpeed || 1.0;
-    const period = (2 * Math.PI) / rotSpeed / 1000;  // Perfect loop
-
-    return {
-        duration: period,  // Recalculated each time settings change
-        loopPoint: period,
-        isSeamless: true,
-        explanation: `One rotation at ${rotSpeed} rad/s = ${period.toFixed(1)}s`
-    };
-}
-```
-
-**Why it matters:** User changes rotation speed to 0.5, but export duration stays 5s → loop is broken.
-
----
-
-**3. Settings Without Group Property**
-```javascript
-// ❌ WRONG: No group property
-getSettingsSchema() {
-    return {
-        ...super.getSettingsSchema(),
-        rotationSpeed: {
-            type: 'number',
-            label: 'Rotation Speed',
-            default: 1.0
-            // Missing: group property!
-        }
-    };
-}
-
-// ✅ CORRECT: Always specify group
-getSettingsSchema() {
-    return {
-        ...super.getSettingsSchema(),
-        rotationSpeed: {
-            type: 'number',
-            label: 'Rotation Speed',
-            default: 1.0,
-            group: 'effect'  // Groups settings in UI
-        }
-    };
-}
-```
-
-**Why it matters:** UI can't organize settings into collapsible sections. Everything appears in one giant list.
-
----
-
-**4. Not Disposing Three.js Resources**
-```javascript
-// ❌ WRONG: Memory leak
-destroy() {
-    this.scene.remove(this.mesh);
-    // Forgot to dispose geometry, material, textures!
-}
-
-// ✅ CORRECT: Always dispose
-destroy() {
-    if (this.mesh) {
-        this.scene.remove(this.mesh);
-    }
-
-    if (this.geometry) {
-        this.geometry.dispose();
-    }
-
-    if (this.material) {
-        if (this.material.map) this.material.map.dispose();
-        if (this.material.normalMap) this.material.normalMap.dispose();
-        this.material.dispose();
-    }
-
-    super.destroy();
-}
-```
-
-**Why it matters:** Every effect switch leaks memory. After 10 switches, browser slows down or crashes.
-
----
-
-**5. Hardcoded Values Instead of Settings**
-```javascript
-// ❌ WRONG: Hardcoded values
-update(deltaTime) {
-    this.mesh.rotation.y += deltaTime * 0.5;  // Magic number!
-}
-
-// ✅ CORRECT: Use settings
-update(deltaTime) {
-    const speed = this.settings.rotationSpeed || 1.0;
-    this.mesh.rotation.y += deltaTime * speed;
-}
-```
-
-**Why it matters:** User can't control the animation. Defeats the purpose of having settings.
-
----
-
-**6. Using deltaTime for Position (Animation Drift)**
-```javascript
-// ❌ WRONG: Using deltaTime for position (accumulates error)
-update(deltaTime) {
-    this.rotation += deltaTime * this.settings.rotationSpeed;
-    this.mesh.rotation.y = this.rotation;
-}
-
-// ✅ CORRECT: Use elapsedTime for deterministic position
-update(deltaTime, elapsedTime) {
-    const speed = this.settings.rotationSpeed || 1.0;
-    this.mesh.rotation.y = elapsedTime * speed;  // Always exact
-}
-```
-
-**Why it matters:** Export relies on exact frame timing. deltaTime causes drift, breaking perfect loops.
-
----
-
-**7. Circular Import Dependencies**
-```javascript
-// ❌ WRONG: Circular imports
-// app.js
-import { MyEffect } from './effects/my-effect.js';
-
-// my-effect.js
-import { App } from './core/app.js';  // Circular!
-
-// ✅ CORRECT: Use dependency injection
-// app.js
-import { MyEffect } from './effects/my-effect.js';
-const effect = new MyEffect();
-effect.init(scene, camera, renderer);  // Pass dependencies
-
-// my-effect.js
-// No import of App needed - receives dependencies via init()
-```
-
-**Why it matters:** Module loading fails with cryptic errors. Very hard to debug.
-
----
-
-**8. Forgetting to Call super.destroy()**
-```javascript
-// ❌ WRONG: Doesn't call parent cleanup
-destroy() {
-    this.geometry.dispose();
-    this.material.dispose();
-    // Forgot super.destroy()!
-}
-
-// ✅ CORRECT: Always call super
-destroy() {
-    // Your cleanup
-    if (this.geometry) this.geometry.dispose();
-    if (this.material) this.material.dispose();
-
-    // Parent cleanup
-    super.destroy();
-}
-```
-
-**Why it matters:** EffectBase has its own cleanup logic. Skipping it causes incomplete cleanup.
-
----
-
-### GitHub Pages Deployment Pitfalls
-
-**9. Testing Wrong Branch**
-```bash
-# ❌ WRONG: Push to branch but GitHub Pages deploys from main
-git checkout claude/my-feature-123
-# ... make changes ...
-git push origin claude/my-feature-123
-
-# User tests at https://karstenhoffmann.github.io/floss/
-# But GitHub Pages is STILL deploying from main branch!
-# User sees OLD code and reports "it doesn't work"
-```
-
-**✅ CORRECT: Update GitHub Pages settings first**
-```
-1. Push to branch: git push origin claude/my-feature-123
-2. TELL USER: "Update GitHub Pages to branch: claude/my-feature-123"
-3. User goes to: Settings → Pages → Branch: [select branch]
-4. Wait 1-2 minutes for deployment
-5. NOW test at https://karstenhoffmann.github.io/floss/
-```
-
-**Why it matters:** This is the #1 wasted-time issue. User tests old code, reports bugs that are already fixed.
-
----
-
-**10. Branch Name Missing Session ID**
-```bash
-# ❌ WRONG: Branch name without session ID
-git checkout -b claude/my-feature
-
-# ✅ CORRECT: Branch name WITH session ID
-git checkout -b claude/my-feature-0141Y9y9rYFGQNXKK1WTUB8H
-```
-
-**Why it matters:** GitHub push will fail with 403 error if branch doesn't end with matching session ID.
-
----
-
-### Documentation Pitfalls
-
-**11. Adding Features Without Documenting Them**
-```javascript
-// ❌ WRONG: Add new method, don't document
-// effect-base.js
-+ getVisualCenter() { return new THREE.Vector3(0, 0, 0); }
-
-// No update to PLUGIN_SPEC.md!
-
-// ✅ CORRECT: Add method AND document
-// effect-base.js
-+ getVisualCenter() { return new THREE.Vector3(0, 0, 0); }
-
-// PLUGIN_SPEC.md
-+ ## getVisualCenter()
-+ Returns the visual center point for camera pivot.
-+ ...
-```
-
-**Why it matters:** Future Claude sessions won't know the method exists. Reinvent the wheel.
-
----
-
-**12. Contradictory Documentation**
-```markdown
-<!-- ❌ WRONG: CLAUDE.md says one thing -->
-CLAUDE.md: "Effects must implement exportDefaults"
-
-<!-- PLUGIN_SPEC.md says another -->
-PLUGIN_SPEC.md: "exportDefaults is optional"
-
-<!-- ✅ CORRECT: Keep docs in sync -->
-CLAUDE.md: "Effects MUST implement exportDefaults (see PLUGIN_SPEC.md)"
-PLUGIN_SPEC.md: "## Required Methods
-- exportDefaults - REQUIRED for video export"
-```
-
-**Why it matters:** Claude gets confused, user gets frustrated, time is wasted resolving conflicts.
-
----
-
-**13. Forgetting to Update version.js Before Committing**
-```bash
-# ❌ WRONG: Commit without updating version
-# ... make code changes ...
-git add .
-git commit -m "feat: new feature"
-# version.js still shows old version!
-
-# ✅ CORRECT: Always update version.js FIRST
-# 1. Make code changes
-# 2. Update js/version.js:
-export const VERSION = {
-    number: '2.3.1',  // Incremented!
-    commit: 'Add new feature',
-    date: '2025-11-21',
-    time: '15:45'
-};
-# 3. Then commit
-git add .
-git commit -m "feat: Add new feature
-
-Version: 2.3.1"
-```
-
-**Why it matters:** User can't tell which version is deployed, debugging becomes impossible, cache issues are invisible.
-
----
-
-### Self-Check Before Finishing Session
-
-Before marking work complete, ask yourself:
-
-**Code Quality:**
-- [ ] Did I add export configuration to new effects?
-- [ ] Did I use dynamic calculation, not static duration?
-- [ ] Did I add `group` property to all settings?
-- [ ] Did I dispose all Three.js resources?
-- [ ] Did I use `this.settings.X` not hardcoded values?
-- [ ] Did I use `elapsedTime` for position, `deltaTime` for velocity?
-- [ ] Did I call `super.destroy()`?
-
-**Documentation:**
-- [ ] Did I update PLUGIN_SPEC.md if API changed?
-- [ ] Did I update CLAUDE.md if architecture changed?
-- [ ] Did I update examples if API changed?
-- [ ] Are all docs consistent with each other?
-
-**Version & Deployment:**
-- [ ] Did I update `js/version.js` before committing?
-- [ ] Did I increment version number correctly?
-- [ ] Did I write brief commit message in version.js (max 47 chars)?
-- [ ] Did I update date and time in version.js?
-- [ ] Did I commit with clear message?
-- [ ] Did I push to correct branch (with session ID)?
-- [ ] Did I TELL USER to update GitHub Pages settings?
-- [ ] Did I REMIND USER which URL to test?
-
-**If ANY checkbox is unchecked → Fix before finishing!**
-
----
-
-## Common Tasks
-
-### Running Locally
-
-```bash
-# Simple HTTP server (from repository root)
-python3 -m http.server 8080
-# → http://localhost:8080
-```
-
-**Important:** The user tests via GitHub Pages, not locally. Always push changes to test.
-
-### Deploying to GitHub Pages
-
-**⚠️ CRITICAL FOR CLAUDE CODE WEB:**
-
-User can ONLY test via GitHub Pages. **Always remind them to update settings!**
-
-**Step-by-step deployment:**
-
-1. **Commit and push changes:**
-   ```bash
-   git add .
-   git commit -m "feat: your changes"
-   git push -u origin claude/your-branch-name-[session-id]
-   ```
-
-2. **🚨 TELL USER to update GitHub Pages settings:**
-   ```
-   Go to: https://github.com/karstenhoffmann/floss/settings/pages
-
-   Settings to verify/update:
-   - Source: "Deploy from a branch"
-   - Branch: [your current working branch] ← SELECT CORRECT BRANCH!
-   - Folder: "/ (root)"
-   - Click "Save"
-   ```
-
-3. **Wait for deployment:**
-   - GitHub Actions will deploy automatically
-   - Wait ~1-2 minutes
-   - Check deployment status: https://github.com/karstenhoffmann/floss/actions
-
-4. **🚨 REMIND USER to test:**
-   ```
-   Test at: https://karstenhoffmann.github.io/floss/
-
-   Verify you're testing the CORRECT branch:
-   - Check GitHub Pages settings shows your branch
-   - Hard refresh browser (Ctrl+Shift+R / Cmd+Shift+R)
-   - Check DevTools → Network to see fresh requests
-   ```
-
-5. **Clear cache if needed:**
-   - Hard refresh: `Ctrl+Shift+R` (Windows) / `Cmd+Shift+R` (Mac)
-   - Or: DevTools → Application → Clear Storage
-
-**Service Worker Cache:**
-- Bump `CACHE_VERSION` in `service-worker.js` when making breaking changes
-- Example: `v1.0.0` → `v1.0.1`
-- Forces clients to re-download assets
-
-**Common Issues:**
-- ❌ Testing wrong branch: Check GitHub Pages settings
-- ❌ Seeing old code: Wait longer or hard refresh
-- ❌ 404 errors: Verify folder is set to `/ (root)` not `/app`
-
-### Adding a New Effect
-
-1. Create `js/effects/my-effect.js` extending `EffectBase`
-2. Implement required methods (see PLUGIN_SPEC.md)
-3. Import in `js/core/effect-manager.js`
-4. Add to effect registry
-5. Test locally, then push
-
-### Modifying UI
-
-- **Styles**: Edit `styles/*.css` files
-- **Icons**: Add to `js/ui/icons.js` SVG sprite
-- **Notifications**: Use `showNotification()` from `js/ui/notification.js`
-- **Controls**: Auto-generated from effect settings schema
+- `isComplete()` - For oneshot effects
+- `getVisualCenter()` - Custom camera pivot
 
 ---
 
 ## 🎬 Video Export System
 
-**Status:** ✅ Fully implemented (v5.1.1+)
+**Status:** ✅ Fully implemented
 **Format:** MP4 (H.264), PowerPoint compatible
 **Resolution:** 1920×1080
 **Frame Rates:** 30fps, 60fps
@@ -1244,425 +353,48 @@ User can ONLY test via GitHub Pages. **Always remind them to update settings!**
 
 ### Overview
 
-The video export system uses **canvas-record** library with **MP4WasmEncoder** for frame-perfect, offline video rendering. This means:
+Uses **canvas-record** library with **MP4WasmEncoder**:
 - ✅ Faster than realtime (30-40× speed)
 - ✅ Perfect loops (calculated from effect settings)
-- ✅ No frame drops or timing issues
-- ✅ Deterministic animation (same input = same output)
+- ✅ Deterministic animation
 - ✅ No external dependencies (WASM embedded)
 
-### Implementation Architecture
+**See docs/VIDEO_EXPORT_SPEC.md for complete technical details.**
 
-**File:** `js/core/video-export.js`
+### Critical Learnings (Top 7)
 
-```
-User clicks Export
-  ↓
-VideoExportManager.enterExportMode()
-  ↓
-SafeFrame component shows 1920×1080 region
-  ↓
-User clicks "Start Export"
-  ↓
-VideoExportManager.startExport()
-  ├─ Create offscreen renderer (1920×1080)
-  ├─ Clone effect to offscreen scene
-  ├─ Reset effect to t=0
-  ├─ Initialize canvas-record Recorder
-  │   ├─ Create MP4WasmEncoder explicitly
-  │   ├─ Calculate bitrate manually
-  │   └─ Start with { initOnly: true }
-  ↓
-renderFrameByFrame()
-  ├─ Loop: for frame 0 to 149 (150 frames)
-  │   ├─ Calculate time = frame / fps
-  │   ├─ effect.update(deltaTime, time)
-  │   ├─ offscreenRenderer.render(scene, camera)
-  │   └─ recorder.step()
-  ↓
-recorder.stop() → Returns Uint8Array buffer
-  ↓
-Convert to Blob → Download MP4
-```
+1. **Use MP4WasmEncoder, NOT WebCodecsEncoder**
+   - Explicitly create `Encoders.MP4WasmEncoder({ extension: 'mp4' })`
 
-### Critical Learnings (MUST READ)
+2. **Pass WebGL Context, NOT Canvas**
+   - `const gl = renderer.context;` (property, not method)
+   - `new Recorder(gl, {...})` not `new Recorder(canvas, {...})`
 
-**🚨 IMPORTANT:** These are hard-learned lessons from v4.0.0-v5.1.1 development. Follow these exactly to avoid wasting time.
+3. **Use Three.js `.context` Property**
+   - Three.js r115 has `.context` property, not `.getContext()` method
 
-#### 1. **Use MP4WasmEncoder, NOT WebCodecsEncoder**
+4. **Provide encoderOptions.bitrateMode**
+   - Required: `bitrateMode: 'variable'` in encoderOptions
 
-**Problem:**
-- canvas-record auto-selects WebCodecsEncoder if browser supports WebCodecs API
-- WebCodecsEncoder has inconsistent browser support and configuration issues
-- Codec compatibility varies across devices (avc1.420034 vs avc1.4d0034)
+5. **Calculate Bitrate Manually**
+   - Don't rely on estimateBitRate() - calculate explicitly
 
-**Solution:**
-```javascript
-import { Recorder, Encoders } from '../../lib/canvas-record/package/index.js';
+6. **Use start({ initOnly: true })**
+   - Prevents double-encoding first frame
 
-// ✅ CORRECT: Explicitly create MP4WasmEncoder
-const encoder = new Encoders.MP4WasmEncoder({
-    extension: 'mp4'
-});
-
-this.recorder = new Recorder(gl, {
-    encoder: encoder,  // Force MP4WasmEncoder
-    // ...
-});
-```
-
-**Why:** MP4WasmEncoder uses embedded WASM binary, no browser API dependencies, works everywhere.
+7. **Use Deterministic Timing**
+   - `const time = frame / fps;` - exact time
+   - Use `elapsedTime` for position, not accumulated `deltaTime`
 
 ---
 
-#### 2. **Pass WebGL Context, NOT Canvas Element**
-
-**Problem:**
-- Recorder expects a RenderingContext (WebGLRenderingContext), not HTMLCanvasElement
-- Error: "Cannot read properties of undefined (reading 'width')"
-
-**Solution:**
-```javascript
-// ❌ WRONG:
-this.recorder = new Recorder(this.offscreenCanvas, {...});
-
-// ✅ CORRECT:
-const gl = this.offscreenRenderer.context;  // Property, not method!
-this.recorder = new Recorder(gl, {...});
-```
-
-**Why:** Recorder.js accesses `this.context.canvas.width` - needs context, not canvas.
-
----
-
-#### 3. **Use Three.js `.context` Property (r115)**
-
-**Problem:**
-- Three.js r115 has `.context` property, not `.getContext()` method
-- Calling `.getContext()` throws deprecation warning or fails
-
-**Solution:**
-```javascript
-// ❌ WRONG:
-const gl = this.offscreenRenderer.getContext();  // Not a method!
-
-// ✅ CORRECT:
-const gl = this.offscreenRenderer.context;  // Property in r115
-```
-
-**Why:** Three.js API changed - use property access for renderer context.
-
----
-
-#### 4. **Provide encoderOptions.bitrateMode**
-
-**Problem:**
-- MP4WasmEncoder.init() accesses `this.encoderOptions.bitrateMode`
-- Error: "Cannot read properties of undefined (reading 'bitrateMode')"
-
-**Solution:**
-```javascript
-this.recorder = new Recorder(gl, {
-    encoder: encoder,
-    encoderOptions: {
-        bitrateMode: 'variable',  // Required!
-        bitrate: bitrate  // Explicit value
-    }
-});
-```
-
-**Why:** Encoder needs bitrateMode to calculate bitrate via estimateBitRate().
-
----
-
-#### 5. **Calculate Bitrate Manually**
-
-**Problem:**
-- `estimateBitRate(width, height, frameRate, motionRank, bitrateMode)`
-- MP4WasmEncoder calls it with wrong parameter order → NaN bitrate
-- Error: "Failed to read the 'bitrate' property from 'VideoEncoderConfig'"
-
-**Solution:**
-```javascript
-// Calculate bitrate manually
-const width = 1920;
-const height = 1080;
-const fps = 60;
-const motionRank = 4;  // 1=low, 2=medium, 4=high motion
-const bitrateMode = 'variable';
-
-const bitrate = Math.round(
-    width * height * fps * motionRank * 0.07 * (bitrateMode === 'variable' ? 0.75 : 1)
-);
-// For 1920×1080@60fps: ~26 Mbps
-
-this.recorder = new Recorder(gl, {
-    encoderOptions: {
-        bitrateMode: bitrateMode,
-        bitrate: bitrate  // Explicit value
-    }
-});
-```
-
-**Why:** Avoid relying on estimateBitRate() parameter order bugs.
-
----
-
-#### 6. **Use start({ initOnly: true }) + Final stop()**
-
-**Problem:**
-- `start()` calls first `step()` automatically → encodes frame 0
-- Loop encodes frames 0-149 → total 151 frames (off by one!)
-- `step()` doesn't return buffer, only calls `stop()` internally
-
-**Solution:**
-```javascript
-// Start without first step
-await this.recorder.start({ initOnly: true });
-
-// Render all frames
-for (let frameNumber = 0; frameNumber < totalFrames; frameNumber++) {
-    effect.update(deltaTime, time);
-    this.offscreenRenderer.render(scene, camera);
-    await this.recorder.step();  // Doesn't return anything!
-}
-
-// Call stop() directly to get buffer
-const buffer = await this.recorder.stop();  // Returns Uint8Array
-const blob = new Blob([buffer], { type: 'video/mp4' });
-```
-
-**Why:**
-- `initOnly: true` prevents double-encoding first frame
-- `step()` has no return statement in else branch
-- `stop()` returns the buffer properly
-
----
-
-#### 7. **Use Deterministic Timing (elapsedTime, not deltaTime)**
-
-**Problem:**
-- Using deltaTime for position accumulates floating-point errors
-- Breaks perfect loops and frame-perfect rendering
-
-**Solution:**
-```javascript
-// ❌ WRONG: Accumulates error
-this.rotation += deltaTime * speed;
-
-// ✅ CORRECT: Deterministic
-for (let frame = 0; frame < totalFrames; frame++) {
-    const time = frame / fps;  // Exact time
-    effect.update(1/fps, time);  // deltaTime, elapsedTime
-}
-```
-
-**Why:** Export relies on exact frame timing for perfect loops.
-
----
-
-### Complete Working Example
-
-```javascript
-// js/core/video-export.js
-import { Recorder, Encoders } from '../../lib/canvas-record/package/index.js';
-
-async startExport() {
-    // 1. Setup
-    const width = 1920;
-    const height = 1080;
-    const fps = 60;
-    const duration = 2.5;  // seconds
-    const totalFrames = duration * fps;  // 150 frames
-
-    // 2. Create offscreen renderer
-    const offscreenCanvas = document.createElement('canvas');
-    offscreenCanvas.width = width;
-    offscreenCanvas.height = height;
-
-    const offscreenRenderer = new THREE.WebGLRenderer({
-        canvas: offscreenCanvas,
-        alpha: true,
-        antialias: true
-    });
-
-    // 3. Get WebGL context (property, not method!)
-    const gl = offscreenRenderer.context;
-
-    // 4. Calculate bitrate manually
-    const motionRank = 4;
-    const bitrateMode = 'variable';
-    const bitrate = Math.round(
-        width * height * fps * motionRank * 0.07 * (bitrateMode === 'variable' ? 0.75 : 1)
-    );
-
-    // 5. Create MP4WasmEncoder explicitly
-    const encoder = new Encoders.MP4WasmEncoder({
-        extension: 'mp4'
-    });
-
-    // 6. Create Recorder
-    this.recorder = new Recorder(gl, {
-        name: `floss-export-${Date.now()}.mp4`,
-        duration: duration,
-        frameRate: fps,
-        download: false,
-        extension: 'mp4',
-        encoder: encoder,
-        encoderOptions: {
-            bitrateMode: bitrateMode,
-            bitrate: bitrate
-        }
-    });
-
-    // 7. Start recording (initOnly - skip first step)
-    await this.recorder.start({ initOnly: true });
-
-    // 8. Render frames
-    for (let frame = 0; frame < totalFrames; frame++) {
-        const time = frame / fps;
-        effect.update(1/fps, time);
-        offscreenRenderer.render(scene, camera);
-        await this.recorder.step();
-    }
-
-    // 9. Stop and get buffer
-    const buffer = await this.recorder.stop();
-    const blob = new Blob([buffer], { type: 'video/mp4' });
-
-    // 10. Download
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `floss-export-${Date.now()}.mp4`;
-    a.click();
-    URL.revokeObjectURL(url);
-}
-```
-
----
-
-### Debugging Video Export
-
-**If export fails, check these in order:**
-
-1. **Console logging:**
-   ```
-   ✓ Using encoder: MP4WasmEncoder  ← Must be MP4WasmEncoder
-   ✓ Bitrate: 26.1 Mbps (variable)  ← Valid number
-   ✓ All frames rendered in X.XXs   ← Should complete
-   → Stopping recording...
-     Current frame count: 150 / 150  ← Should match
-   ✓ Recording stopped, buffer type: Uint8Array  ← Not undefined!
-     Buffer size: XXXXXX bytes  ← Not 0!
-   ✓ Recording stopped, blob size: X.XX MB  ← Valid size
-   ```
-
-2. **Common errors:**
-   - "Cannot read properties of undefined (reading 'width')" → Pass context, not canvas
-   - "Cannot read properties of undefined (reading 'bitrateMode')" → Add encoderOptions
-   - "Failed to read 'bitrate' property" → Calculate bitrate manually
-   - Blob size 0.00 MB → Buffer is undefined, check stop() call
-   - File contains "undefined" → new Blob([undefined], ...) - buffer is undefined
-
-3. **Verify MP4 file:**
-   - Size should be 2-10 MB (depending on duration/fps)
-   - Should open in QuickTime/VLC
-   - Should play in PowerPoint
-   - Should loop perfectly (if effect implements calculateExportSuggestion)
-
----
-
-### Dependencies
-
-**Library:** canvas-record v5.5.0 (vendored in `/lib/canvas-record/`)
-
-**Import Map:** (in `index.html`)
-```html
-<script type="importmap">
-{
-  "imports": {
-    "canvas-context": "https://esm.sh/canvas-context@3.3.1",
-    "canvas-screenshot": "https://esm.sh/canvas-screenshot@4.2.2",
-    "mediabunny": "https://esm.sh/mediabunny@1.24.2",
-    "media-codecs": "https://esm.sh/media-codecs@2.0.2",
-    "gifenc": "https://esm.sh/gifenc@1.0.3",
-    "h264-mp4-encoder": "https://esm.sh/h264-mp4-encoder@1.0.12",
-    "@ffmpeg/ffmpeg": "https://esm.sh/@ffmpeg/ffmpeg@0.12.7",
-    "@ffmpeg/util": "https://esm.sh/@ffmpeg/util@0.12.1"
-  }
-}
-</script>
-```
-
-**Why Import Maps:** canvas-record uses bare module specifiers that need resolution.
-
----
-
-### Future Improvements
-
-- [ ] Custom bitrate control (UI slider)
-- [ ] Multiple format support (WebM, GIF)
-- [ ] Resolution presets (4K, 1080p, 720p)
-- [ ] Background export (Web Worker)
-- [ ] Progress bar with time estimates
-- [ ] Cancel export functionality
-- [ ] Export queue (multiple exports)
-
----
-
-## Reference Directory (DO NOT MODIFY)
-
-The `/reference/` directory contains the **original Codrops kinetic typography tutorial** that Floss was based on. These files are:
-
-- **Read-only**: Keep for reference, do NOT modify
-- **Old architecture**: Uses different structure (Type.js, options.js)
-- **Learning resource**: Good examples of effect techniques
-- **Historical**: Shows evolution of the project
-
-**If you need to reference the original tutorial:**
-- Look in `/reference/index.html`
-- Check `/reference/js/gl/shaders.js` for shader examples
-- Review `/reference/js/options.js` for effect configurations
-
----
-
-## Known Issues & Gotchas
-
-### 1. Service Worker Caching
-**Problem:** Changes not visible after deployment
-**Solution:** Bump `CACHE_VERSION` in `service-worker.js`
-**Debug:** Dev Tools → Application → Clear Storage
-
-### 2. LocalStorage Quota
-**Problem:** Presets fail to save
-**Solution:** Limit preset count or compress data
-**Debug:** Check Console for QuotaExceededError
-
-### 3. THREE.js Version
-**Problem:** Compatibility with r115
-**Solution:** Use THREE.js r115 syntax, check docs at three.js.org
-**Note:** OrbitControls is from r115 examples
-
-### 4. GitHub Pages Deployment
-**Branch:** Deploys from `main` branch root directory
-**Cache:** GitHub Pages CDN caches aggressively - wait ~1 min
-**Path:** No `/app/` subdirectory anymore (old structure)
-
-### 5. Cross-Origin Issues
-**Problem:** Canvas tainted by cross-origin images
-**Solution:** Use data URLs or same-origin images
-**Note:** Affects text texture export
-
----
-
-## Development Workflow
+## 🔄 Git & Deployment Workflow
 
 ### Git Branch Strategy
 
 - `main` - Production branch (GitHub Pages deploys from here)
-- `claude/*` - Feature branches for Claude Code sessions
-- Merge to `main` via commit when feature is complete and tested
+- `claude/*` - Feature branches (must end with session ID)
+- Merge to `main` when feature complete and tested
 
 ### Commit Message Format
 
@@ -1673,66 +405,171 @@ The `/reference/` directory contains the **original Codrops kinetic typography t
 
 Changes:
 - file1.js - what changed
-- file2.css - what changed
 ```
 
 **Types:** `feat`, `fix`, `refactor`, `docs`, `style`, `perf`, `chore`
 
-### Session Start Checklist
+### Deploying to GitHub Pages
 
-Before starting work:
-- [ ] Read this CLAUDE.md file completely
-- [ ] Check current branch (`git branch --show-current`)
-- [ ] 🚨 **TELL USER to update GitHub Pages settings to current branch**
-- [ ] Verify repository structure (no `/app/` directory)
-- [ ] Understand the effect system architecture
-- [ ] Review any open issues or TODOs
+**Step-by-step:**
 
-### After Making Changes Checklist
+1. **Commit and push:**
+   ```bash
+   git add .
+   git commit -m "feat: your changes"
+   git push -u origin claude/your-branch-name-[session-id]
+   ```
 
-Before user can test:
-- [ ] Commit changes with clear message
-- [ ] Push to branch with correct session ID
-- [ ] 🚨 **REMIND USER: "Update GitHub Pages to branch [branch-name] if not already done"**
-- [ ] 🚨 **REMIND USER: "Wait 1-2 minutes, then test at https://karstenhoffmann.github.io/floss/"**
-- [ ] 🚨 **REMIND USER: "Verify you're testing the correct branch"**
+2. **🚨 TELL USER to update GitHub Pages:**
+   ```
+   Go to: https://github.com/karstenhoffmann/floss/settings/pages
 
----
+   Settings:
+   - Source: "Deploy from a branch"
+   - Branch: [your current working branch] ← SELECT CORRECT BRANCH!
+   - Folder: "/ (root)"
+   - Click "Save"
+   ```
 
-## Effect Development Guidelines
+3. **Wait for deployment:**
+   - GitHub Actions deploys automatically
+   - Wait ~1-2 minutes
+   - Check: https://github.com/karstenhoffmann/floss/actions
 
-### Performance
+4. **🚨 REMIND USER to test:**
+   ```
+   Test at: https://karstenhoffmann.github.io/floss/
 
-- Target 60 FPS on modern desktop hardware
-- Use BufferGeometry (not legacy Geometry)
-- Minimize uniform updates in shaders
-- Dispose resources properly on effect switch
+   Verify correct branch:
+   - Check GitHub Pages settings
+   - Hard refresh: Ctrl+Shift+R (Windows) / Cmd+Shift+R (Mac)
+   ```
 
-### Visual Quality
+5. **Service Worker Cache:**
+   - Bump `CACHE_VERSION` in `service-worker.js` for breaking changes
+   - Forces clients to re-download assets
 
-- Use OKLCH color space for better perceptual uniformity
-- Implement smooth transitions between parameter changes
-- Consider fog/depth for 3D effects
-- Add subtle animation to static parameters
-
-### User Experience
-
-- Settings should have immediate visual feedback
-- Use sensible defaults
-- Provide helpful parameter labels
-- Consider preset-friendliness of settings
-
-### Code Style
-
-- Use ES6 modules
-- Prefer `const` over `let`
-- Use descriptive variable names
-- Add JSDoc comments for public methods
-- Keep methods under 50 lines
+**Common Issues:**
+- ❌ Testing wrong branch → Check GitHub Pages settings
+- ❌ Seeing old code → Wait longer or hard refresh
+- ❌ 404 errors → Verify folder is `/ (root)` not `/app`
 
 ---
 
-## Testing
+## 🛠️ Common Tasks
+
+### Adding a New Effect
+
+1. Create `js/effects/my-effect.js` extending `EffectBase`
+2. Implement required methods (see PLUGIN_SPEC.md)
+3. Import in `js/core/effect-manager.js`
+4. Add to effect registry
+5. Test, then push
+
+### Modifying UI
+
+- **Styles**: Edit `styles/*.css`
+- **Icons**: Add to `js/ui/icons.js`
+- **Notifications**: Use `showNotification()`
+- **Controls**: Auto-generated from settings schema
+
+---
+
+# SECTION 4: KNOWN ISSUES & TROUBLESHOOTING
+
+## ⚠️ Common Pitfalls (Critical Only)
+
+**This section contains only the top critical pitfalls. For comprehensive details, see DETAILED_PITFALLS.md**
+
+### Effect Development (Top 5)
+
+1. **Forgetting Export Configuration**
+   - Always implement `exportDefaults()` and `calculateExportSuggestion()`
+   - Video export won't work without these
+
+2. **Static Export Duration**
+   - Calculate duration dynamically based on CURRENT settings
+   - Don't hardcode duration values
+
+3. **Not Disposing Three.js Resources**
+   - Always dispose geometry, material, textures in `destroy()`
+   - Memory leak after 10+ effect switches
+
+4. **Using deltaTime for Position**
+   - Use `elapsedTime` for deterministic position
+   - Using deltaTime accumulates errors, breaks perfect loops
+
+5. **Settings Without Group Property**
+   - Always specify `group: 'effect'` in settings schema
+   - UI can't organize settings without it
+
+### Deployment (Top 2)
+
+6. **Testing Wrong Branch**
+   - User tests old code if GitHub Pages deploys from wrong branch
+   - #1 wasted-time issue - always remind user to update settings
+
+7. **Branch Name Missing Session ID**
+   - Push fails with 403 if branch doesn't end with session ID
+   - Format: `claude/feature-name-[SESSION_ID]`
+
+**For detailed examples and more pitfalls, see DETAILED_PITFALLS.md**
+
+---
+
+## 🐛 Known Issues
+
+### 1. Service Worker Caching
+**Problem:** Changes not visible after deployment
+**Solution:** Bump `CACHE_VERSION` in `service-worker.js`
+
+### 2. LocalStorage Quota
+**Problem:** Presets fail to save
+**Solution:** Limit preset count or compress data
+
+### 3. THREE.js Version
+**Problem:** Compatibility issues
+**Solution:** Use THREE.js r115 syntax
+**Note:** OrbitControls is from r115 examples
+
+### 4. Cross-Origin Issues
+**Problem:** Canvas tainted by cross-origin images
+**Solution:** Use data URLs or same-origin images
+
+---
+
+## 🔍 Troubleshooting
+
+### App Not Loading
+1. Check Console for JavaScript errors
+2. Verify Network tab for 404s or failed CDN requests
+3. Check Service Worker registration
+4. Clear browser cache
+5. Verify correct URL (not `/app/` subdirectory)
+
+### Effect Not Rendering
+1. Check WebGL availability
+2. Verify THREE.js version compatibility
+3. Check shader syntax (GLSL errors)
+4. Verify geometry/material/mesh creation
+5. Check scene.add() was called
+
+### Settings Not Saving
+1. Check LocalStorage quota
+2. Verify JSON serialization works
+3. Check Console errors
+4. Try clearing LocalStorage
+
+### GitHub Pages Not Updating
+1. Verify pushed to correct branch
+2. Wait 1-2 minutes for deployment
+3. Hard refresh browser
+4. Bump Service Worker cache version
+5. Check GitHub Actions status
+
+---
+
+## 🧪 Testing
 
 ### Manual Testing Checklist
 
@@ -1741,9 +578,8 @@ Before user can test:
 - [ ] All settings controls work
 - [ ] Presets save and load
 - [ ] Effect switches cleanly (no memory leaks)
-- [ ] Performance is acceptable (check FPS)
+- [ ] Performance acceptable (check FPS)
 - [ ] Works offline (Service Worker)
-- [ ] Mobile responsive (if applicable)
 
 ### Browser Compatibility
 
@@ -1753,118 +589,43 @@ Before user can test:
 
 ---
 
-## Debugging
+# SECTION 5: FUTURE WORK & PLANNED FEATURES
 
-### Common Console Messages
+## Roadmap
 
-```javascript
-// Good
-"Effect loaded: my-effect"
-"Settings initialized"
-"Preset saved: My Preset"
+See CHANGELOG.md and GitHub Issues for detailed roadmap.
 
-// Warnings
-"WebGL not available - falling back"
-"LocalStorage quota exceeded"
-
-// Errors
-"Failed to load effect: ..."
-"THREE.js error: ..."
-```
-
-### Debug Tools
-
-- Chrome DevTools → Application → Service Workers
-- Chrome DevTools → Application → Local Storage
-- THREE.js Inspector extension
-- Stats.js for FPS monitoring (add to renderer.js)
-
----
-
-## Future Enhancements
-
-See `CHANGELOG.md` and GitHub Issues for roadmap.
-
-Priority features:
-- [ ] Export video/GIF functionality
+**Priority features:**
 - [ ] More effect implementations (smoke, particles, etc.)
 - [ ] Timeline-based animation sequencing
 - [ ] Custom font upload
 - [ ] Collaborative presets (cloud sync)
-- [ ] Effect parameters randomization
 - [ ] Keyboard shortcuts customization
 
-### index-iife.html Visual Polish (Post-Migration)
-
-**Context:** `index-iife.html` currently uses simple Torus geometry for text rendering (PoC for file:// compatibility). This is intentional - visual finesse comes later.
-
-**TODO (Future Phase):**
-- [ ] Replace Torus with TorusKnot geometry (like original Codrops example)
-- [ ] Improve UV mapping for complex geometries
-- [ ] Add shader-based text rendering for better quality
-- [ ] Implement multiple effect options (not just one geometry)
-- [ ] Add proper lighting and materials (MeshStandardMaterial vs MeshBasicMaterial)
-
-**Priority:** LOW - Only after core migration is complete (vendoring CDN dependencies, offline-first architecture)
-
-**Rationale:** index-iife.html is a simplified IIFE entry point for file:// compatibility testing. The production app (index.html with ES6 modules) will have full visual effects. Don't spend time on visual polish until architecture is solid.
+**Low priority (UX polish):**
+- [ ] index-iife.html visual polish (TorusKnot geometry, shader-based text)
+- [ ] Coloris color picker replacement (evaluate Pickr, vanilla-picker, iro.js)
 
 ---
 
-### Coloris Color Picker UX Issues (Post-Migration)
+## 🔐 App Shell & Auth Gate (Planned)
 
-**Context:** Coloris color picker (vendored v1.0+) has persistent UX issues where the picker UI behaves inconsistently - sometimes closing immediately on click, sometimes staying open but not responding to interactions.
+**Status:** Planned architecture for future implementation (current version see CURRENT_STATUS.md)
 
-**Known Issues:**
-- Picker sometimes disappears immediately on first mousedown
-- Gradient selector occasionally non-responsive
-- Hue/alpha sliders sometimes don't register clicks
-- Inconsistent behavior across different sessions
-- Multiple attempts to fix with event handlers caused regressions
-
-**TODO (Future Phase - UX Polish):**
-- [ ] Evaluate alternative color picker libraries:
-  - [ ] Pickr (https://github.com/Simonwep/pickr) - Modern, well-maintained
-  - [ ] vanilla-picker (https://github.com/Sphinxxxx/vanilla-picker) - Lightweight
-  - [ ] iro.js (https://iro.js.org/) - HSV color picker with great UX
-  - [ ] Custom implementation using native `<input type="color">` + enhancement layer
-- [ ] Test alternative libraries for stability and UX
-- [ ] Replace Coloris if better option found
-- [ ] Ensure vendoring + offline-first compatibility
-- [ ] Update all color input components consistently
-
-**Priority:** LOW - Color picker is functional enough for PoC, focus on core architecture first
-
-**Rationale:** Coloris works but has edge-case UX issues. Don't spend more time debugging - evaluate alternatives in future UX polish phase. Current functionality is "good enough" for development/testing.
-
-**Version History:**
-- v5.4.0-5.4.6: Multiple attempts to fix picker closing issues
-- Tried: Custom event handlers, stopPropagation, event delegation, timing fixes
-- Result: Functional but still buggy - move on for now
-
----
-
-## 🔐 App Shell & Auth Gate – Rules
-
-**Status:** Planned architecture for future implementation (post-v5.5.0)
-
-**Context:** Floss will eventually have a unified loading screen with optional password gate for online deployment. This section defines rules for how Claude should approach this feature when it's implemented.
+**Context:** Floss will eventually have a unified loading screen with optional password gate for online deployment.
 
 ### Responsibilities
 
-**App Shell (Loading Screen) is responsible for:**
-- ✅ Preloader animation (Floss logo)
-- ✅ Environment detection (file:// vs https://)
-- ✅ Password gate UI (online mode only)
-- ✅ Password validation (client-side check)
-- ✅ Explicit call to `FlossApp.start({ mode: 'offline' | 'online' })`
+**App Shell is responsible for:**
+- Preloader animation
+- Environment detection (file:// vs https://)
+- Password gate UI (online mode only)
+- Explicit call to `FlossApp.start({ mode: 'offline' | 'online' })`
 
 **Floss App is responsible for:**
-- ✅ Main application logic (effects, export, UI)
-- ✅ Remaining mode-agnostic (no auth logic)
-- ✅ Starting ONLY when shell calls start()
-- ❌ NO built-in password/auth flow
-- ❌ NO assumptions about security guarantees
+- Main application logic (effects, export, UI)
+- Remaining mode-agnostic (no auth logic)
+- Starting ONLY when shell calls start()
 
 ### Critical Rules for Claude
 
@@ -1872,149 +633,92 @@ Priority features:
 
 1. **No False Security Claims**
    - ❌ NEVER claim password gate provides "secure authentication"
-   - ❌ NEVER claim it "protects confidential data"
-   - ❌ NEVER suggest it provides "access control" in a security sense
    - ✅ ALWAYS clarify: "UX/access gate for casual users only"
    - ✅ ALWAYS mention: "Client-side, can be bypassed by technical users"
 
 2. **Separation of Concerns**
-   - ❌ Don't mix auth logic into Floss App code
-   - ✅ Keep all password/gate logic in App Shell
-   - ✅ Use clean API boundary: `FlossApp.start(config)`
-   - ✅ App should work identically regardless of how it was started
+   - Keep all password/gate logic in App Shell
+   - Use clean API: `FlossApp.start(config)`
+   - App works identically regardless of how it was started
 
 3. **Documentation Requirements**
-   - ✅ ALWAYS document limitations in user-facing docs
-   - ✅ Explain when password gate is appropriate (demos, private portfolios)
-   - ✅ Explain when it's NOT appropriate (confidential projects, client data)
-   - ✅ Provide examples of proper use cases
+   - Document limitations in user-facing docs
+   - Explain when password gate is appropriate (demos, portfolios)
+   - Explain when NOT appropriate (confidential projects)
 
-4. **Testing Both Modes**
-   - ✅ Test file:// mode (no password gate)
-   - ✅ Test https:// mode (with password gate)
-   - ✅ Verify app functions identically in both modes
-   - ✅ Verify password gate can be easily bypassed (expected behavior)
+4. **Forbidden Assumptions**
+   - ❌ Don't claim password gate provides "security"
+   - ❌ Don't suggest storing sensitive data behind gate
+   - ❌ Don't add server-side components (defeats offline-first)
+   - ❌ Don't make password gate mandatory for file:// mode
 
-### Forbidden Assumptions
-
-When working on this feature, Claude MUST NOT:
-
-- ❌ Claim password gate provides "security"
-- ❌ Suggest storing sensitive data behind the gate
-- ❌ Implement complex auth flows (OAuth, JWT, etc.) - not in scope
-- ❌ Add server-side components (defeats offline-first philosophy)
-- ❌ Make password gate mandatory for file:// mode
-- ❌ Create different code paths for online/offline (defeats unified app goal)
-
-### Implementation Timeline
-
-- **Current Status:** Not implemented (planned for future)
-- **When to implement:** After Phase 6 complete, when user requests it
-- **Estimated effort:** 2-3 sessions
-- **Dependencies:** v5.5.0+ (offline architecture complete)
-
-**References:**
-- PHASE_OVERVIEW.md → "App Shell & Auth Gate (Planned Architecture)"
-- CURRENT_STATUS.md → "Potential Future Work" → "App Shell & Password Gate"
+**Implementation Timeline:**
+- Current Status: Not implemented
+- When: After current phases complete, when user requests it
+- Dependencies: Current stable version (see CURRENT_STATUS.md)
 
 ---
+
+# SECTION 6: REFERENCE
 
 ## External Dependencies
 
-### Vendoring Status (v5.5.0)
+### Vendoring Status
 
-**Philosophy:** All dependencies SHOULD be vendored locally for offline-first, copy-paste portability. ES modules with complex internal dependencies are bundled using Rollup.
+**Philosophy:** All dependencies vendored locally for offline-first portability. Complex ES modules bundled using Rollup.
 
 **✅ Fully Vendored (Offline-Ready):**
 - **Three.js r115** (646 KB) - `/lib/three/`
-  - three.min.js, OrbitControls.js, EffectComposer.js, RenderPass.js, ShaderPass.js, CopyShader.js
-- **Open Props** (3 KB minimal subset) - `/lib/open-props/`
-  - open-props.min.css, normalize.min.css
-- **Coloris Color Picker** (22 KB) - `/lib/coloris/`
-  - coloris.min.css, coloris.min.js
-- **MP4 Export Dependencies (Rollup-bundled)** (2.8 MB) - `/lib/esm/bundles/`
-  - canvas-context.js (2.1 KB)
-  - canvas-screenshot.js (3.0 KB)
-  - media-codecs.js (15 KB)
-  - mediabunny.js (1.1 MB - includes Node.js polyfills for Stream/Buffer)
-  - h264-mp4-encoder.js (1.7 MB - UMD bundle with embedded WASM + ES6 export wrapper)
-
-**Current Import Map (index.html):**
-```javascript
-{
-  "imports": {
-    "canvas-context": "./lib/esm/bundles/canvas-context.js",
-    "canvas-screenshot": "./lib/esm/bundles/canvas-screenshot.js",
-    "mediabunny": "./lib/esm/bundles/mediabunny.js",
-    "media-codecs": "./lib/esm/bundles/media-codecs.js",
-    "h264-mp4-encoder": "./lib/esm/bundles/h264-mp4-encoder.js",
-    "gifenc": "https://esm.sh/gifenc@1.0.3",
-    "@ffmpeg/ffmpeg": "https://esm.sh/@ffmpeg/ffmpeg@0.12.7",
-    "@ffmpeg/util": "https://esm.sh/@ffmpeg/util@0.12.1"
-  }
-}
-```
+- **Open Props** (3 KB) - `/lib/open-props/`
+- **Coloris** (22 KB) - `/lib/coloris/`
+- **MP4 Export Dependencies** (2.8 MB) - `/lib/esm/bundles/`
+  - canvas-context, canvas-screenshot, media-codecs, mediabunny, h264-mp4-encoder
 
 **⏳ Still on CDN (Optional Features):**
-- **gifenc** (1.0.3) - GIF export (optional, rarely used)
-- **@ffmpeg/ffmpeg** (0.12.7) - Advanced video formats (requires SharedArrayBuffer → HTTPS only, not file://)
-- **@ffmpeg/util** (0.12.1) - FFmpeg utilities
+- gifenc (GIF export - optional)
+- @ffmpeg/ffmpeg (requires HTTPS, not available file://)
 
-**Bundling Process (Rollup):**
-1. Install dependencies: `npm install`
-2. Run bundler: `npm run bundle:all`
-3. Rollup creates single-file ES6 bundles with:
-   - All internal dependencies resolved
-   - Node.js polyfills (Stream, Buffer) for mediabunny
-   - Browser-specific builds
-4. h264-mp4-encoder requires special handling:
-   - Pre-built UMD bundle copied from node_modules
-   - ES6 `export default` wrapper appended for compatibility
+**Bundling Process:**
+1. `npm install`
+2. `npm run bundle:all`
+3. Rollup creates single-file ES6 bundles
 
 **Impact:**
-- ✅ Basic app functionality: **100% offline** (Three.js, Open Props, Coloris)
-- ✅ MP4 video export: **100% offline** (h264-mp4-encoder with embedded WASM)
-- ⏳ GIF export: Requires CDN on first load, then cached
-- ⏳ Advanced formats (FFmpeg): CDN only, not available via file://
-
-**Total Vendored:** ~3.5 MB (671 KB + 2.8 MB bundles)
-**Build Required:** Yes - run `npm run bundle:all` after `npm install`
+- ✅ Basic app: **100% offline**
+- ✅ MP4 export: **100% offline**
+- ⏳ GIF export: Requires CDN first load, then cached
 
 ---
 
-## Troubleshooting
+## Reference Directory (DO NOT MODIFY)
 
-### App Not Loading
+The `/reference/` directory contains the **original Codrops kinetic typography tutorial** that Floss was based on.
 
-1. Check Console for JavaScript errors
-2. Verify Network tab for 404s or failed CDN requests
-3. Check Service Worker registration
-4. Clear browser cache and Service Worker cache
-5. Verify correct URL (not `/app/` subdirectory)
+- **Read-only**: Keep for reference, do NOT modify
+- **Old architecture**: Different structure (Type.js, options.js)
+- **Learning resource**: Good examples of effect techniques
 
-### Effect Not Rendering
+---
 
-1. Check WebGL availability (Console error?)
-2. Verify THREE.js version compatibility
-3. Check effect shader syntax (GLSL errors)
-4. Verify geometry/material/mesh creation
-5. Check scene.add() was called
-6. Verify camera position and field of view
+## Effect Development Guidelines
 
-### Settings Not Saving
+### Performance
+- Target 60 FPS on modern desktop hardware
+- Use BufferGeometry (not legacy Geometry)
+- Minimize uniform updates in shaders
+- Dispose resources properly
 
-1. Check LocalStorage quota
-2. Verify JSON serialization works
-3. Check for Console errors
-4. Try clearing LocalStorage and retrying
+### Visual Quality
+- Use OKLCH color space for better perceptual uniformity
+- Implement smooth transitions
+- Consider fog/depth for 3D effects
 
-### GitHub Pages Not Updating
-
-1. Verify pushed to correct branch (`main`)
-2. Wait 1-2 minutes for deployment
-3. Hard refresh browser (Ctrl+Shift+R)
-4. Bump Service Worker cache version
-5. Check GitHub Actions for deployment status
+### Code Style
+- Use ES6 modules
+- Prefer `const` over `let`
+- Descriptive variable names
+- JSDoc comments for public methods
+- Keep methods under 50 lines
 
 ---
 
@@ -2035,17 +739,17 @@ When working on this feature, Claude MUST NOT:
 
 ## Version History
 
-See `CHANGELOG.md` for detailed version history.
+**See CHANGELOG.md for detailed version history.**
 
-**Current Version:** 2.2.0
+**Current version:** See CURRENT_STATUS.md and js/version.js
 **Architecture:** Post-restructure (app in root, reference isolated)
 **Last Major Change:** Repository restructure (Nov 2024)
 
 ---
 
-## 🚀 QUICK REFERENCE FOR CLAUDE
+# QUICK REFERENCE
 
-### Critical Reminders (Execute Every Session)
+## Critical Reminders (Execute Every Session)
 
 **1. At Session Start:**
 ```
@@ -2059,22 +763,14 @@ See `CHANGELOG.md` for detailed version history.
 🚨 REMIND USER: "I've pushed to [branch-name]"
 🚨 REMIND USER: "Update GitHub Pages settings if you haven't already"
 🚨 REMIND USER: "Wait 1-2 min, then test at https://karstenhoffmann.github.io/floss/"
-🚨 REMIND USER: "Verify you're testing the correct branch"
 ```
 
-**3. When Creating New Branch:**
-```
-🚨 Branch must end with session ID: claude/feature-name-[SESSION_ID]
-🚨 TELL USER: "Update GitHub Pages: Settings → Pages → Branch: [new-branch]"
-```
-
-**4. Before User Tests:**
+**3. Before User Tests:**
 ```
 Checklist:
 ✅ Changes committed
 ✅ Changes pushed to correct branch (with session ID)
 ✅ User reminded to update GitHub Pages
-✅ User reminded to wait 1-2 minutes
 ✅ User reminded which URL to test
 ```
 
@@ -2082,12 +778,5 @@ Checklist:
 
 - User has **NO local file access** (Claude Code for Web)
 - User can **ONLY test via GitHub Pages**
-- Wrong branch in GitHub Pages = user tests **old code**
-- Wasted time if user isn't reminded to update settings
-
-### Common Mistakes to Avoid
-
-❌ Don't assume user can test locally
-❌ Don't forget to remind about GitHub Pages settings
-❌ Don't push without telling user which branch
-❌ Don't forget the session ID in branch name
+- Wrong branch = user tests **old code**
+- #1 wasted-time issue if not handled properly
