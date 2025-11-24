@@ -3,7 +3,7 @@
  * Caches assets for offline functionality
  */
 
-const CACHE_NAME = 'floss-v5.1.1'; // Call stop() directly (step returns void)
+const CACHE_NAME = 'floss-v5.5.0'; // All dependencies bundled with Rollup (MP4 export offline-ready)
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
@@ -38,15 +38,26 @@ const ASSETS_TO_CACHE = [
     // canvas-record library (vendored, will be cached on first load)
     './lib/canvas-record/package/index.js',
     './manifest.json',
-    // Three.js from CDN
-    'https://unpkg.com/three@0.115.0/build/three.min.js',
-    'https://unpkg.com/three@0.115.0/examples/js/controls/OrbitControls.js',
-    // Open Props
-    'https://unpkg.com/open-props',
-    'https://unpkg.com/open-props/normalize.min.css',
-    // Coloris Color Picker
-    'https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css',
-    'https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js'
+    // Three.js (vendored locally)
+    './lib/three/three.min.js',
+    './lib/three/examples/js/controls/OrbitControls.js',
+    './lib/three/examples/js/postprocessing/EffectComposer.js',
+    './lib/three/examples/js/postprocessing/RenderPass.js',
+    './lib/three/examples/js/postprocessing/ShaderPass.js',
+    './lib/three/examples/js/shaders/CopyShader.js',
+    // Open Props (vendored locally - minimal subset)
+    './lib/open-props/open-props.min.css',
+    './lib/open-props/normalize.min.css',
+    // Coloris Color Picker (vendored locally)
+    './lib/coloris/coloris.min.css',
+    './lib/coloris/coloris.min.js',
+    // canvas-record Dependencies (bundled with Rollup for offline support)
+    './lib/esm/bundles/canvas-context.js',
+    './lib/esm/bundles/canvas-screenshot.js',
+    './lib/esm/bundles/media-codecs.js',
+    './lib/esm/bundles/mediabunny.js',
+    './lib/esm/bundles/h264-mp4-encoder.js'
+    // Note: gifenc, @ffmpeg/ffmpeg, @ffmpeg/util remain on CDN (optional features)
 ];
 
 // Install event - cache assets

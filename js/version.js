@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.2.0',
-    commit: 'feat: Add Wave Plane and Sphere Text effects',
-    date: '2025-11-23',
-    time: '14:45'
+    number: '5.5.0',
+    commit: 'feat: Bundle MP4 export deps with Rollup (offline)',
+    date: '2025-11-24',
+    time: '09:30'
 };
 
 export default VERSION;

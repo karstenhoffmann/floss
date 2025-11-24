@@ -16,12 +16,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- Open Props - Modern CSS Design Tokens -->
-    <link rel="stylesheet" href="https://unpkg.com/open-props" />
-    <link rel="stylesheet" href="https://unpkg.com/open-props/normalize.min.css" />
+    <!-- Open Props - Modern CSS Design Tokens (Vendored locally) -->
+    <link rel="stylesheet" href="./lib/open-props/open-props.min.css" />
+    <link rel="stylesheet" href="./lib/open-props/normalize.min.css" />
 
-    <!-- Coloris - Modern Color Picker -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css"/>
+    <!-- Coloris - Modern Color Picker (Vendored locally) -->
+    <link rel="stylesheet" href="./lib/coloris/coloris.min.css"/>
 
     <!-- Styles -->
     <link rel="stylesheet" href="./styles/theme.css">
@@ -34,21 +34,15 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="./manifest.json">
 
-    <!-- Three.js via CDN (v0.115.0) -->
-    <script src="https://unpkg.com/three@0.115.0/build/three.min.js"></script>
+    <!-- Three.js (v0.115.0) - Vendored locally -->
+    <script src="./lib/three/three.min.js"></script>
     <!-- OrbitControls for camera interaction -->
-    <script src="https://unpkg.com/three@0.115.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="./lib/three/examples/js/controls/OrbitControls.js"></script>
     <!-- Post-Processing for Glitch Effect -->
-    <script src="https://unpkg.com/three@0.115.0/examples/js/postprocessing/EffectComposer.js"></script>
-    <script src="https://unpkg.com/three@0.115.0/examples/js/postprocessing/RenderPass.js"></script>
-    <script src="https://unpkg.com/three@0.115.0/examples/js/postprocessing/ShaderPass.js"></script>
-    <script src="https://unpkg.com/three@0.115.0/examples/js/shaders/CopyShader.js"></script>
-    <!-- Fallback CDN if unpkg fails -->
-    <script>
-        if (typeof THREE === 'undefined') {
-            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r115/three.min.js"><\/script>');
-        }
-    </script>
+    <script src="./lib/three/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="./lib/three/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="./lib/three/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="./lib/three/examples/js/shaders/CopyShader.js"></script>
 
     <!-- canvas-record: Loaded as ES module in video-export.js via esm.sh CDN -->
     <!-- No script tag needed here - imported dynamically when needed -->
@@ -395,19 +389,20 @@
     </div>
 
     <!-- Coloris - Modern Color Picker -->
-    <script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
+    <!-- Coloris Color Picker (Vendored locally) -->
+    <script src="./lib/coloris/coloris.min.js"></script>
 
-    <!-- Import Maps - Map bare module specifiers to CDN URLs -->
-    <!-- Required for canvas-record dependencies -->
+    <!-- Import Maps - Map bare module specifiers to local bundles -->
+    <!-- MP4 Export dependencies bundled with Rollup (v5.5.0) -->
     <script type="importmap">
     {
       "imports": {
-        "canvas-context": "https://esm.sh/canvas-context@3.3.1",
-        "canvas-screenshot": "https://esm.sh/canvas-screenshot@4.2.2",
-        "mediabunny": "https://esm.sh/mediabunny@1.24.2",
-        "media-codecs": "https://esm.sh/media-codecs@2.0.2",
+        "canvas-context": "./lib/esm/bundles/canvas-context.js",
+        "canvas-screenshot": "./lib/esm/bundles/canvas-screenshot.js",
+        "mediabunny": "./lib/esm/bundles/mediabunny.js",
+        "media-codecs": "./lib/esm/bundles/media-codecs.js",
+        "h264-mp4-encoder": "./lib/esm/bundles/h264-mp4-encoder.js",
         "gifenc": "https://esm.sh/gifenc@1.0.3",
-        "h264-mp4-encoder": "https://esm.sh/h264-mp4-encoder@1.0.12",
         "@ffmpeg/ffmpeg": "https://esm.sh/@ffmpeg/ffmpeg@0.12.7",
         "@ffmpeg/util": "https://esm.sh/@ffmpeg/util@0.12.1"
       }

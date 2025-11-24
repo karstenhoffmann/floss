@@ -1,9 +1,120 @@
 # Claude Code Session Context
 
-**Last Updated:** 2025-11-23
+**Last Updated:** 2025-11-24
 **Project:** Floss - Professional Kinetic Typography Motion Design Tool
 **Repository:** https://github.com/karstenhoffmann/floss
 **Deployment:** https://karstenhoffmann.github.io/floss/
+
+---
+
+## 🚀 CRITICAL: Session Bootstrapping & File-Awareness Policy
+
+**MANDATORY FOR EVERY NEW SESSION:**
+
+### 1. Session Start Protocol
+
+**When starting a new Claude Code session, ALWAYS do this FIRST:**
+
+```
+Step 1: Check for status files
+  - Read PHASE_OVERVIEW.md (if exists)
+  - Read CURRENT_STATUS.md (if exists)
+
+Step 2: Summarize loaded context
+  - Briefly confirm what phase/status was loaded
+  - Show current branch, version, recent work
+  - Demonstrate that context is correctly understood
+
+Step 3: DO NOT assume chat history is current
+  - NEVER rely on information from previous chat messages
+  - ALWAYS use the status files as source of truth
+  - If files don't exist, acknowledge and proceed normally
+```
+
+**Example Session Start:**
+```
+✅ Status files loaded:
+  - PHASE_OVERVIEW.md: Phase 4 (MP4 Export) - Complete
+  - CURRENT_STATUS.md: Branch claude/convert-index-iife-XXX, v5.5.0
+  - Last work: Rollup bundling for offline MP4 export
+
+Ready to continue. What would you like to work on?
+```
+
+### 2. Status File Update Protocol
+
+**When to propose updates:**
+- ✅ Phase completed (e.g., "Phase 4: Bundling - Complete")
+- ✅ New branch created or switched
+- ✅ Architecture decision made (e.g., "Use Rollup instead of esbuild")
+- ✅ Major milestone reached (e.g., "100% offline MP4 export working")
+- ✅ Significant blocker encountered (e.g., "FFmpeg requires HTTPS, not file://")
+
+**How to propose updates:**
+```
+🔄 Suggest: "Should I update PHASE_OVERVIEW.md with:
+   - Phase 4: Complete (Rollup bundling, 2.8 MB bundles)
+   - Phase 5: Next (Testing on GitHub Pages)"
+
+Wait for user approval: "Yes" / "No" / "Later"
+```
+
+**CRITICAL RULES:**
+- ❌ NEVER update status files automatically
+- ❌ NEVER overwrite files without explicit permission
+- ✅ ALWAYS propose changes, then wait for approval
+- ✅ ALWAYS show what will be written before writing
+
+### 3. File Modification Policy
+
+**Before modifying ANY status/tracking file:**
+
+1. **Show proposed changes:**
+   ```
+   I propose updating CURRENT_STATUS.md with:
+
+   [Show exact content that will be written]
+
+   Proceed? (yes/no)
+   ```
+
+2. **Wait for explicit approval:**
+   - User says "yes" → Proceed with write
+   - User says "no" → Don't write, offer alternatives
+   - User says "later" → Make note, don't write now
+
+3. **Never guess or assume:**
+   - Don't reorganize files without asking
+   - Don't delete sections without confirmation
+   - Don't merge information without approval
+
+### 4. File Awareness Best Practices
+
+**Status files are the source of truth:**
+- PHASE_OVERVIEW.md → What phases exist, which are done, what's next
+- CURRENT_STATUS.md → Current branch, version, recent commits, blockers
+- CLAUDE.md (this file) → Project rules, architecture, workflows
+
+**When files conflict with chat history:**
+- ✅ Trust the files (they persist across sessions)
+- ❌ Don't trust chat history (it's session-specific)
+- 🔄 If unsure, ask user to clarify
+
+**File naming conventions:**
+- Use UPPERCASE for status files (PHASE_OVERVIEW.md, CURRENT_STATUS.md)
+- Keep them in repository root for easy access
+- Don't create new status file types without discussing first
+
+### 5. Self-Check Before Every Response
+
+Ask yourself:
+- [ ] Did I read status files at session start?
+- [ ] Is my understanding based on files, not old chat context?
+- [ ] Did I propose (not execute) status file updates?
+- [ ] Did I wait for approval before writing?
+- [ ] Did I explain what I'm about to write?
+
+**If ANY checkbox is unchecked → Fix before proceeding!**
 
 ---
 
@@ -1613,28 +1724,116 @@ Priority features:
 - [ ] Effect parameters randomization
 - [ ] Keyboard shortcuts customization
 
+### index-iife.html Visual Polish (Post-Migration)
+
+**Context:** `index-iife.html` currently uses simple Torus geometry for text rendering (PoC for file:// compatibility). This is intentional - visual finesse comes later.
+
+**TODO (Future Phase):**
+- [ ] Replace Torus with TorusKnot geometry (like original Codrops example)
+- [ ] Improve UV mapping for complex geometries
+- [ ] Add shader-based text rendering for better quality
+- [ ] Implement multiple effect options (not just one geometry)
+- [ ] Add proper lighting and materials (MeshStandardMaterial vs MeshBasicMaterial)
+
+**Priority:** LOW - Only after core migration is complete (vendoring CDN dependencies, offline-first architecture)
+
+**Rationale:** index-iife.html is a simplified IIFE entry point for file:// compatibility testing. The production app (index.html with ES6 modules) will have full visual effects. Don't spend time on visual polish until architecture is solid.
+
+---
+
+### Coloris Color Picker UX Issues (Post-Migration)
+
+**Context:** Coloris color picker (vendored v1.0+) has persistent UX issues where the picker UI behaves inconsistently - sometimes closing immediately on click, sometimes staying open but not responding to interactions.
+
+**Known Issues:**
+- Picker sometimes disappears immediately on first mousedown
+- Gradient selector occasionally non-responsive
+- Hue/alpha sliders sometimes don't register clicks
+- Inconsistent behavior across different sessions
+- Multiple attempts to fix with event handlers caused regressions
+
+**TODO (Future Phase - UX Polish):**
+- [ ] Evaluate alternative color picker libraries:
+  - [ ] Pickr (https://github.com/Simonwep/pickr) - Modern, well-maintained
+  - [ ] vanilla-picker (https://github.com/Sphinxxxx/vanilla-picker) - Lightweight
+  - [ ] iro.js (https://iro.js.org/) - HSV color picker with great UX
+  - [ ] Custom implementation using native `<input type="color">` + enhancement layer
+- [ ] Test alternative libraries for stability and UX
+- [ ] Replace Coloris if better option found
+- [ ] Ensure vendoring + offline-first compatibility
+- [ ] Update all color input components consistently
+
+**Priority:** LOW - Color picker is functional enough for PoC, focus on core architecture first
+
+**Rationale:** Coloris works but has edge-case UX issues. Don't spend more time debugging - evaluate alternatives in future UX polish phase. Current functionality is "good enough" for development/testing.
+
+**Version History:**
+- v5.4.0-5.4.6: Multiple attempts to fix picker closing issues
+- Tried: Custom event handlers, stopPropagation, event delegation, timing fixes
+- Result: Functional but still buggy - move on for now
+
 ---
 
 ## External Dependencies
 
-### CDN Resources
+### Vendoring Status (v5.5.0)
 
-All loaded from CDN, cached by Service Worker:
+**Philosophy:** All dependencies SHOULD be vendored locally for offline-first, copy-paste portability. ES modules with complex internal dependencies are bundled using Rollup.
 
-```html
-<!-- Open Props -->
-<link rel="stylesheet" href="https://unpkg.com/open-props" />
+**✅ Fully Vendored (Offline-Ready):**
+- **Three.js r115** (646 KB) - `/lib/three/`
+  - three.min.js, OrbitControls.js, EffectComposer.js, RenderPass.js, ShaderPass.js, CopyShader.js
+- **Open Props** (3 KB minimal subset) - `/lib/open-props/`
+  - open-props.min.css, normalize.min.css
+- **Coloris Color Picker** (22 KB) - `/lib/coloris/`
+  - coloris.min.css, coloris.min.js
+- **MP4 Export Dependencies (Rollup-bundled)** (2.8 MB) - `/lib/esm/bundles/`
+  - canvas-context.js (2.1 KB)
+  - canvas-screenshot.js (3.0 KB)
+  - media-codecs.js (15 KB)
+  - mediabunny.js (1.1 MB - includes Node.js polyfills for Stream/Buffer)
+  - h264-mp4-encoder.js (1.7 MB - UMD bundle with embedded WASM + ES6 export wrapper)
 
-<!-- THREE.js r115 -->
-<script src="https://unpkg.com/three@0.115.0/build/three.min.js"></script>
-<script src="https://unpkg.com/three@0.115.0/examples/js/controls/OrbitControls.js"></script>
-
-<!-- Coloris -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css"/>
-<script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
+**Current Import Map (index.html):**
+```javascript
+{
+  "imports": {
+    "canvas-context": "./lib/esm/bundles/canvas-context.js",
+    "canvas-screenshot": "./lib/esm/bundles/canvas-screenshot.js",
+    "mediabunny": "./lib/esm/bundles/mediabunny.js",
+    "media-codecs": "./lib/esm/bundles/media-codecs.js",
+    "h264-mp4-encoder": "./lib/esm/bundles/h264-mp4-encoder.js",
+    "gifenc": "https://esm.sh/gifenc@1.0.3",
+    "@ffmpeg/ffmpeg": "https://esm.sh/@ffmpeg/ffmpeg@0.12.7",
+    "@ffmpeg/util": "https://esm.sh/@ffmpeg/util@0.12.1"
+  }
+}
 ```
 
-**Fallback Strategy:** Service Worker caches for offline use. No runtime fallbacks currently.
+**⏳ Still on CDN (Optional Features):**
+- **gifenc** (1.0.3) - GIF export (optional, rarely used)
+- **@ffmpeg/ffmpeg** (0.12.7) - Advanced video formats (requires SharedArrayBuffer → HTTPS only, not file://)
+- **@ffmpeg/util** (0.12.1) - FFmpeg utilities
+
+**Bundling Process (Rollup):**
+1. Install dependencies: `npm install`
+2. Run bundler: `npm run bundle:all`
+3. Rollup creates single-file ES6 bundles with:
+   - All internal dependencies resolved
+   - Node.js polyfills (Stream, Buffer) for mediabunny
+   - Browser-specific builds
+4. h264-mp4-encoder requires special handling:
+   - Pre-built UMD bundle copied from node_modules
+   - ES6 `export default` wrapper appended for compatibility
+
+**Impact:**
+- ✅ Basic app functionality: **100% offline** (Three.js, Open Props, Coloris)
+- ✅ MP4 video export: **100% offline** (h264-mp4-encoder with embedded WASM)
+- ⏳ GIF export: Requires CDN on first load, then cached
+- ⏳ Advanced formats (FFmpeg): CDN only, not available via file://
+
+**Total Vendored:** ~3.5 MB (671 KB + 2.8 MB bundles)
+**Build Required:** Yes - run `npm run bundle:all` after `npm install`
 
 ---
 

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floss - Motion Design (IIFE Version)</title>
+
+    <!-- Open Props - Modern CSS Design Tokens (Vendored locally) -->
+    <link rel="stylesheet" href="./lib/open-props/open-props.min.css" />
+    <link rel="stylesheet" href="./lib/open-props/normalize.min.css" />
+
+    <!-- Coloris - Modern Color Picker (Vendored locally) -->
+    <link rel="stylesheet" href="./lib/coloris/coloris.min.css"/>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="./styles/theme.css">
+    <link rel="stylesheet" href="./styles/main-modern.css">
+    <link rel="stylesheet" href="./styles/help-overlay.css">
+    <link rel="stylesheet" href="./styles/settings-overlay.css">
+    <link rel="stylesheet" href="./styles/notifications.css">
+
+    <!-- Three.js (v0.115.0) - Vendored locally -->
+    <script src="./lib/three/three.min.js"></script>
+    <!-- OrbitControls for camera interaction -->
+    <script src="./lib/three/examples/js/controls/OrbitControls.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #e5e5e5;
+        }
+
+        .iife-notice {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.5);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 10000;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20, 20, 20, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-size: 12px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .control-group input[type="range"] {
+            width: 150px;
+        }
+
+        .control-group input[type="text"] {
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #e5e5e5;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.5);
+            border-radius: 6px;
+            color: #e5e5e5;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.7);
+        }
+
+        .value-display {
+            display: inline-block;
+            min-width: 40px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #8b5cf6;
+        }
+    </style>
+</head>
+<body>
+    <!-- IIFE Version Notice -->
+    <div class="iife-notice">
+        IIFE Version (file:// compatible)
+    </div>
+
+    <!-- Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <div class="control-group">
+            <label>Text</label>
+            <input type="text" id="text-input" value="FLOSS" maxlength="10">
+        </div>
+
+        <div class="control-group">
+            <label>Rotation Speed</label>
+            <input type="range" id="rotation-speed" min="0" max="5" step="0.1" value="1">
+            <span class="value-display" id="rotation-speed-value">1.0</span>
+        </div>
+
+        <div class="control-group">
+            <label>Scale</label>
+            <input type="range" id="scale-slider" min="0.5" max="3" step="0.1" value="1">
+            <span class="value-display" id="scale-value">1.0</span>
+        </div>
+
+        <button id="reset-btn">Reset Camera</button>
+    </div>
+
+    <!-- Coloris Color Picker (Vendored locally) -->
+    <script src="./lib/coloris/coloris.min.js"></script>
+
+    <!-- Main App (IIFE) -->
+    <script>
+    (function() {
+        'use strict';
+
+        console.log(`
+╔════════════════════════════════════════════════════════════════╗
+║   🎨 Floss - Motion Design (IIFE Version)                      ║
+║   Version: 5.4.8       Date: 2025-11-24 03:30                 ║
+║   Mode: file:// compatible (Three.js vendored)                ║
+╚════════════════════════════════════════════════════════════════╝
+        `);
+
+        // Check WebGL
+        if (!isWebGLAvailable()) {
+            document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;"><h1>WebGL not supported</h1></div>';
+            return;
+        }
+
+        function isWebGLAvailable() {
+            try {
+                const canvas = document.createElement('canvas');
+                return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // =====================================================================
+        // Scene Setup
+        // =====================================================================
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0a0a);
+
+        const camera = new THREE.PerspectiveCamera(
+            50,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+        );
+        camera.position.set(0, 0, 5);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // OrbitControls
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // Save initial state for reset
+        const initialCameraPosition = camera.position.clone();
+        const initialControlsTarget = new THREE.Vector3(0, 0, 0);
+
+        // =====================================================================
+        // Text Texture Generator
+        // =====================================================================
+        function createTextTexture(text) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+
+            // Background
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Text (repeated pattern for better tiling)
+            ctx.fillStyle = '#8b5cf6';  // Violet color
+            ctx.font = 'bold 120px Arial Black, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Tile text multiple times for better coverage
+            const cols = 3;
+            const rows = 3;
+            const cellWidth = canvas.width / cols;
+            const cellHeight = canvas.height / rows;
+
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const x = cellWidth * (col + 0.5);
+                    const y = cellHeight * (row + 0.5);
+                    ctx.fillText(text, x, y);
+                }
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(2, 2);
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+        // =====================================================================
+        // Create Endless Effect (Torus)
+        // =====================================================================
+        let mesh;
+        let settings = {
+            text: 'FLOSS',
+            rotationSpeed: 1.0,
+            scale: 1.0
+        };
+
+        function createEffect() {
+            // Save old rotation to preserve animation state
+            let oldRotation = null;
+            if (mesh) {
+                oldRotation = {
+                    x: mesh.rotation.x,
+                    y: mesh.rotation.y,
+                    z: mesh.rotation.z
+                };
+            }
+
+            // Remove old mesh
+            if (mesh) {
+                scene.remove(mesh);
+                mesh.geometry.dispose();
+                mesh.material.dispose();
+                if (mesh.material.map) {
+                    mesh.material.map.dispose();
+                }
+            }
+
+            // Create geometry (Torus has simpler UVs than TorusKnot)
+            const geometry = new THREE.TorusGeometry(1.2, 0.4, 32, 64);
+
+            // Create material with text texture
+            const texture = createTextTexture(settings.text);
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                color: 0xffffff
+            });
+
+            mesh = new THREE.Mesh(geometry, material);
+            mesh.scale.setScalar(settings.scale);
+
+            // Restore rotation to preserve animation continuity
+            if (oldRotation) {
+                mesh.rotation.set(oldRotation.x, oldRotation.y, oldRotation.z);
+            }
+
+            scene.add(mesh);
+        }
+
+        createEffect();
+
+        // =====================================================================
+        // Animation Loop
+        // =====================================================================
+        let lastTime = performance.now();
+        function animate(currentTime) {
+            requestAnimationFrame(animate);
+
+            // Calculate delta time in seconds
+            const deltaTime = (currentTime - lastTime) / 1000;
+            lastTime = currentTime;
+
+            // Incremental rotation (no jumps when settings change)
+            if (mesh) {
+                mesh.rotation.x += deltaTime * settings.rotationSpeed * 0.3;
+                mesh.rotation.y += deltaTime * settings.rotationSpeed * 0.5;
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate(performance.now());
+
+        // =====================================================================
+        // UI Controls
+        // =====================================================================
+        const textInput = document.getElementById('text-input');
+        const rotationSpeedSlider = document.getElementById('rotation-speed');
+        const rotationSpeedValue = document.getElementById('rotation-speed-value');
+        const scaleSlider = document.getElementById('scale-slider');
+        const scaleValue = document.getElementById('scale-value');
+        const resetBtn = document.getElementById('reset-btn');
+
+        textInput.addEventListener('input', (e) => {
+            settings.text = e.target.value || 'FLOSS';
+            createEffect();
+        });
+
+        rotationSpeedSlider.addEventListener('input', (e) => {
+            settings.rotationSpeed = parseFloat(e.target.value);
+            rotationSpeedValue.textContent = settings.rotationSpeed.toFixed(1);
+        });
+
+        scaleSlider.addEventListener('input', (e) => {
+            settings.scale = parseFloat(e.target.value);
+            scaleValue.textContent = settings.scale.toFixed(1);
+            if (mesh) {
+                mesh.scale.setScalar(settings.scale);
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            // Reset camera position
+            camera.position.copy(initialCameraPosition);
+
+            // Reset controls target (orbit center)
+            controls.target.copy(initialControlsTarget);
+
+            // Reset camera rotation
+            camera.rotation.set(0, 0, 0);
+
+            // Reset mesh rotation (visual feedback that reset happened)
+            if (mesh) {
+                mesh.rotation.set(0, 0, 0);
+            }
+
+            // Force update controls
+            controls.update();
+
+            console.log('✓ Camera and mesh reset');
+
+            // Visual feedback: flash the button
+            resetBtn.style.background = 'rgba(139, 92, 246, 0.5)';
+            setTimeout(() => {
+                resetBtn.style.background = 'rgba(139, 92, 246, 0.2)';
+            }, 200);
+        });
+
+        // =====================================================================
+        // Window Resize
+        // =====================================================================
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        console.log('✓ Floss IIFE initialized successfully');
+    })();
+    </script>
+</body>
+</html>

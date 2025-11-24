@@ -728,18 +728,12 @@ class App {
             });
         }
 
-        // Coloris change event
+        // Coloris change event (fires when picker closes with OK)
         input.addEventListener('change', (e) => {
             const color = e.target.value;
             updatePreview(color);
             onChange(color);
-
-            // Track recently used colors
-            if (/^#[0-9A-F]{6}$/i.test(color)) {
-                appSettings.addRecentColor(color);
-                // Reinitialize Coloris with updated recent colors
-                this.initializeColoris();
-            }
+            // Note: Recent colors are tracked in Coloris's global onChange handler
         });
 
         // Manual text input (for typing HEX values)
@@ -748,11 +742,6 @@ class App {
             if (/^#[0-9A-F]{6}$/i.test(color)) {
                 updatePreview(color);
                 onChange(color);
-
-                // Track recently used colors
-                appSettings.addRecentColor(color);
-                // Reinitialize Coloris with updated recent colors
-                this.initializeColoris();
             }
         });
 
@@ -1470,17 +1459,25 @@ class App {
             // Row 3: Recent colors (up to 5 colors)
             const allSwatches = [...defaultSwatches, ...recentColors];
 
+            // Initialize Coloris according to official documentation
+            // https://coloris.js.org/
             Coloris({
+                el: '.coloris',
                 theme: 'pill',
                 themeMode: 'dark',
-                alpha: false,
-                format: 'hex',
+                formatToggle: true,
+                alpha: true,
                 swatches: allSwatches,
-                clearButton: false,
-                closeButton: true,
-                closeLabel: 'OK',
-                selectInput: true,
-                focusInput: false
+                onChange: (color, inputEl) => {
+                    if (!inputEl) return;
+
+                    // Track recently used colors
+                    if (/^#[0-9A-F]{6}$/i.test(color)) {
+                        appSettings.addRecentColor(color);
+                        // Reinitialize with updated swatches
+                        this.initializeColoris();
+                    }
+                }
             });
 
             console.log(`✓ Coloris initialized (${defaultSwatches.length} default + ${recentColors.length} recent)`);
@@ -1622,21 +1619,16 @@ class App {
             return;
         }
 
-        // Reinitialize Coloris with current swatches
+        // Reinitialize Coloris with current swatches (for settings overlay)
         setTimeout(() => {
             const swatches = appSettings.getColorSwatches();
             Coloris({
                 el: '.color-swatch-input',
                 theme: 'pill',
                 themeMode: 'dark',
-                alpha: false,
-                format: 'hex',
-                swatches: swatches,
-                clearButton: false,
-                closeButton: true,
-                closeLabel: 'OK',
-                selectInput: true,
-                focusInput: true
+                formatToggle: true,
+                alpha: true,
+                swatches: swatches
             });
         }, 100);
     }
