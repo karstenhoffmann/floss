@@ -7,19 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [5.9.6] - 2025-11-25
 
-### Changed
-- Standardized app name to lowercase "floss" across codebase
-  - README.md: Updated main title to "floss"
-  - index.html: Updated meta description
-  - service-worker.js: Updated cache name from "kinetic-typo" to "floss"
+### Repository Audit & Cleanup
 
-### Planned
-- Video/GIF export functionality
-- Custom text input
-- Timeline-based animation sequencing
-- Touch gesture controls for mobile
+#### Removed
+- `index-iife.html` - Obsolete after Phase 7.3 Single Entry Point
+- `js/app-bundle-iife.js` - Replaced by Rollup-generated `floss-app.iife.js`
+- `build-iife-bundle.sh` - Obsolete shell script (Rollup now used)
+- `lib/canvas-record/index.js` - Empty placeholder file
+
+#### Changed
+- CLAUDE.md: Added "Single Entry Point Rule (Hard Invariant)"
+- CLAUDE.md: Added "Hard Invariants (Audit-Derived Rules)" section
+- CLAUDE.md: Updated App Shell & Password Gate status to "Implemented"
+- service-worker.js: Synchronized CACHE_NAME with version.js
+- service-worker.js: Added missing assets to cache list
+
+#### Documentation
+- PHASE_OVERVIEW.md: Updated to reflect Phase 7.3 complete
+- CURRENT_STATUS.md: Updated version to 5.9.6
+- CHANGELOG.md: Restructured with Pre-7.x Historical Summary
+
+---
+
+## Pre-7.x Historical Summary
+
+**Versions 2.0.0 - 5.9.5** (November 2025)
+
+Major milestones in chronological order:
+
+| Phase | Version | Highlights |
+|-------|---------|------------|
+| Phase 2 | 2.x | Effect plugin architecture, EffectBase class |
+| Phase 3 | 3.x | Settings schema system, reactive controls |
+| Phase 4 | 4.x | Preset management, LocalStorage persistence |
+| Phase 5 | 5.0-5.3 | Video export (MP4), canvas-record integration |
+| Phase 6 | 5.4-5.6 | Additional effects (Wave Plane, Sphere Text, Particles) |
+| Phase 7.1 | 5.7 | Vendored dependencies, offline-first completion |
+| Phase 7.2 | 5.8 | Password gate, App Shell architecture |
+| Phase 7.3 | 5.9 | Single Entry Point (index.html only) |
+
+**Key architectural decisions made during this period:**
+- Core/Shell separation (js/app.js vs js/floss-app.js)
+- Dual-mode loading (file:// IIFE, https:// ESM)
+- Rollup bundling for IIFE generation
+- All dependencies vendored in /lib/
 
 ---
 
@@ -29,95 +62,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### UI/UX
 - Ultra-dark theme with glassmorphism effects
-- Rive-inspired floating UI panels (topbar, toolbar, playback controls)
+- Rive-inspired floating UI panels
 - Open Props design system with OKLCH color space
-- Inline SVG sprite system with Phosphor Icons
-- Auto-hide UI functionality
 - Keyboard shortcuts (Space, Esc, 1-4)
-- Effect selector dropdown with 4 kinetic effects
-- Playback speed control slider
-- Settings panel with quality/performance toggles
+- Effect selector dropdown
 
 #### Architecture
 - **Offline-first PWA** with Service Worker
-- **Hybrid UMD+ESM architecture** for legacy libraries
-- Sequential script loading system (fixes timing issues)
-- Import Maps for clean module resolution
+- Sequential script loading system
 - LocalStorage state persistence
 - Copy & paste deployment (no build step)
 
-#### Technical Stack
-- THREE.js 0.158.0 for WebGL rendering
-- GSAP 3.12.4 for animations
-- Open Props 1.7.3 for design tokens
-- MSDF font rendering via three-bmfont-text
-- Native ES Modules throughout
-
-#### Developer Experience
-- Comprehensive `CLAUDE.md` documentation
-- `.clauderc` session configuration
-- Updated `README.md` with new branding
-- `CHANGELOG.md` for version tracking
-- Clean separation of old demo (moved to `/archive`)
-
-### Changed
-- Project renamed from "TT K1n3t1c" to "Floss"
-- Repository renamed from `codrops-kinetic-typo` to `floss`
-- Complete file structure reorganization
-- CSS split into modular files (tokens, base, components, animations)
-- Vendor dependencies now use local ESM wrappers
-
-### Fixed
-- Script loading race condition (ESM before UMD globals)
-- GitHub Pages deployment path issues
-- Service Worker scope configuration
-- Import Map compatibility with legacy libraries
-- ORB (Cross-Origin Read Blocking) errors
-
-### Removed
-- Webpack build system (moved to `/archive`)
-- npm dependencies (moved to `/archive`)
-- Emoji icons (replaced with Phosphor Icons SVG)
-- Build-step requirement
-
 ---
 
-## [0.1.0] - 2020-XX-XX (Original Codrops Demo)
+## [0.1.0] - 2020 (Original Codrops Demo)
 
 ### Initial Release
 - Basic kinetic typography demo
 - Webpack-based build system
 - Four effect configurations
 - MSDF font rendering
-- Original Codrops tutorial implementation
 
-**Note:** Original demo preserved in `/archive` directory
-
----
-
-## Version History Summary
-
-| Version | Date | Highlights |
-|---------|------|------------|
-| **1.0.0** | 2025-11-18 | Complete Rive-inspired redesign, offline-first PWA |
-| 0.1.0 | 2020 | Original Codrops tutorial demo |
-
----
-
-## Migration Notes
-
-### Upgrading from 0.1.0 to 1.0.0
-
-**Breaking Changes:**
-- No webpack - pure ES Modules now
-- No npm install required
-- Different file structure
-- New UI system
-
-**Migration Path:**
-1. The old demo is preserved in `/archive` if you need it
-2. New version is standalone - just serve the root directory
-3. No build step required anymore
+**Note:** Original demo preserved in `/reference` directory
 
 ---
 
