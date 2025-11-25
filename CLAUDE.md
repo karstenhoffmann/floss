@@ -1,6 +1,6 @@
 # Claude Code Session Context
 
-**Last Updated:** 2025-11-24
+**Last Updated:** 2025-11-25
 **Project:** Floss - Professional Kinetic Typography Motion Design Tool
 **Repository:** https://github.com/karstenhoffmann/floss
 **Deployment:** https://karstenhoffmann.github.io/floss/
@@ -183,7 +183,6 @@ Before modifying any code related to startup, globals, app initialization, bundl
 2. Apply the following invariant rules:
    - Core files (js/app.js, js/core/*, js/effects/*) never define globals, never attach to window, never make startup decisions.
    - Shell files (index.html, js/floss-app.js, js/floss-app.iife.js) are the only place where environment handling, startup wiring, globals, preloaders or password gates may live.
-   - Note: index-iife.html is DEPRECATED (see Single Entry Policy below) - do not extend it.
 
 3. If the requested change affects Core/Shell boundaries, or could contradict the documented plan:
    - Stop, summarize the existing architecture context,
@@ -194,43 +193,88 @@ Before modifying any code related to startup, globals, app initialization, bundl
 
 ---
 
-## 🚪 Single Entry Policy (Phase 7.3+)
+## 🚪 Single Entry Point Rule (Hard Invariant)
 
-**CRITICAL: The project maintains exactly ONE long-term HTML entry point: `index.html`**
+**ABSOLUTE RULE: There is exactly ONE entry point file: `index.html`**
 
-### Policy Rules:
+### Invariant Rules:
 
-1. **index.html is the ONLY permanent entry point**
-   - Works for both `file://` and `https://` protocols
-   - Contains Shell logic for environment detection
-   - Loads appropriate bundle (IIFE for file://, ESM for https://)
+1. **`index.html` is the ONLY HTML entry point** - No exceptions
+2. **file:// and https:// modes** are handled exclusively by the App Shell (inline script in index.html)
+3. **No additional HTML files** - Never create:
+   - Demo HTML files
+   - Alternate entry points
+   - Debug HTML files
+   - Legacy/fallback HTML files
+   - Test HTML files
 
-2. **Additional HTML entry files are TEMPORARY only**
-   - Must be marked as `DEPRECATED` in comments and documentation
-   - Must have a documented decommission plan
-   - May NOT contain independent implementations
-   - Should redirect to index.html
+### Before Creating Any HTML File:
 
-3. **index-iife.html Status: DEPRECATED (Phase 7.3)**
-   - Exists only as a redirect stub to index.html
-   - Will be removed in a future phase
-   - Do NOT add features to this file
-   - Do NOT use as a reference implementation
+**STOP.** There is no valid reason to create another HTML entry point.
 
-### Before Editing Entry Points:
+If you think you need one:
+1. You are wrong
+2. The solution belongs in index.html or JavaScript
+3. Ask the user for clarification
 
-Claude MUST:
-1. Check this Single Entry Policy
-2. Verify the change aligns with "one index.html" architecture
-3. If adding a new HTML file is proposed → STOP and discuss with user
-4. Never create parallel implementations in multiple HTML files
+### Why This Rule Is Absolute:
 
-### Why This Policy Exists:
+- Code duplication leads to divergent codebases
+- Bug fixes must be applied in multiple places
+- Features drift between versions
+- Session confusion causes wasted time
+- **Previous violations caused significant debugging effort**
 
-- **Code duplication** - Multiple entry points lead to divergent codebases
-- **Maintenance burden** - Bug fixes must be applied in multiple places
-- **Inconsistent behavior** - Features drift between versions
-- **Session confusion** - Claude may work on wrong entry point
+---
+
+## 🛡️ Hard Invariants (Audit-Derived Rules)
+
+**These rules exist because their violation caused problems in the past.**
+
+### 1. Version Sync Invariant
+```
+version.js version ↔ service-worker.js CACHE_NAME must match
+```
+When updating `js/version.js`, **immediately** update `CACHE_NAME` in `service-worker.js`.
+
+### 2. Service Worker Asset Invariant
+```
+Every .js and .css file → must be in ASSETS_TO_CACHE
+```
+When adding new JavaScript or CSS files, add them to `service-worker.js` ASSETS_TO_CACHE array.
+
+### 3. Bundle Rebuild Invariant
+```
+Changes to js/app.js, js/core/*, js/effects/*, js/ui/*, js/utils/*
+→ requires npm run bundle:app
+→ commit updated floss-app.iife.js
+```
+The IIFE bundle must be regenerated after any application code changes.
+
+### 4. Documentation Freshness Rule
+```
+After merge to main:
+- CURRENT_STATUS.md version must match js/version.js
+- PHASE_OVERVIEW.md phase status must be current
+- CHANGELOG.md must have entry for new version
+```
+
+### 5. Cleanup-First Rule
+```
+Before adding new functionality:
+1. Identify obsolete files that should be removed
+2. Remove deprecated code markers
+3. Update documentation to remove stale references
+```
+
+### 6. No Parallel Implementations Rule
+```
+Never create a new file that duplicates existing functionality.
+If a new approach is needed:
+1. Modify existing file, OR
+2. Replace existing file entirely
+Never maintain two versions of the same thing.
+```
 
 ---
 
@@ -666,33 +710,21 @@ See CHANGELOG.md and GitHub Issues for detailed roadmap.
 - [ ] Keyboard shortcuts customization
 
 **Low priority (UX polish):**
-- [ ] index-iife.html visual polish (TorusKnot geometry, shader-based text)
 - [ ] Coloris color picker replacement (evaluate Pickr, vanilla-picker, iro.js)
 
 ---
 
-## 🔐 App Shell & Auth Gate (Planned)
+## 🔐 App Shell & Password Gate
 
-**Status:** Planned architecture for future implementation (current version see CURRENT_STATUS.md)
+**Status:** ✅ Implemented (Phase 7.2)
 
-**Context:** Floss will eventually have a unified loading screen with optional password gate for online deployment.
-
-### Responsibilities
-
-**App Shell is responsible for:**
+The App Shell in `index.html` handles:
 - Preloader animation
 - Environment detection (file:// vs https://)
 - Password gate UI (online mode only)
-- Explicit call to `FlossApp.start({ mode: 'offline' | 'online' })`
+- Calling `FlossApp.start({ mode: 'offline' | 'online' })`
 
-**Floss App is responsible for:**
-- Main application logic (effects, export, UI)
-- Remaining mode-agnostic (no auth logic)
-- Starting ONLY when shell calls start()
-
-### Critical Rules for Claude
-
-**When implementing App Shell / Password Gate:**
+### Critical Rules for Password Gate:
 
 1. **No False Security Claims**
    - ❌ NEVER claim password gate provides "secure authentication"
@@ -700,25 +732,9 @@ See CHANGELOG.md and GitHub Issues for detailed roadmap.
    - ✅ ALWAYS mention: "Client-side, can be bypassed by technical users"
 
 2. **Separation of Concerns**
-   - Keep all password/gate logic in App Shell
-   - Use clean API: `FlossApp.start(config)`
-   - App works identically regardless of how it was started
-
-3. **Documentation Requirements**
-   - Document limitations in user-facing docs
-   - Explain when password gate is appropriate (demos, portfolios)
-   - Explain when NOT appropriate (confidential projects)
-
-4. **Forbidden Assumptions**
-   - ❌ Don't claim password gate provides "security"
-   - ❌ Don't suggest storing sensitive data behind gate
-   - ❌ Don't add server-side components (defeats offline-first)
-   - ❌ Don't make password gate mandatory for file:// mode
-
-**Implementation Timeline:**
-- Current Status: Not implemented
-- When: After current phases complete, when user requests it
-- Dependencies: Current stable version (see CURRENT_STATUS.md)
+   - All password/gate logic lives in App Shell (index.html)
+   - Core app (`js/app.js`) is mode-agnostic
+   - Clean API: `FlossApp.start(config)`
 
 ---
 

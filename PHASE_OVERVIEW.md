@@ -1,8 +1,8 @@
 # Floss - Phase Overview
 
 **Project:** Floss App Shell & Unification
-**Current Version:** 5.8.0
-**Status:** Phase 7.2 complete, Phase 7.3 ready to start
+**Current Version:** 5.9.6
+**Status:** Phase 7.3 complete ✅ (Single Entry Point achieved)
 
 *Note: This file describes the project state on the main branch, independent of temporary feature branches.*
 
@@ -110,18 +110,16 @@ These are optional enhancements, not required for core functionality:
 - ✅ `window.FlossApp.start({ mode: 'online' | 'offline' })` API
 - ✅ Core/Shell separation enforced:
   - Core (js/app.js): No window globals, no startup decisions, clean export
-  - Shell (js/floss-app.js, index-iife.html): Startup, environment, globals
+  - Shell (js/floss-app.js, index.html): Startup, environment, globals
 - ✅ js/app.js: Auto-init removed, exports App class
-- ✅ js/floss-app.js: NEW shell entry point for ES modules
-- ✅ index.html: Loads js/floss-app.js, calls `FlossApp.start({ mode: 'online' })`
-- ✅ index-iife.html: Wraps code in initializeApp(), calls `FlossApp.start({ mode: 'offline' })`
-- ✅ Behavior unchanged: Both variants auto-start as before
+- ✅ js/floss-app.js: Shell entry point for ES modules
+- ✅ index.html: Single entry point with dual-mode loading
+- ✅ Behavior unchanged: Both modes auto-start as before
 
 **Files Changed:**
 - js/app.js (modified)
 - js/floss-app.js (NEW)
 - index.html (modified)
-- index-iife.html (modified)
 
 **Architecture Invariant Enforced:**
 - Core files never define globals, never attach to window, never make startup decisions
@@ -169,7 +167,6 @@ These are optional enhancements, not required for core functionality:
 ### Files Created/Modified
 
 - index.html (preloader + password gate)
-- index-iife.html (preloader + password gate inline)
 - styles/preloader.css (NEW)
 - styles/password-gate.css (NEW)
 - js/utils/password-gate.js (NEW)
@@ -184,7 +181,7 @@ These are optional enhancements, not required for core functionality:
 
 ### Architecture Goal: Single Entry Policy
 
-**CRITICAL DECISION:** The project maintains exactly ONE long-term HTML entry point: `index.html`
+**ACHIEVED:** The project maintains exactly ONE HTML entry point: `index.html`
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -199,14 +196,9 @@ These are optional enhancements, not required for core functionality:
 │  • Preloader animation                                         │
 │  • Password gate (https:// only)                               │
 └─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│               index-iife.html (DEPRECATED)                       │
-├─────────────────────────────────────────────────────────────────┤
-│  Minimal stub with redirect to index.html                       │
-│  Will be removed in future phase                                │
-└─────────────────────────────────────────────────────────────────┘
 ```
+
+**Note:** `index-iife.html` was removed in v5.9.6 (no longer needed).
 
 ### Why Single Entry?
 
@@ -237,34 +229,23 @@ if (location.protocol === 'file:') {
 }
 ```
 
-**3. index-iife.html Deprecation:**
-- Reduced to minimal redirect stub
-- Auto-redirects to index.html after 3 seconds
-- Contains deprecation notice
-
-### Deliverables
+### Deliverables (Completed)
 
 | File | Action | Description |
 |------|--------|-------------|
 | `rollup.config.app.js` | NEW | Rollup config for app bundle |
 | `js/floss-app.iife.js` | NEW | Generated IIFE bundle |
-| `index.html` | MODIFY | Add dual-mode loading |
-| `index-iife.html` | REPLACE | Deprecated redirect stub |
-| `package.json` | MODIFY | Add `bundle:app` script |
+| `index.html` | MODIFY | Dual-mode loading (file:// + https://) |
+| `package.json` | MODIFY | Added `bundle:app` script |
 | Documentation | UPDATE | All status files |
 
-### Decommission Plan for index-iife.html
+### Cleanup (v5.9.6)
 
-**Phase 7.3 (Current):** Convert to redirect stub
-**Phase 7.4+ (Future):** Remove file entirely, update all references
-
-### Dependencies
-
-- Requires: v5.8.0+ (Phase 7.2 complete)
-- Blockers: None
-- Estimated Effort: 1 session
+- ✅ `index-iife.html` removed (no longer needed)
+- ✅ `js/app-bundle-iife.js` removed (replaced by Rollup bundle)
+- ✅ `build-iife-bundle.sh` removed (obsolete shell script)
 
 ### References
 
-- CLAUDE.md → "Single Entry Policy (Phase 7.3+)"
+- CLAUDE.md → "Single Entry Point Rule (Hard Invariant)"
 - CLAUDE.md → "Architecture Integrity Rule"

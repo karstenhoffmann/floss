@@ -1,67 +1,96 @@
 /**
  * Service Worker for Offline Support
  * Caches assets for offline functionality
+ *
+ * IMPORTANT: CACHE_NAME must match version in js/version.js
+ * See CLAUDE.md → "Version Sync Invariant"
  */
 
-const CACHE_NAME = 'floss-v5.8.0'; // Phase 7.2: Password Gate + Session Management
+const CACHE_NAME = 'floss-v5.9.6';
 
-// Assets to cache
+// Assets to cache (alphabetically sorted by category)
 const ASSETS_TO_CACHE = [
+    // Root
     './',
     './index.html',
-    './styles/theme.css',
-    './styles/preloader.css',
-    './styles/password-gate.css',
-    './styles/main-modern.css',
-    './styles/help-overlay.css',
-    './styles/settings-overlay.css',
-    './styles/notifications.css',
-    './styles/video-export.css',
+    './manifest.json',
+
+    // Core JavaScript
     './js/app.js',
-    './js/floss-app.js',
     './js/config.js',
+    './js/floss-app.js',
+    './js/floss-app.iife.js',
     './js/version.js',
-    './js/core/state.js',
-    './js/core/scene.js',
-    './js/core/renderer.js',
+
+    // Core modules
+    './js/core/app-settings.js',
+    './js/core/camera-controller.js',
     './js/core/effect-manager.js',
     './js/core/preset-manager.js',
-    './js/core/app-settings.js',
+    './js/core/renderer.js',
+    './js/core/scene.js',
+    './js/core/state.js',
     './js/core/video-export.js',
+
+    // Effects
     './js/effects/effect-base.js',
     './js/effects/endless.js',
+    './js/effects/glitch-shader.js',
     './js/effects/glitch.js',
     './js/effects/particles.js',
-    './js/ui/notification.js',
-    './js/ui/icons.js',
-    './js/ui/safe-frame.js',
+    './js/effects/sphere-text.js',
+    './js/effects/wave-plane.js',
+
+    // UI components
     './js/ui/export-panel.js',
+    './js/ui/icons.js',
+    './js/ui/notification.js',
+    './js/ui/safe-frame.js',
+
+    // Utilities
+    './js/utils/password-gate.js',
     './js/utils/storage.js',
     './js/utils/text-texture.js',
     './js/utils/webgl-check.js',
-    './js/utils/password-gate.js',
-    // canvas-record library (vendored, will be cached on first load)
-    './lib/canvas-record/package/index.js',
-    './manifest.json',
-    // Three.js (vendored locally)
+
+    // Styles
+    './styles/help-overlay.css',
+    './styles/main-modern.css',
+    './styles/notifications.css',
+    './styles/password-gate.css',
+    './styles/preloader.css',
+    './styles/settings-overlay.css',
+    './styles/theme.css',
+    './styles/video-export.css',
+
+    // Three.js (vendored)
     './lib/three/three.min.js',
     './lib/three/examples/js/controls/OrbitControls.js',
     './lib/three/examples/js/postprocessing/EffectComposer.js',
     './lib/three/examples/js/postprocessing/RenderPass.js',
     './lib/three/examples/js/postprocessing/ShaderPass.js',
     './lib/three/examples/js/shaders/CopyShader.js',
-    // Open Props (vendored locally - minimal subset)
-    './lib/open-props/open-props.min.css',
+
+    // Open Props (vendored)
     './lib/open-props/normalize.min.css',
-    // Coloris Color Picker (vendored locally)
+    './lib/open-props/open-props.min.css',
+
+    // Coloris (vendored)
     './lib/coloris/coloris.min.css',
     './lib/coloris/coloris.min.js',
-    // canvas-record Dependencies (bundled with Rollup for offline support)
+
+    // canvas-record (vendored)
+    './lib/canvas-record/canvas-record.iife.js',
+    './lib/canvas-record/h264-mp4-encoder.umd.js',
+    './lib/canvas-record/package/index.js',
+
+    // canvas-record dependencies (Rollup bundles)
     './lib/esm/bundles/canvas-context.js',
     './lib/esm/bundles/canvas-screenshot.js',
+    './lib/esm/bundles/h264-mp4-encoder.js',
     './lib/esm/bundles/media-codecs.js',
-    './lib/esm/bundles/mediabunny.js',
-    './lib/esm/bundles/h264-mp4-encoder.js'
+    './lib/esm/bundles/mediabunny.js'
+
     // Note: gifenc, @ffmpeg/ffmpeg, @ffmpeg/util remain on CDN (optional features)
 ];
 

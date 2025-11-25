@@ -1,243 +1,122 @@
 # Current Status
 
-**Current Version:** 5.9.0
-**Last Major Milestone:** v5.9.0 - Phase 7.3: Single HTML Entry (IIFE Bundle)
-**Status:** Phase 7.3 complete ✅
+**Current Version:** 5.9.6
+**Last Major Milestone:** v5.9.6 - Repository Audit & Cleanup
+**Status:** Phase 7.3 complete ✅ (Single Entry Point achieved)
 
 *Note: This file describes the project state on the main branch, independent of temporary feature branches.*
 
 ---
 
-## Last Merged Work (v5.9.0)
+## Last Merged Work (v5.9.6)
 
-### Completed: Phase 7.3 - Single HTML Entry (IIFE Bundle)
+### Completed: Repository Audit & Cleanup
 
-**Architecture Decision:** `index.html` is the ONLY long-term HTML entry point.
+**What was done:**
+1. Removed obsolete files:
+   - `index-iife.html` (redundant after Single Entry Point)
+   - `js/app-bundle-iife.js` (replaced by Rollup bundle)
+   - `build-iife-bundle.sh` (obsolete shell script)
+   - `lib/canvas-record/index.js` (empty file)
+
+2. Updated CLAUDE.md with:
+   - Single Entry Point Rule (Hard Invariant)
+   - Hard Invariants (Audit-Derived Rules)
+   - Updated App Shell status to "Implemented"
+
+3. Synchronized service-worker.js:
+   - CACHE_NAME updated to v5.9.6
+   - Added missing assets to cache list
+
+4. Updated all documentation:
+   - PHASE_OVERVIEW.md
+   - CURRENT_STATUS.md
+   - CHANGELOG.md
+
+---
+
+## Architecture Summary
+
+### Entry Point (Single Entry Policy)
 
 | Entry Point | Status | Description |
 |-------------|--------|-------------|
-| `index.html` | ✅ PRIMARY | Single entry for file:// and https:// |
-| `index-iife.html` | ⚠️ DEPRECATED | Redirect stub only, will be removed |
+| `index.html` | ✅ **ONLY** | Single entry for file:// and https:// |
 
-### What Was Done
+**Note:** No other HTML entry points exist. This is enforced by CLAUDE.md rules.
 
-1. **IIFE Bundle Created**
-   - `rollup.config.app.js` → builds `js/floss-app.iife.js` (688KB)
-   - Bundles entire app (core, effects, ui, utils)
-   - External: THREE.js, Coloris, h264-mp4-encoder (globals)
+### Core/Shell Separation
 
-2. **index.html Dual-Mode Loading**
-   - Detects `file://` vs `https://` protocol automatically
-   - `file://` → loads IIFE bundle + video export IIFE
-   - `https://` → uses ES modules with import maps
+| Component | Files | Responsibilities |
+|-----------|-------|------------------|
+| Core | `js/app.js`, `js/core/*`, `js/effects/*` | App logic, no globals, no startup |
+| Shell | `index.html`, `js/floss-app.js` | Startup, environment, globals |
+| IIFE Bundle | `js/floss-app.iife.js` | Bundled app for file:// mode |
 
-3. **index-iife.html Deprecated**
-   - Converted to minimal redirect stub
-   - Auto-redirects to index.html after 3 seconds
-   - Contains deprecation notice
+### Protocol Handling
 
-### Files Changed
-
-| File | Action | Size |
-|------|--------|------|
-| `rollup.config.app.js` | NEW | - |
-| `js/floss-app.iife.js` | NEW | 688KB |
-| `index.html` | MODIFIED | Dual-mode loading |
-| `index-iife.html` | REPLACED | Redirect stub |
-| `package.json` | MODIFIED | bundle:app script |
-| `js/floss-app.js` | MODIFIED | Export for bundling |
-
-### Single Entry Policy (Enforced)
-
-**Documented in CLAUDE.md:**
-- Only ONE permanent HTML entry point: `index.html`
-- Additional HTML files must be temporary and deprecated
-- No parallel implementations allowed
+| Protocol | Loads | Features |
+|----------|-------|----------|
+| `file://` | IIFE bundle | Preloader, no password gate |
+| `https://` | ES modules | Preloader + password gate |
 
 ---
 
-## Previous Work (v5.8.0)
+## Key Version History
 
-### Completed: Phase 7.2 - App Shell UI (Preloader + Password Gate)
-
-**What was done:**
-1. Preloader animation (1.5s FLOSS logo + spinner)
-2. Password gate with session management (online only)
-3. Environment detection (file:// vs https://)
-4. Session tokens (5-minute timeout)
-
-**Security Note:**
-- ⚠️ Password gate is a UX/access gate, NOT security
-- Client-side, can be bypassed by technical users
+| Version | Phase | Description |
+|---------|-------|-------------|
+| 5.9.6 | 7.3+ | Repository Audit & Cleanup |
+| 5.9.0 | 7.3 | Single HTML Entry (IIFE Bundle) |
+| 5.8.0 | 7.2 | App Shell UI (Preloader + Password Gate) |
+| 5.7.0 | 7.1 | FlossApp.start() API |
+| 5.5.0 | - | MP4 Export Offline |
 
 ---
-
-## Recent Main Branch Commits
-
-### v5.8.0 (Phase 7.2)
-- `d9a9656` - Merge pull request #16 (Phase 7.2)
-- `5c4b4d2` - fix: Correct password hash for "capy"
-- `f2af308` - feat: Add password gate with session management (Phase 7.2 Part 2)
-- `ba92447` - fix: Center preloader spinner
-- `6f57f6e` - feat: Add preloader animation (Phase 7.2 Part 1)
-
-### v5.7.0 (Phase 7.1)
-- `a8fa481` - feat: Add FlossApp.start() API (Phase 7.1)
-
-### v5.5.0 (MP4 Export Offline)
-- `c68e352` - feat: Bundle MP4 export dependencies with Rollup
 
 ## Architecture Decisions
 
+### Single Entry Point (v5.9.0)
+- **Decision:** One HTML file only (`index.html`)
+- **Why:** Eliminate code duplication, maintenance burden
+- **Enforced by:** CLAUDE.md "Single Entry Point Rule (Hard Invariant)"
+
 ### Core/Shell Separation (v5.7.0)
-- **Decision:** Strict separation between Core and Shell responsibilities
-- **Why:** Enables future App Shell (preloader, password gate) without touching core logic
-- **Impact:** Core stays clean, shell handles all startup/environment concerns
-- **Reference:** CLAUDE.md → "Architecture Integrity Rule (Core vs Shell)"
+- **Decision:** Strict separation between Core and Shell
+- **Why:** Enables App Shell without touching core logic
+- **Reference:** CLAUDE.md → "Architecture Integrity Rule"
 
-### Rollup Hybrid Approach (Approved)
-- **Decision:** Bundle 4 small modules, copy h264-mp4-encoder UMD
-- **Why:** h264-mp4-encoder already has pre-built bundle with WASM
-- **Impact:** 2.8 MB total, 100% offline MP4 export
-
-### Skip FFmpeg (Documented)
-- **Decision:** Don't bundle @ffmpeg/ffmpeg, @ffmpeg/util
-- **Why:** Requires SharedArrayBuffer (HTTPS only, not file://)
-- **Impact:** h264-mp4-encoder sufficient for MP4 export
-
-## Known Issues
-None
+### Rollup Hybrid Approach
+- **Decision:** Bundle app modules, external globals for THREE.js
+- **Impact:** Single IIFE bundle (704KB) for file:// mode
 
 ---
 
-## 🎨 UX & Visual Polish – Current Known Issues
+## Known Issues
 
-### 1. Coloris Color Picker UX Problems
+### Coloris Color Picker UX
 
 **Severity:** LOW (functional but has edge-case bugs)
-**Status:** Documented for future UX polish phase
 
 **Symptoms:**
 - Color picker sometimes closes immediately on first click
 - Gradient selector occasionally non-responsive
-- Hue/alpha sliders don't always register clicks
-- Inconsistent behavior across sessions
 
-**History:**
-- v5.4.0-v5.4.6: Multiple fix attempts (event handlers, timing, delegation)
-- Result: Improved but still has edge-case issues
-- Decision: Move on for now, evaluate alternatives in future UX polish phase
+**Workaround:** Multiple clicks usually work.
 
-**Workaround:** Multiple clicks usually work. Refresh page if picker becomes unresponsive.
-
-**Future Action:** Evaluate alternative color picker libraries (see "UX Polish – Future Planned Tasks" below)
+**Future Action:** Evaluate alternative color picker libraries.
 
 ---
 
-## 🎨 UX Polish – Future Planned Tasks
+## Potential Future Work
 
-**Phase: UX Polish (LOW PRIORITY)**
-
-### Task Group 1: Color Picker Replacement
-
-- [ ] Evaluate 3-4 alternative color picker libraries
-  - Pickr, vanilla-picker, iro.js, native `<input type="color">`
-- [ ] Create comparison table (size, features, UX, offline-compatibility)
-- [ ] Test top 2 candidates in development branch
-- [ ] Replace Coloris if better option found
-- [ ] Vendor new library locally (maintain offline-first principle)
-- [ ] Update all color input components across codebase
-
-**Estimated Effort:** 2-3 sessions
-**Blockers:** None (can start anytime after Phase 6)
-
----
-
-### Task Group 2: General UI/UX Improvements
-
-- [ ] Slider controls audit
-  - Consistent styling across all sliders
-  - Touch-friendly hit targets
-  - Value display improvements
-- [ ] Text input enhancements
-  - Better responsiveness
-  - Character counter
-  - Undo/redo support
-- [ ] Keyboard shortcuts
-  - Visibility (help overlay)
-  - Customization support
-- [ ] Tooltip system
-  - Context-sensitive help for all settings
-  - Keyboard shortcut hints
-- [ ] Accessibility improvements
-  - ARIA labels for screen readers
-  - Keyboard navigation (tab order)
-  - High contrast mode support
-
-**Estimated Effort:** 2-3 sessions
-**Blockers:** None (can start anytime after Phase 6)
-
----
-
-**UX Polish Total Estimated Effort:** 4-6 sessions
-**When to Start:** Optional future work - core functionality is complete
-
-**References:**
-- CLAUDE.md - "Future Enhancements" sections
-- PLUGIN_SPEC.md - Effect development API
+1. **Bundle gifenc** for offline GIF export
+2. **Color picker replacement** (evaluate Pickr, vanilla-picker, iro.js)
+3. **Additional effects** (more kinetic typography variations)
+4. **Custom font upload** support
 
 ---
 
 ## Blockers
+
 None
-
-## Potential Future Work
-
-These are optional enhancements, not required for core functionality:
-
-1. **Bundle gifenc** for offline GIF export (currently uses CDN)
-2. **UX Polish** (see above) - color picker replacement, general UI improvements
-
----
-
-### 4. App Shell & Password Gate (Future Enhancement)
-
-**Goal:** Create a unified loading experience with optional password gate for online deployment.
-
-**Requirements:**
-- ✅ **One unified app** - Works in both file:// and https:// modes without code duplication
-- ✅ **file:// mode:** Preloader animation only, no password
-- ✅ **https:// mode:** Preloader + password gate, app starts after successful entry
-
-**Architecture:**
-- App Shell handles:
-  - Environment detection (file:// vs https://)
-  - Preloader animation (Floss logo)
-  - Password gate UI (online only)
-  - Explicit call to `FlossApp.start({ mode })`
-- Floss App:
-  - No built-in auth logic
-  - Starts only when shell invokes start()
-  - Mode-agnostic implementation
-
-**Security Clarification:**
-- ⚠️ Password gate is a **UX/access gate**, NOT a security measure
-- No server/backend = no real authentication
-- Client-side password can be bypassed by technical users
-- Acceptable for: Private demos, deterring casual users
-- NOT for: Protecting confidential data, security-critical access
-
-**Planned Scope:**
-- Define **Phase 7: App Shell & Loading/Password Screen** (placeholder)
-- Implement preloader animation
-- Implement password gate UI (online mode)
-- Refactor app initialization to use explicit start() API
-- Test both modes (file:// and https://)
-
-**Estimated Effort:** 2-3 sessions
-**Blockers:** None (can start after v5.5.0)
-**Priority:** LOW (optional enhancement)
-
-**References:**
-- PHASE_OVERVIEW.md → "App Shell & Auth Gate (Planned Architecture)"
-- CLAUDE.md → "App Shell & Auth Gate - Rules"
