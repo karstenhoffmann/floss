@@ -4,10 +4,10 @@
  */
 
 export const VERSION = {
-    number: '5.9.6',
-    commit: 'chore: Repository audit & cleanup',
+    number: '5.9.7',
+    commit: 'chore: Safe cleanup & guardrails',
     date: '2025-11-25',
-    time: '12:00'
+    time: '23:50'
 };
 
 export default VERSION;

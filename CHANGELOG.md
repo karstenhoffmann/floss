@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [5.9.7] - 2025-11-25
+
+### Safe Cleanup & Guardrails
+
+#### Removed
+- `lib/three.min.js` - 13-byte stub file (obsolete)
+
+#### Changed
+- README.md: Removed obsolete reference to `index-iife.html`
+- README.md: Added all 5 effects to documentation
+
+#### Added
+- CLAUDE.md: CSS Asset Invariant (rule #7)
+- CLAUDE.md: Module Size Guideline (rule #8)
+- CLAUDE.md: README Sync Rule (rule #9)
+- CLAUDE.md: lib/ Directory Invariant (rule #10)
+
+---
+
 ## [5.9.6] - 2025-11-25
 
 ### Repository Audit & Cleanup

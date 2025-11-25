@@ -56,7 +56,6 @@ File: index.html
 - ✅ MP4 video export (offline)
 - ✅ Works on air-gapped machines
 
-> **Note:** `index-iife.html` is deprecated and only redirects to `index.html`.
 
 ## 🚀 Local Development
 
@@ -116,8 +115,11 @@ npx serve
 ### 1. Choose an Effect
 
 Use the dropdown in the toolbar to select an effect:
-- 🌀 **Endless** - Infinite scrolling text on torus knot (currently available)
-- More effects coming soon!
+- 🌀 **Endless** - Infinite scrolling text on torus knot
+- ⚡ **Glitch** - Digital glitch distortion effect
+- ✨ **Particles** - Particle-based text dissolution
+- 🌊 **Wave Plane** - Wavy text on animated plane
+- 🔮 **Sphere Text** - Text mapped onto rotating sphere
 
 ### 2. Adjust Settings
 
@@ -206,6 +208,22 @@ Infinite scrolling text mapped onto a torus knot geometry with depth fog. Inspir
 - Text: Short words (3-8 letters)
 - Tile Repeats: 8-15 for smooth scroll
 - Animation Speed: 0.3-0.6 for hypnotic effect
+
+### ⚡ Glitch
+
+Digital glitch distortion with RGB shift, scanlines, and noise. Uses post-processing for authentic CRT/digital artifact effects.
+
+### ✨ Particles
+
+Text dissolves into animated particles with customizable lifetime, movement patterns, and color transitions.
+
+### 🌊 Wave Plane
+
+Text displayed on an undulating plane with configurable wave amplitude and frequency.
+
+### 🔮 Sphere Text
+
+Text mapped onto a 3D sphere with rotation controls and customizable mapping.
 
 ## 🧩 Browser Compatibility
 

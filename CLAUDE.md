@@ -276,6 +276,35 @@ If a new approach is needed:
 Never maintain two versions of the same thing.
 ```
 
+### 7. CSS Asset Invariant
+```
+Every CSS file in styles/ must either:
+- Be linked in index.html, OR
+- Be documented as "dynamically loaded" or "legacy - do not delete"
+Unused CSS files should be removed in dedicated cleanup phases after analysis.
+```
+
+### 8. Module Size Guideline
+```
+JS modules should ideally stay under ~500 lines.
+If significantly larger: Plan modularization in a dedicated phase.
+This is a guideline, not an automatic trigger for refactoring.
+```
+
+### 9. README Sync Rule
+```
+After major features or structural changes:
+- Update effects list and entry points in README.md
+- Remove obsolete references (e.g., deleted files)
+```
+
+### 10. lib/ Directory Invariant
+```
+No stub files or empty placeholders in lib/.
+Every file must have a documented purpose or be marked "legacy/optional".
+Obsolete files should be removed in cleanup phases.
+```
+
 ---
 
 ## ✅ Session Start Checklist
