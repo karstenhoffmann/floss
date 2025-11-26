@@ -1,37 +1,35 @@
 # Current Status
 
-**Current Version:** 5.9.6
-**Last Major Milestone:** v5.9.6 - Repository Audit & Cleanup
+**Current Version:** 5.9.7
+**Last Major Milestone:** v5.9.7 - Safe Cleanup & Guardrails
 **Status:** Phase 7.3 complete ✅ (Single Entry Point achieved)
 
 *Note: This file describes the project state on the main branch, independent of temporary feature branches.*
 
 ---
 
-## Last Merged Work (v5.9.6)
+## Last Merged Work (v5.9.7)
 
-### Completed: Repository Audit & Cleanup
+### Completed: Safe Cleanup & Guardrails
 
 **What was done:**
-1. Removed obsolete files:
-   - `index-iife.html` (redundant after Single Entry Point)
-   - `js/app-bundle-iife.js` (replaced by Rollup bundle)
-   - `build-iife-bundle.sh` (obsolete shell script)
-   - `lib/canvas-record/index.js` (empty file)
+1. Removed obsolete stub file:
+   - `lib/three.min.js` (13-byte stub, obsolete)
 
-2. Updated CLAUDE.md with:
-   - Single Entry Point Rule (Hard Invariant)
-   - Hard Invariants (Audit-Derived Rules)
-   - Updated App Shell status to "Implemented"
+2. Updated README.md:
+   - Removed reference to deleted `index-iife.html`
+   - Added all 5 effects (Endless, Glitch, Particles, Wave Plane, Sphere Text)
 
-3. Synchronized service-worker.js:
-   - CACHE_NAME updated to v5.9.6
-   - Added missing assets to cache list
+3. Added new guardrails to CLAUDE.md:
+   - CSS Asset Invariant
+   - Module Size Guideline
+   - README Sync Rule
+   - lib/ Directory Invariant
 
-4. Updated all documentation:
-   - PHASE_OVERVIEW.md
+4. Synchronized versions (5.9.7):
+   - js/version.js
+   - service-worker.js CACHE_NAME
    - CURRENT_STATUS.md
-   - CHANGELOG.md
 
 ---
 
@@ -66,6 +64,7 @@
 
 | Version | Phase | Description |
 |---------|-------|-------------|
+| 5.9.7 | 7.3+ | Safe Cleanup & Guardrails |
 | 5.9.6 | 7.3+ | Repository Audit & Cleanup |
 | 5.9.0 | 7.3 | Single HTML Entry (IIFE Bundle) |
 | 5.8.0 | 7.2 | App Shell UI (Preloader + Password Gate) |

@@ -35,6 +35,28 @@ Ready to continue. What would you like to work on?
 
 ---
 
+## 🧠 Problem-Solving Principle: Prefer Robust Defaults
+
+When choosing between approaches, prefer simple universal solutions over complex conditional ones - when the cost tradeoff allows.
+
+**Ask:** "Is the cost of 'always do X' acceptable?"
+- If yes → universal approach (simpler, no edge cases, no maintenance)
+- If no → conditional approach (accept the maintenance burden)
+
+**Apply when:**
+- Cost of the action is low (seconds, not minutes)
+- Cost of forgetting is high (debugging, broken deployments)
+- Conditions would require ongoing maintenance
+
+**Don't apply when:**
+- Action is expensive (long-running tests, heavy builds)
+- Precision matters (security, access control)
+- Universal action has harmful side effects
+
+Applies to code, architecture, rules, and solutions proposed in sessions.
+
+---
+
 ## 📂 Status File Rules
 
 **CRITICAL: Status files are branch-neutral and describe the main branch state**
@@ -245,11 +267,9 @@ When adding new JavaScript or CSS files, add them to `service-worker.js` ASSETS_
 
 ### 3. Bundle Rebuild Invariant
 ```
-Changes to js/app.js, js/core/*, js/effects/*, js/ui/*, js/utils/*
-→ requires npm run bundle:app
-→ commit updated floss-app.iife.js
+Any change to JavaScript files in js/ → run npm run bundle:app → commit updated floss-app.iife.js
 ```
-The IIFE bundle must be regenerated after any application code changes.
+The IIFE bundle serves file:// mode. Always rebuild before committing JS changes. Takes ~1 second.
 
 ### 4. Documentation Freshness Rule
 ```
@@ -274,6 +294,35 @@ If a new approach is needed:
 1. Modify existing file, OR
 2. Replace existing file entirely
 Never maintain two versions of the same thing.
+```
+
+### 7. CSS Asset Invariant
+```
+Every CSS file in styles/ must either:
+- Be linked in index.html, OR
+- Be documented as "dynamically loaded" or "legacy - do not delete"
+Unused CSS files should be removed in dedicated cleanup phases after analysis.
+```
+
+### 8. Module Size Guideline
+```
+JS modules should ideally stay under ~500 lines.
+If significantly larger: Plan modularization in a dedicated phase.
+This is a guideline, not an automatic trigger for refactoring.
+```
+
+### 9. README Sync Rule
+```
+After major features or structural changes:
+- Update effects list and entry points in README.md
+- Remove obsolete references (e.g., deleted files)
+```
+
+### 10. lib/ Directory Invariant
+```
+No stub files or empty placeholders in lib/.
+Every file must have a documented purpose or be marked "legacy/optional".
+Obsolete files should be removed in cleanup phases.
 ```
 
 ---

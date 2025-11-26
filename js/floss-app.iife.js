@@ -12422,10 +12422,10 @@ return ret;
      */
 
     const VERSION = {
-        number: '5.9.4',
-        commit: 'fix: Add util shim for canvas-record FFmpeg',
-        date: '2025-11-24',
-        time: '23:00'
+        number: '5.9.8',
+        commit: 'docs: Add problem-solving principle',
+        date: '2025-11-26',
+        time: '00:15'
     };
 
     /**
