@@ -6,7 +6,7 @@
  * See CLAUDE.md → "Version Sync Invariant"
  */
 
-const CACHE_NAME = 'floss-v5.9.7';
+const CACHE_NAME = 'floss-v5.9.8';
 
 // Assets to cache (alphabetically sorted by category)
 const ASSETS_TO_CACHE = [

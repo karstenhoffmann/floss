@@ -35,6 +35,28 @@ Ready to continue. What would you like to work on?
 
 ---
 
+## 🧠 Problem-Solving Principle: Prefer Robust Defaults
+
+When choosing between approaches, prefer simple universal solutions over complex conditional ones - when the cost tradeoff allows.
+
+**Ask:** "Is the cost of 'always do X' acceptable?"
+- If yes → universal approach (simpler, no edge cases, no maintenance)
+- If no → conditional approach (accept the maintenance burden)
+
+**Apply when:**
+- Cost of the action is low (seconds, not minutes)
+- Cost of forgetting is high (debugging, broken deployments)
+- Conditions would require ongoing maintenance
+
+**Don't apply when:**
+- Action is expensive (long-running tests, heavy builds)
+- Precision matters (security, access control)
+- Universal action has harmful side effects
+
+Applies to code, architecture, rules, and solutions proposed in sessions.
+
+---
+
 ## 📂 Status File Rules
 
 **CRITICAL: Status files are branch-neutral and describe the main branch state**
@@ -245,11 +267,9 @@ When adding new JavaScript or CSS files, add them to `service-worker.js` ASSETS_
 
 ### 3. Bundle Rebuild Invariant
 ```
-Changes to js/app.js, js/core/*, js/effects/*, js/ui/*, js/utils/*
-→ requires npm run bundle:app
-→ commit updated floss-app.iife.js
+Any change to JavaScript files in js/ → run npm run bundle:app → commit updated floss-app.iife.js
 ```
-The IIFE bundle must be regenerated after any application code changes.
+The IIFE bundle serves file:// mode. Always rebuild before committing JS changes. Takes ~1 second.
 
 ### 4. Documentation Freshness Rule
 ```
